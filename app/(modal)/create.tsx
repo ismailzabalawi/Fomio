@@ -18,7 +18,7 @@ import { BlockEditorProvider, useBlockEditor, TitleInput, BottomToolbar } from '
 import { useTheme } from '../../lib/theme/theme';
 import { Plus, Image, ListBullets, ListNumbers, TextB, TextItalic, Link, TextStrikethrough, Keyboard as KeyboardIcon } from 'phosphor-react-native';
 
-type ThemeMode = 'light' | 'dark' | 'reading';
+type ThemeMode = 'light' | 'dark' | 'reader';
 
 interface ThemeColors {
   background: string;
@@ -49,7 +49,7 @@ const themeColors: Record<ThemeMode, ThemeColors> = {
     publishButton: '#0A84FF',
     primary: '#0A84FF',
   },
-  reading: {
+  reader: {
     background: '#F2F2F7',
     text: '#1C1C1E',
     placeholder: '#8E8E93',
