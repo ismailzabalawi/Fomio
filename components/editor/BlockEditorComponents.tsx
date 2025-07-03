@@ -36,7 +36,7 @@ export interface Block {
   attributes?: Record<string, any>;
 }
 
-type ThemeMode = 'light' | 'dark' | 'reading';
+type ThemeMode = 'light' | 'dark' | 'reader';
 
 interface ThemeColors {
   background: string;
@@ -58,7 +58,7 @@ const themeColors: Record<ThemeMode, ThemeColors> = {
     secondaryText: '#8E8E93',
     border: '#2C2C2E',
   },
-  reading: {
+  reader: {
     background: '#FAF4E6',
     text: '#2E2C28',
     secondaryText: '#6C6A67',
