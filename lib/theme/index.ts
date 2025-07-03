@@ -1,6 +1,4 @@
-import { type Theme } from '@gluestack-ui/themed';
 import { config } from './theme.config';
-import { readerModeConfig } from './reader-mode.config';
 // Export the theme provider and hook
 export {
   ThemeProvider,
