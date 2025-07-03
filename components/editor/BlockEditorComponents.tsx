@@ -26,7 +26,6 @@ export type BlockType =
   | 'mediaText'
   | 'embed'
   | 'video'
-  | 'embed'
   | 'code';
 
 export interface Block {
