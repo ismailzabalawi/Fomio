@@ -1,0 +1,61 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can [Manifesto.md](mdc:documentation/Vision/Manifesto.md) [AppStructure.md](mdc:documentation/Vision/AppStructure.md) 
+- You can use markdown but dont have to
+Introduction
+
+This document establishes the fundamental rules and guiding principles for the Fomio project. It is designed to ensure that every team member—across all personas—aligns with our vision of creating a community-first, privacy-respecting, and user-empowering platform. These rules are the cornerstone of our development process and decision-making.
+
+Core Principles
+	•	User Empowerment & Freedom
+Every feature and decision prioritizes the user’s ability to control their experience. We commit to minimal censorship, transparent moderation, and providing tools that empower community self-governance.
+	•	Transparency & Open Communication
+All major decisions, updates, and changes must be clearly documented and shared. Regular cross-team communication is essential for maintaining alignment with the project’s vision.
+	•	Privacy-First Approach
+Safeguarding user data and privacy is non-negotiable. Our design and development processes ensure that user information is handled with the highest standards of confidentiality and security.
+	•	Simplicity & Elegance
+We strive for a clean, intuitive, and fast user experience. Our design should feel modern and effortless, similar to the clarity and speed found in apps like Telegram.
+	•	Modular & Scalable Architecture
+The project is built with flexibility in mind. Our structure—organized as Hubs → Terets → Bytes—ensures that the platform can grow and evolve seamlessly over time.
+	•	Community-Driven Development
+Early adopters and community feedback shape our evolution. Every update should consider the real needs and challenges of our user base.
+	•	Innovation & Agility
+We encourage creative solutions and remain agile in our approach, continuously adapting to new ideas and emerging trends.
+
+Roles & Responsibilities
+	•	Visionary:
+Sets the overall philosophy and long-term direction. Responsible for defining the Manifesto, AppStructure, and other guiding documents.
+	•	UI/UX Persona:
+Translates our vision into intuitive, user-friendly designs that embody the project’s principles.
+	•	Frontend Persona:
+Constructs the mobile app’s shell and flow, ensuring a seamless and engaging interface.
+	•	API Engineer Persona:
+Bridges the frontend with the backend by efficiently mapping and integrating data via REST and GraphQL interfaces.
+	•	Product Engineer Persona:
+Focuses on enhancing performance, caching, and overall user experience to ensure that the app remains responsive and reliable.
+	•	Community Architect:
+Designs the scalable community logic, including moderation, role management, and feedback systems that foster a healthy online environment.
+
+Documentation & Communication
+	•	Centralized Documentation:
+All guiding documents, updates, and decisions should be stored in a well-organized structure (e.g., /Documentation/Vision/).
+	•	Regular Updates:
+Cross-team communication is critical. Regular status updates and feedback loops are required to ensure everyone is aligned with the project’s vision.
+	•	Consistent Documentation Standards:
+Use clear, concise, and accessible language in all documents. Every change should be accompanied by appropriate documentation.
+
+Quality & Testing
+	•	High Standards:
+Maintain a commitment to high-quality, well-documented code and design. Regular reviews and testing cycles are mandatory.
+	•	User-Centric Testing:
+Validate every feature through user testing to ensure it meets the community’s needs and maintains the platform’s core values.
+
+Final Note
+
+These .cursorrules represent the foundational mindset and operational practices for the Fomio project. By adhering to these guidelines, all contributors can help ensure that we deliver a platform that is not only innovative and scalable but also true to our mission of empowering communities and championing user freedom.

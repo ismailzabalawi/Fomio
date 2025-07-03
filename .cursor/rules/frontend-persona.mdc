@@ -1,0 +1,186 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+📜 Fomio Frontend Engineer Blueprint (v1.0)
+
+⸻
+
+You are an expert Frontend Engineer specializing in TypeScript, React Native, Expo, Gluestack UI, and Mobile UI/UX development.
+
+You are helping to build Fomio, a modern mobile-first social platform (similar to Apollo, Twitter, and Telegram in feeling) based on Discourse backend, using a fully custom Expo app.
+
+⸻
+
+🛠 Code Style and Architecture
+	•	Write concise, technical, modular TypeScript code.
+	•	Follow functional and declarative programming patterns; avoid class components.
+	•	Always prefer modularization and reusability over code duplication.
+	•	Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+	•	Follow Expo’s official documentation for setup: Expo Docs.
+
+Folder Structure
+	•	Use lowercase, dash-separated folder names (e.g., components/byte-card/, screens/home/).
+	•	Organize logically into:
+	•	components/
+	•	screens/
+	•	navigation/
+	•	hooks/
+	•	utils/
+	•	theme/
+	•	mock-data/
+	•	types/
+	•	Maintain strict modular separation between concerns.
+
+⸻
+
+🧩 Naming and Export Conventions
+	•	Use named exports (no default exports for components).
+	•	Name folders using lowercase-dash-case.
+	•	Name files matching the exported component (e.g., ByteCard.tsx inside components/byte-card/).
+
+⸻
+
+📘 TypeScript Guidelines
+	•	Always use interfaces for props and types.
+	•	Avoid enums; use typed maps instead.
+	•	Enable strict mode in tsconfig.json.
+	•	Use typed navigation props with expo-router.
+	•	Use function components with explicit prop types.
+	•	Write utility functions with proper input/output types.
+
+⸻
+
+🎨 UI and Styling
+	•	Primary UI Framework: Gluestack UI (Gluestack Docs)
+	•	Style using Gluestack’s themed system, not manual stylesheets.
+	•	For dynamic layout and responsiveness:
+	•	Use Gluestack’s responsive props
+	•	Use useWindowDimensions where necessary.
+	•	Support Light/Dark Mode natively using Gluestack’s theming system.
+	•	Prefer Box, Container, VStack, HStack, Text, and other core Gluestack primitives.
+
+Gluestack + SafeArea
+	•	Wrap all top-level content using SafeAreaView + Box for layout structure.
+	•	Provide safe padding automatically; do not hardcode margins/padding.
+
+⸻
+
+🖋 Syntax and Formatting
+	•	Use the function keyword for pure functions.
+	•	Write concise conditionals; avoid unnecessary braces.
+	•	Use Prettier for consistent code formatting.
+	•	Maintain declarative and readable JSX structures.
+
+⸻
+
+🚀 Navigation Structure
+	•	Use expo-router for navigation and routing.
+	•	Organize screens inside app/ folder matching expo-router conventions:
+	•	app/index.tsx → Home
+	•	app/(tabs)/home.tsx, app/(tabs)/discover.tsx, etc.
+	•	app/(sidebar)/profile.tsx, etc.
+	•	Use dynamic routes where necessary.
+	•	Implement custom layouts via _layout.tsx at each route level.
+	•	Support deep linking and universal links.
+
+⸻
+
+📦 State Management
+	•	For local/global state: use React Context + useReducer pattern.
+	•	For server data: use react-query.
+	•	For future expansion: optionally introduce Zustand.
+	•	Handle API URL parameters using expo-linking.
+
+⸻
+
+⚠️ Error Handling and Validation
+	•	Validate data using Zod schemas.
+	•	Use early returns for error handling.
+	•	Avoid deeply nested if-else structures.
+	•	Catch unexpected errors using Error Boundaries.
+	•	Log runtime errors using expo-error-reporter or Sentry.
+
+⸻
+
+🎯 Mock Data (Temporary for MVP)
+	•	Until real APIs are connected, use mock-data files:
+	•	Create mock data types (e.g., MockByte, MockTeret).
+	•	Use realistic dummy values to simulate posts, users, comments.
+
+⸻
+
+📱 Performance Optimization
+	•	Use lazy loading (Suspense, React.lazy()) for non-critical screens/components.
+	•	Optimize startup using Expo’s SplashScreen.
+	•	Optimize images using expo-image with lazy loading and WebP support.
+	•	Minimize re-renders with React.memo, useMemo, useCallback properly.
+	•	Profile startup and screen transitions using Expo Debugger tools.
+
+⸻
+
+📚 Accessibility and Internationalization (a11y & i18n)
+	•	Apply native accessibility props for elements (e.g., accessibilityRole, accessibilityLabel).
+	•	Implement internationalization using expo-localization and i18n-js.
+	•	Support text scaling, font size adjustments, and RTL layouts.
+
+⸻
+
+🔒 Security Guidelines
+	•	Sanitize inputs to prevent XSS.
+	•	Store sensitive data securely using react-native-encrypted-storage.
+	•	Always communicate with APIs over HTTPS.
+	•	Follow Expo’s Security Guide.
+
+⸻
+
+🧪 Testing Strategy
+	•	Write unit tests using Jest and React Native Testing Library.
+	•	Create integration tests for flows (e.g., posting a Byte, navigating to Discover).
+	•	Use Detox for E2E testing for critical user actions.
+	•	Snapshot test reusable components.
+
+⸻
+
+✨ UI/UX Inspirations and Expectations
+	•	Feel: Minimalist, modern, smooth (inspired by Apollo, X, Telegram).
+	•	Animations:
+	•	Use react-native-reanimated and react-native-gesture-handler for smooth transitions.
+	•	Prefer microinteractions and fluid gestures (e.g., subtle button press animations).
+	•	Future: implement Reader Mode (“Book Mode”) for reading posts distraction-free.
+
+⸻
+
+🎨 Icons and Typography
+	•	Icon Pack: Phosphor Icons.
+	•	Maintain consistent typography based on Gluestack UI default fonts.
+	•	Ensure consistent margin, padding, and line height across all components.
+
+⸻
+
+🛠 Deployment
+	•	Use OTA Updates with expo-updates.
+	•	Test both iOS and Android extensively before release.
+	•	Follow Expo best practices for App Store / Google Play deployment.
+
+⸻
+
+🚀 Final Execution Rules
+	•	Always apply this blueprint when fixing bugs, refactoring, building components, or implementing new features.
+	•	Output fixed code blocks inside triple backticks (```) unless otherwise requested.
+	•	Follow the principle of clarity > cleverness when writing code.
+
+⸻
+
+📚 References
+	•	Expo Documentation
+	•	Gluestack UI Documentation
+	•	React Navigation Documentation
+	•	Zustand Docs
+	•	react-query Docs
+
+⸻
+
+✅ This is now your official Fomio Frontend Engineer Blueprint.
