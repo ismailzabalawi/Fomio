@@ -1,84 +1,125 @@
 import React from 'react';
-import { Box, Heading, Text } from '@gluestack-ui/themed';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 
 export interface CardProps {
   children: React.ReactNode;
-  className?: string;
+  style?: ViewStyle;
 }
 
 export interface CardHeaderProps {
   children: React.ReactNode;
-  className?: string;
+  style?: ViewStyle;
 }
 
 export interface CardTitleProps {
   children: React.ReactNode;
-  className?: string;
+  style?: TextStyle;
 }
 
 export interface CardDescriptionProps {
   children: React.ReactNode;
-  className?: string;
+  style?: TextStyle;
 }
 
 export interface CardContentProps {
   children: React.ReactNode;
-  className?: string;
+  style?: ViewStyle;
 }
 
 export interface CardFooterProps {
   children: React.ReactNode;
-  className?: string;
+  style?: ViewStyle;
 }
 
-export function Card({ children, className, ...props }: CardProps) {
+export function Card({ children, style }: CardProps) {
   return (
-    <Box
-      className={className}
-      {...props}
-    >
+    <View style={[styles.card, style]}>
       {children}
-    </Box>
+    </View>
   );
 }
 
-export function CardHeader({ children, className, ...props }: CardHeaderProps) {
+export function CardHeader({ children, style }: CardHeaderProps) {
   return (
-    <Box className={className} {...props}>
+    <View style={[styles.header, style]}>
       {children}
-    </Box>
+    </View>
   );
 }
 
-export function CardTitle({ children, className, ...props }: CardTitleProps) {
+export function CardTitle({ children, style }: CardTitleProps) {
   return (
-    <Heading className={className} {...props}>
-      {children}
-    </Heading>
-  );
-}
-
-export function CardDescription({ children, className, ...props }: CardDescriptionProps) {
-  return (
-    <Text className={className} {...props}>
+    <Text style={[styles.title, style]}>
       {children}
     </Text>
   );
 }
 
-export function CardContent({ children, className, ...props }: CardContentProps) {
+export function CardDescription({ children, style }: CardDescriptionProps) {
   return (
-    <Box className={className} {...props}>
+    <Text style={[styles.description, style]}>
       {children}
-    </Box>
+    </Text>
   );
 }
 
-export function CardFooter({ children, className, ...props }: CardFooterProps) {
+export function CardContent({ children, style }: CardContentProps) {
   return (
-    <Box className={className} {...props}>
+    <View style={[styles.content, style]}>
       {children}
-    </Box>
+    </View>
   );
 }
+
+export function CardFooter({ children, style }: CardFooterProps) {
+  return (
+    <View style={[styles.footer, style]}>
+      {children}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    padding: 16,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  header: {
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  description: {
+    fontSize: 14,
+    color: '#6b7280',
+    lineHeight: 20,
+  },
+  content: {
+    // No default styles for content
+  },
+  footer: {
+    marginTop: 12,
+  },
+});
 

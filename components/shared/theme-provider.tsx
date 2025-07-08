@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GluestackUIProvider } from '@gluestack-ui/themed';
-import config from '../../theme/gluestack-ui.config';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -68,9 +66,7 @@ export function ThemeProvider({
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
-      <GluestackUIProvider config={config} colorMode={isDark ? 'dark' : 'light'}>
-        {children}
-      </GluestackUIProvider>
+      {children}
     </ThemeProviderContext.Provider>
   );
 }
