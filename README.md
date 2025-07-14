@@ -22,7 +22,7 @@ A mobile-native version of the Fomio social media platform, migrated from Next.j
 ### Main App Flow
 - **Feed** (`/feed`) - Main content feed with bytes
 - **Byte Details** (`/feed/[byteId]`) - Individual byte view with comments
-- **Compose** (`/compose`) - Create new bytes
+- **Compose** (`/(compose)`) - Create new bytes
 - **Profile** (`/(profile)`) - User profile and settings
 
 ## 🛠 Tech Stack
