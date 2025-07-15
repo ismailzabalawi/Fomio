@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useTheme } from '../../components/shared/theme-provider';
+import { HeaderBar } from '../../components/nav';
+import { GearSix } from 'phosphor-react-native';
 
 const user = {
   name: 'John Doe',
@@ -31,6 +34,23 @@ const recentPosts = [
 ];
 
 export default function ProfileScreen() {
+  const { isDark } = useTheme();
+  const colors = {
+    background: isDark ? '#18181b' : '#fff',
+    card: isDark ? '#27272a' : '#f8fafc',
+    text: isDark ? '#f4f4f5' : '#1e293b',
+    secondary: isDark ? '#a1a1aa' : '#64748b',
+    accent: isDark ? '#38bdf8' : '#0ea5e9',
+    border: isDark ? '#334155' : '#0ea5e9',
+    divider: isDark ? '#334155' : '#e2e8f0',
+    username: isDark ? '#a1a1aa' : '#64748b',
+    bio: isDark ? '#a1a1aa' : '#475569',
+    statLabel: isDark ? '#a1a1aa' : '#64748b',
+    statNumber: isDark ? '#f4f4f5' : '#1e293b',
+    timestamp: isDark ? '#a1a1aa' : '#94a3b8',
+    editButton: isDark ? '#18181b' : 'transparent',
+  };
+
   const handleBack = () => {
     router.back();
   };
@@ -46,64 +66,71 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity onPress={handleSettings} style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>⚙️</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <HeaderBar
+        title="Profile"
+        leftIcon={undefined}
+        onLeftPress={handleBack}
+        leftA11yLabel="Back"
+        rightIcon={<GearSix size={28} weight="bold" />}
+        onRightPress={handleSettings}
+        rightA11yLabel="Settings"
+        style={{ marginBottom: 4 }}
+      />
 
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.profileHeader}>
             <Image source={{ uri: user.avatar }} style={styles.avatar} />
             <View style={styles.profileInfo}>
-              <Text style={styles.name}>{user.name}</Text>
-              <Text style={styles.username}>{user.username}</Text>
+              <Text style={[styles.name, { color: colors.text }]}>{user.name}</Text>
+              <Text style={[styles.username, { color: colors.username }]}>{user.username}</Text>
             </View>
           </View>
 
-          <Text style={styles.bio}>{user.bio}</Text>
+          <Text style={[styles.bio, { color: colors.bio }]}>{user.bio}</Text>
 
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{user.posts}</Text>
-              <Text style={styles.statLabel}>Posts</Text>
+              <Text style={[styles.statNumber, { color: colors.statNumber }]}>{user.posts}</Text>
+              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Posts</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{user.followers}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
+              <Text style={[styles.statNumber, { color: colors.statNumber }]}>{user.followers}</Text>
+              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Followers</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{user.following}</Text>
-              <Text style={styles.statLabel}>Following</Text>
+              <Text style={[styles.statNumber, { color: colors.statNumber }]}>{user.following}</Text>
+              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Following</Text>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
+          <TouchableOpacity
+            style={[styles.editButton, { borderColor: colors.accent, backgroundColor: colors.editButton }]}
+            onPress={handleEditProfile}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Edit Profile"
+            accessibilityHint="Edit your profile information"
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Text style={[styles.editButtonText, { color: colors.accent }]}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.postsSection}>
-          <Text style={styles.sectionTitle}>Recent Posts</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Posts</Text>
           {recentPosts.map((post) => (
-            <View key={post.id} style={styles.postCard}>
-              <Text style={styles.postContent}>{post.content}</Text>
+            <View key={post.id} style={[styles.postCard, { backgroundColor: colors.card }]}>
+              <Text style={[styles.postContent, { color: colors.text }]}>{post.content}</Text>
               <View style={styles.postActions}>
                 <View style={styles.actionItem}>
-                  <Text style={styles.actionText}>❤️ {post.likes}</Text>
+                  <Text style={[styles.actionText, { color: colors.secondary }]}>❤️ {post.likes}</Text>
                 </View>
                 <View style={styles.actionItem}>
-                  <Text style={styles.actionText}>💬 {post.comments}</Text>
+                  <Text style={[styles.actionText, { color: colors.secondary }]}>💬 {post.comments}</Text>
                 </View>
-                <Text style={styles.timestamp}>{post.timestamp}</Text>
+                <Text style={[styles.timestamp, { color: colors.timestamp }]}>{post.timestamp}</Text>
               </View>
             </View>
           ))}
@@ -116,7 +143,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
@@ -124,19 +150,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   backButton: {
     padding: 8,
   },
   backButtonText: {
     fontSize: 24,
-    color: '#0ea5e9',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1e293b',
   },
   headerActions: {
     flexDirection: 'row',
@@ -171,16 +194,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
   },
   username: {
     fontSize: 16,
-    color: '#64748b',
   },
   bio: {
     fontSize: 16,
-    color: '#475569',
     lineHeight: 24,
     marginBottom: 20,
   },
@@ -195,24 +214,19 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1e293b',
   },
   statLabel: {
     fontSize: 14,
-    color: '#64748b',
     marginTop: 4,
   },
   editButton: {
-    backgroundColor: 'transparent',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#0ea5e9',
   },
   editButtonText: {
-    color: '#0ea5e9',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -222,18 +236,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1e293b',
     marginBottom: 16,
   },
   postCard: {
-    backgroundColor: '#f8fafc',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
   },
   postContent: {
     fontSize: 16,
-    color: '#1e293b',
     lineHeight: 24,
     marginBottom: 12,
   },
@@ -246,11 +257,9 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    color: '#64748b',
   },
   timestamp: {
     fontSize: 12,
-    color: '#94a3b8',
     marginLeft: 'auto',
   },
 });

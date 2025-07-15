@@ -2,8 +2,22 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useTheme } from '../../components/shared/theme-provider';
 
 export default function SignInScreen() {
+  const { isDark } = useTheme();
+  const colors = {
+    background: isDark ? '#18181b' : '#fff',
+    primary: isDark ? '#38bdf8' : '#0ea5e9',
+    text: isDark ? '#f4f4f5' : '#1e293b',
+    secondary: isDark ? '#a1a1aa' : '#64748b',
+    border: isDark ? '#334155' : '#0ea5e9',
+    inputBg: isDark ? '#27272a' : '#fff',
+    inputBorder: isDark ? '#334155' : '#d1d5db',
+    divider: isDark ? '#334155' : '#e2e8f0',
+    label: isDark ? '#f4f4f5' : '#1e293b',
+    disabled: isDark ? '#64748b' : '#64748b',
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +32,7 @@ export default function SignInScreen() {
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      router.replace('/(tabs)');
+      router.replace('/feed');
     }, 1000);
   };
 
@@ -31,57 +45,80 @@ export default function SignInScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: colors.divider }]}>
+        <TouchableOpacity
+          onPress={handleBack}
+          style={styles.backButton}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          accessibilityHint="Go back to previous screen"
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <Text style={[styles.backButtonText, { color: colors.primary }]}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sign In</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Sign In</Text>
         <View style={styles.placeholder} />
       </View>
 
       <View style={styles.content}>
         <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={[styles.label, { color: colors.label }]}>Email</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
             value={email}
             onChangeText={setEmail}
             placeholder="Enter your email"
+            placeholderTextColor={colors.secondary}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={[styles.label, { color: colors.label }]}>Password</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
             value={password}
             onChangeText={setPassword}
             placeholder="Enter your password"
+            placeholderTextColor={colors.secondary}
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
           />
 
           <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.disabledButton]}
+            style={[styles.primaryButton, loading && styles.disabledButton, { backgroundColor: colors.primary }]}
             onPress={handleSignIn}
             disabled={loading}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Sign In"
+            accessibilityHint="Sign in to your Fomio account"
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            <Text style={styles.primaryButtonText}>
+            <Text style={[styles.primaryButtonText, { color: colors.background }]}>
               {loading ? 'Signing In...' : 'Sign In'}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
+            <Text style={[styles.dividerText, { color: colors.secondary }]}>or</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
           </View>
 
-          <TouchableOpacity style={styles.secondaryButton} onPress={handleSignUp}>
-            <Text style={styles.secondaryButtonText}>Create Account</Text>
+          <TouchableOpacity
+            style={[styles.secondaryButton, { borderColor: colors.primary }]}
+            onPress={handleSignUp}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Create Account"
+            accessibilityHint="Go to sign up screen"
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>Create Account</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -92,27 +129,22 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   backButton: {
     padding: 8,
   },
   backButtonText: {
     fontSize: 24,
-    color: '#0ea5e9',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1e293b',
   },
   placeholder: {
     width: 40,
@@ -130,27 +162,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
     marginBottom: 20,
-    backgroundColor: '#ffffff',
   },
   primaryButton: {
-    backgroundColor: '#0ea5e9',
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 20,
   },
   primaryButtonText: {
-    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -165,23 +191,18 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#e2e8f0',
   },
   dividerText: {
     marginHorizontal: 16,
-    color: '#64748b',
     fontSize: 14,
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#0ea5e9',
   },
   secondaryButtonText: {
-    color: '#0ea5e9',
     fontSize: 16,
     fontWeight: '600',
   },

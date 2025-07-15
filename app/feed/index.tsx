@@ -2,6 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { FlatList, RefreshControl, View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { ByteCard } from '../../components/feed';
+import { HeaderBar } from '../../components/nav';
+import { UserCircle } from 'phosphor-react-native';
 
 interface Byte {
   id: string;
@@ -67,7 +70,7 @@ export default function FeedScreen() {
   }, []);
 
   const handleCompose = () => {
-    router.push('/compose');
+    router.push('/(compose)');
   };
 
   const handleProfile = () => {
@@ -75,56 +78,38 @@ export default function FeedScreen() {
   };
 
   const handleBytePress = (byteId: string) => {
-    router.push(`/feed/${byteId}`);
+    router.push({ pathname: '/feed/[byteId]', params: { byteId } });
+  };
+
+  const handleCommentPress = (byteId: string) => {
+    router.push({ pathname: '/feed/[byteId]', params: { byteId, openComments: 'true' } });
   };
 
   const renderByte = ({ item }: { item: Byte }) => (
-    <View style={styles.byteCard}>
-      <View style={styles.byteHeader}>
-        <Image source={{ uri: item.author.avatar }} style={styles.avatar} />
-        <View style={styles.authorInfo}>
-          <Text style={styles.authorName}>{item.author.name}</Text>
-          <Text style={styles.timestamp}>{item.timestamp}</Text>
-        </View>
-      </View>
-
-      <Text style={styles.content}>{item.content}</Text>
-
-      <View style={styles.tagsContainer}>
-        {item.tags.map((tag) => (
-          <Text key={tag} style={styles.tag}>#{tag}</Text>
-        ))}
-      </View>
-
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionText}>❤️ {item.likes}</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionText}>💬 {item.comments}</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionText}>📤</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <ByteCard
+      id={item.id}
+      content={item.content}
+      author={item.author}
+      likes={item.likes}
+      comments={item.comments}
+      tags={item.tags}
+      timestamp={item.timestamp}
+      onPress={handleBytePress}
+      onLike={() => {}}
+      onComment={handleCommentPress}
+      style={{}}
+    />
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Feed</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>🔍</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton} onPress={handleProfile}>
-            <Text style={styles.headerButtonText}>👤</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderBar
+        title="Feed"
+        rightIcon={<UserCircle size={28} weight="bold" />}
+        onRightPress={handleProfile}
+        rightA11yLabel="Profile"
+        style={{ marginBottom: 4 }}
+      />
 
       <FlatList
         data={bytes}
@@ -137,7 +122,15 @@ export default function FeedScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.fab} onPress={handleCompose}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={handleCompose}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="Create Byte"
+        accessibilityHint="Opens the compose screen to create a new Byte"
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -176,71 +169,6 @@ const styles = StyleSheet.create({
   },
   feedList: {
     padding: 16,
-  },
-  byteCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  byteHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  authorInfo: {
-    flex: 1,
-  },
-  authorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#64748b',
-    marginTop: 2,
-  },
-  content: {
-    fontSize: 16,
-    color: '#1e293b',
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 12,
-  },
-  tag: {
-    color: '#0ea5e9',
-    marginRight: 8,
-    marginBottom: 4,
-    fontSize: 14,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  actionText: {
-    fontSize: 14,
-    color: '#64748b',
   },
   fab: {
     position: 'absolute',

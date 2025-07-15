@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useTheme } from '../../components/shared/theme-provider';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +26,16 @@ const onboardingSteps = [
 
 export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
+  const { isDark } = useTheme();
+  const colors = {
+    background: isDark ? '#18181b' : '#fff',
+    primary: isDark ? '#38bdf8' : '#0ea5e9',
+    text: isDark ? '#f4f4f5' : '#1e293b',
+    secondary: isDark ? '#a1a1aa' : '#64748b',
+    indicator: isDark ? '#334155' : '#e2e8f0',
+    activeIndicator: isDark ? '#38bdf8' : '#0ea5e9',
+    buttonText: isDark ? '#fff' : '#fff',
+  };
 
   const handleNext = () => {
     if (currentStep < onboardingSteps.length - 1) {
@@ -39,18 +50,26 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipButtonText}>Skip</Text>
+        <TouchableOpacity
+          onPress={handleSkip}
+          style={styles.skipButton}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Skip"
+          accessibilityHint="Skip onboarding and go to sign up"
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <Text style={[styles.skipButtonText, { color: colors.secondary }]}>Skip</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.stepContainer}>
           <Text style={styles.emoji}>{onboardingSteps[currentStep].emoji}</Text>
-          <Text style={styles.title}>{onboardingSteps[currentStep].title}</Text>
-          <Text style={styles.description}>{onboardingSteps[currentStep].description}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{onboardingSteps[currentStep].title}</Text>
+          <Text style={[styles.description, { color: colors.secondary }]}>{onboardingSteps[currentStep].description}</Text>
         </View>
 
         <View style={styles.indicators}>
@@ -59,7 +78,8 @@ export default function OnboardingScreen() {
               key={index}
               style={[
                 styles.indicator,
-                index === currentStep && styles.activeIndicator,
+                { backgroundColor: colors.indicator },
+                index === currentStep && { backgroundColor: colors.activeIndicator },
               ]}
             />
           ))}
@@ -67,8 +87,16 @@ export default function OnboardingScreen() {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>
+        <TouchableOpacity
+          style={[styles.nextButton, { backgroundColor: colors.primary }]}
+          onPress={handleNext}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel={currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
+          accessibilityHint={currentStep === onboardingSteps.length - 1 ? 'Finish onboarding and go to sign up' : 'Go to next onboarding step'}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <Text style={[styles.nextButtonText, { color: colors.buttonText }]}>
             {currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
           </Text>
         </TouchableOpacity>
@@ -80,7 +108,6 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
@@ -92,7 +119,6 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 16,
-    color: '#64748b',
   },
   content: {
     flex: 1,
@@ -111,13 +137,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1e293b',
     textAlign: 'center',
     marginBottom: 16,
   },
   description: {
     fontSize: 18,
-    color: '#64748b',
     textAlign: 'center',
     lineHeight: 26,
   },
@@ -129,23 +153,20 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#e2e8f0',
     marginHorizontal: 4,
   },
   activeIndicator: {
-    backgroundColor: '#0ea5e9',
+    // This style is now handled by the inline style
   },
   footer: {
     padding: 20,
   },
   nextButton: {
-    backgroundColor: '#0ea5e9',
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   nextButtonText: {
-    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
