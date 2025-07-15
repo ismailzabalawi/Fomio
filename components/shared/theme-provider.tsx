@@ -13,12 +13,14 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
   isDark: boolean;
 };
 
 const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
+  toggleTheme: () => null,
   isDark: false,
 };
 
@@ -59,6 +61,16 @@ export function ThemeProvider({
       } catch (error) {
         console.error('Failed to save theme to storage:', error);
         setTheme(theme);
+      }
+    },
+    toggleTheme: async () => {
+      const newTheme = isDark ? 'light' : 'dark';
+      try {
+        await AsyncStorage.setItem(storageKey, newTheme);
+        setTheme(newTheme);
+      } catch (error) {
+        console.error('Failed to save theme to storage:', error);
+        setTheme(newTheme);
       }
     },
     isDark,

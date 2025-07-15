@@ -70,11 +70,11 @@ export default function FeedScreen() {
   }, []);
 
   const handleCompose = () => {
-    router.push('/(compose)');
+    router.push('/(compose)' as any);
   };
 
   const handleProfile = () => {
-    router.push('/(profile)');
+    router.push('/(profile)' as any);
   };
 
   const handleBytePress = (byteId: string) => {
