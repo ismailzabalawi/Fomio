@@ -121,9 +121,6 @@ export default function ProfileScreen() {
         leftIcon={undefined}
         onLeftPress={handleBack}
         leftA11yLabel="Back"
-        rightIcon={<GearSix size={28} weight="bold" />}
-        onRightPress={handleSettings}
-        rightA11yLabel="Settings"
         style={{ marginBottom: 4 }}
       />
 
@@ -131,7 +128,7 @@ export default function ProfileScreen() {
         <View style={[styles.profileSection, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.profileHeader}>
             <Avatar
-              source={avatarUrl ? { uri: avatarUrl } : undefined}
+              src={avatarUrl || undefined}
               fallback={user?.username?.charAt(0).toUpperCase() || 'U'}
               size="xl"
             />

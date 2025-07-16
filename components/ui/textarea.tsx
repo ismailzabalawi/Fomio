@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ViewStyle,
   TextStyle,
+  StyleProp,
 } from 'react-native';
 
 export interface TextareaProps {
@@ -12,8 +13,8 @@ export interface TextareaProps {
   value?: string;
   onChangeText?: (text: string) => void;
   disabled?: boolean;
-  style?: ViewStyle;
-  inputStyle?: TextStyle;
+  style?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'outline' | 'underlined' | 'rounded';
   numberOfLines?: number;
@@ -32,32 +33,20 @@ export function Textarea({
   numberOfLines = 4,
   maxLength,
 }: TextareaProps) {
-  const containerStyle: ViewStyle[] = [
+  const containerStyle: StyleProp<ViewStyle> = [
     styles.container,
     styles[`${variant}Container` as keyof typeof styles] as ViewStyle,
     styles[`${size}Container` as keyof typeof styles] as ViewStyle,
+    disabled ? styles.disabledContainer : undefined,
+    style,
   ];
-  
-  if (disabled) {
-    containerStyle.push(styles.disabledContainer);
-  }
-  
-  if (style) {
-    containerStyle.push(style);
-  }
 
-  const textInputStyle: TextStyle[] = [
+  const textInputStyle: StyleProp<TextStyle> = [
     styles.input,
     styles[`${size}Input` as keyof typeof styles] as TextStyle,
+    disabled ? styles.disabledInput : undefined,
+    inputStyle,
   ];
-  
-  if (disabled) {
-    textInputStyle.push(styles.disabledInput);
-  }
-  
-  if (inputStyle) {
-    textInputStyle.push(inputStyle);
-  }
 
   return (
     <View style={containerStyle}>

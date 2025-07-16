@@ -128,9 +128,8 @@ class DiscourseApiService {
         'Content-Type': 'application/json',
         'Api-Key': this.config.apiKey || '',
         'Api-Username': this.config.apiUsername || '',
-        ...options.headers,
+        ...(options.headers as Record<string, string> | undefined),
       };
-
       if (this.authToken) {
         headers['Authorization'] = `Bearer ${this.authToken}`;
       }

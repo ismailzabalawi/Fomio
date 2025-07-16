@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ViewStyle,
   TextStyle,
+  StyleProp,
 } from 'react-native';
 
 export interface AvatarProps {
@@ -13,7 +14,7 @@ export interface AvatarProps {
   alt?: string;
   fallback?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 const sizeMap = {

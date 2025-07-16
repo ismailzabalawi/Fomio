@@ -51,8 +51,8 @@ export interface InputProps {
   disabled?: boolean;
   multiline?: boolean;
   numberOfLines?: number;
-  style?: ViewStyle;
-  inputStyle?: TextStyle;
+  style?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'outline' | 'underlined' | 'rounded';
 }

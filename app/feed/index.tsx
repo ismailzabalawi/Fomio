@@ -17,44 +17,60 @@ interface Byte {
   comments: number;
   tags: string[];
   timestamp: string;
+  teretId: string;
+  teretName: string;
+  isLiked: boolean;
+  createdAt: Date;
 }
 
 const mockBytes: Byte[] = [
   {
     id: '1',
-    content: 'Just discovered this amazing new feature! The possibilities are endless. #innovation #tech',
+    content: 'Just discovered this amazing new feature! The possibilities are endless.',
+    teretId: 'react-native',
+    teretName: 'React Native',
     author: {
       name: 'Alex Chen',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     },
     likes: 42,
     comments: 8,
-    tags: ['innovation', 'tech'],
+    isLiked: false,
+    createdAt: new Date(),
     timestamp: '2h ago',
+    tags: ['innovation', 'tech'],
   },
   {
     id: '2',
-    content: 'Sometimes the best code is the code you don\'t write. Keep it simple! #programming #simplicity',
+    content: 'Sometimes the best code is the code you don\'t write. Keep it simple!',
+    teretId: 'programming',
+    teretName: 'Programming',
     author: {
       name: 'Sarah Kim',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     },
     likes: 28,
     comments: 5,
-    tags: ['programming', 'simplicity'],
+    isLiked: true,
+    createdAt: new Date(),
     timestamp: '4h ago',
+    tags: ['programming', 'simplicity'],
   },
   {
     id: '3',
-    content: 'Working on something exciting! Can\'t wait to share it with you all. Stay tuned! #excited #building',
+    content: 'Working on something exciting! Can\'t wait to share it with you all. Stay tuned!',
+    teretId: 'building',
+    teretName: 'Building',
     author: {
       name: 'Mike Johnson',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     },
     likes: 15,
     comments: 3,
-    tags: ['excited', 'building'],
+    isLiked: false,
+    createdAt: new Date(),
     timestamp: '6h ago',
+    tags: ['excited', 'building'],
   },
 ];
 
@@ -85,18 +101,27 @@ export default function FeedScreen() {
     router.push({ pathname: '/feed/[byteId]', params: { byteId, openComments: 'true' } });
   };
 
+  const handleTeretPress = (teretId: string) => {
+    // TODO: Implement navigation to teret page or teret-filtered feed
+    router.push({ pathname: '/feed', params: { teretId } });
+  };
+
   const renderByte = ({ item }: { item: Byte }) => (
     <ByteCard
       id={item.id}
       content={item.content}
+      teretName={item.teretName}
       author={item.author}
       likes={item.likes}
       comments={item.comments}
-      tags={item.tags}
       timestamp={item.timestamp}
-      onPress={handleBytePress}
+      isLiked={item.isLiked}
+      isBookmarked={false}
+      onPress={() => handleBytePress(item.id)}
       onLike={() => {}}
-      onComment={handleCommentPress}
+      onComment={() => handleCommentPress(item.id)}
+      onBookmark={() => {}}
+      onTeretPress={() => handleTeretPress(item.teretId)}
       style={{}}
     />
   );
@@ -121,18 +146,6 @@ export default function FeedScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handleCompose}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="Create Byte"
-        accessibilityHint="Opens the compose screen to create a new Byte"
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }

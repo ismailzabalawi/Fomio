@@ -22,7 +22,6 @@ import {
   MapPin, 
   Globe, 
   Calendar,
-  Mail,
   Check,
   X,
   ArrowLeft
@@ -231,7 +230,7 @@ export default function EditProfileScreen() {
         <View style={[styles.avatarSection, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.avatarContainer}>
             <Avatar
-              source={avatarUrl ? { uri: avatarUrl } : undefined}
+              src={avatarUrl || undefined}
               fallback={user.username.charAt(0).toUpperCase()}
               size="xl"
             />
@@ -259,8 +258,8 @@ export default function EditProfileScreen() {
             <Text style={[styles.fieldLabel, { color: colors.text }]}>Username</Text>
             <Input
               value={user.username}
-              editable={false}
-              style={[styles.input, { opacity: 0.6 }]}
+              disabled={true}
+              style={{ ...styles.input, opacity: 0.6 }}
             />
             <Text style={[styles.fieldHint, { color: colors.secondary }]}>
               Username cannot be changed
@@ -290,8 +289,7 @@ export default function EditProfileScreen() {
               value={formData.bio_raw}
               onChangeText={(value) => handleInputChange('bio_raw', value)}
               placeholder="Tell us about yourself..."
-              style={[styles.textarea]}
-              multiline
+              style={styles.textarea}
               numberOfLines={4}
             />
             <Text style={[styles.fieldHint, { color: colors.secondary }]}>
@@ -313,7 +311,7 @@ export default function EditProfileScreen() {
                 value={formData.location}
                 onChangeText={(value) => handleInputChange('location', value)}
                 placeholder="Where are you located?"
-                style={[styles.input, styles.inputWithIconPadding]}
+                style={{ ...styles.input, ...styles.inputWithIconPadding }}
               />
             </View>
           </View>
@@ -327,7 +325,7 @@ export default function EditProfileScreen() {
                 value={formData.website}
                 onChangeText={(value) => handleInputChange('website', value)}
                 placeholder="https://yourwebsite.com"
-                style={[styles.input, styles.inputWithIconPadding]}
+                style={{ ...styles.input, ...styles.inputWithIconPadding }}
                 keyboardType="url"
                 autoCapitalize="none"
               />
@@ -348,7 +346,7 @@ export default function EditProfileScreen() {
                 value={formData.date_of_birth}
                 onChangeText={(value) => handleInputChange('date_of_birth', value)}
                 placeholder="YYYY-MM-DD"
-                style={[styles.input, styles.inputWithIconPadding]}
+                style={{ ...styles.input, ...styles.inputWithIconPadding }}
               />
             </View>
             <Text style={[styles.fieldHint, { color: colors.secondary }]}>

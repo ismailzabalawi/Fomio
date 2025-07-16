@@ -3,24 +3,28 @@ import { useAuth } from './useAuth';
 
 export interface Byte {
   id: string;
+  content: string;
+  teretId: string;
+  teretName: string;
   author: {
     id: string;
     name: string;
     username: string;
     avatar?: string;
   };
-  content: string;
-  tags: string[];
-  timestamp: string;
   likes: number;
   comments: number;
   isLiked: boolean;
   createdAt: Date;
+  timestamp: string;
+  tags: string[];
 }
 
 export interface CreateByteData {
   content: string;
   tags: string[];
+  teretId: string;
+  teretName: string;
 }
 
 export function useCreateByte() {
@@ -47,19 +51,21 @@ export function useCreateByte() {
       // For now, simulate byte creation
       const newByte: Byte = {
         id: Date.now().toString(),
+        content: data.content.trim(),
+        teretId: data.teretId,
+        teretName: data.teretName,
         author: {
           id: user.id,
           name: user.name,
           username: user.username,
           avatar: user.avatar,
         },
-        content: data.content.trim(),
-        tags: data.tags,
-        timestamp: 'now',
         likes: 0,
         comments: 0,
         isLiked: false,
         createdAt: new Date(),
+        timestamp: 'now',
+        tags: data.tags,
       };
 
       // Simulate API delay
