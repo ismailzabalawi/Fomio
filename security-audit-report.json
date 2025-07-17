@@ -1,0 +1,39 @@
+{
+  "vulnerabilities": [
+    {
+      "type": "dependency",
+      "description": "5 low severity vulnerabilities",
+      "severity": "medium"
+    },
+    {
+      "type": "code_injection",
+      "file": "scripts/security-audit.js",
+      "description": "eval() usage detected",
+      "severity": "high"
+    },
+    {
+      "type": "code_injection",
+      "file": "shared/memory-optimizer.ts",
+      "description": "Function constructor usage detected",
+      "severity": "high"
+    }
+  ],
+  "securityChecks": [
+    "No sensitive data exposure detected in config files",
+    "AsyncStorage used for data persistence",
+    "Comprehensive input validation implemented (6 rules)",
+    "Secure error logging implemented",
+    "Error messages do not expose sensitive data",
+    "HTTPS usage detected in API calls",
+    "Authorization headers implemented"
+  ],
+  "recommendations": [
+    "Consider encrypting sensitive data before storing",
+    "Consider adding input sanitization for XSS protection"
+  ],
+  "warnings": [
+    "Dependency vulnerabilities detected - run npm audit fix"
+  ],
+  "score": 19,
+  "timestamp": "2025-07-17T23:14:08.815Z"
+}
