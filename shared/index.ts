@@ -8,8 +8,19 @@ export * from './design-system';
 
 // Performance Optimization exports
 export * from './performance-monitor';
-export * from './memory-optimizer';
+export { 
+  memoryOptimizer,
+  useMemoryOptimization,
+  useTrackedTimeout,
+  useTrackedInterval,
+  useEffectWithCleanup,
+} from './memory-optimizer';
 export * from './lazy-loading';
+
+// Error Handling & UX exports
+export * from './error-handling';
+export * from './offline-support';
+export * from './form-validation';
 
 // Discourse integration exports
 export { 
