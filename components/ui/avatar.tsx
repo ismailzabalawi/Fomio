@@ -1,85 +1,73 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-  StyleProp,
-} from 'react-native';
+import { View, Image, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import { useTheme } from '@/components/shared/theme-provider';
 
 export interface AvatarProps {
-  src?: string;
-  alt?: string;
+  source?: { uri: string } | number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   fallback?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-  style?: StyleProp<ViewStyle>;
+  style?: ViewStyle;
 }
 
-const sizeMap = {
-  xs: 24,
-  sm: 32,
-  md: 40,
-  lg: 48,
-  xl: 56,
-  '2xl': 64,
-};
+export function Avatar({ source, size = 'md', fallback, style }: AvatarProps) {
+  const { isDark } = useTheme();
 
-export function Avatar({
-  src,
-  alt,
-  fallback,
-  size = 'md',
-  style,
-}: AvatarProps) {
-  const avatarSize = sizeMap[size];
-  const fontSize = avatarSize * 0.4;
+  const getSizeStyle = () => {
+    switch (size) {
+      case 'sm': return { width: 32, height: 32, borderRadius: 16 };
+      case 'md': return { width: 40, height: 40, borderRadius: 20 };
+      case 'lg': return { width: 56, height: 56, borderRadius: 28 };
+      case 'xl': return { width: 80, height: 80, borderRadius: 40 };
+      default: return { width: 40, height: 40, borderRadius: 20 };
+    }
+  };
 
-  const containerStyle = [
-    styles.container,
+  const getFallbackTextSize = () => {
+    switch (size) {
+      case 'sm': return 12;
+      case 'md': return 16;
+      case 'lg': return 20;
+      case 'xl': return 28;
+      default: return 16;
+    }
+  };
+
+  const avatarStyle: StyleProp<ViewStyle> = [
+    styles.base,
+    getSizeStyle(),
     {
-      width: avatarSize,
-      height: avatarSize,
-      borderRadius: avatarSize / 2,
+      backgroundColor: isDark ? '#4b5563' : '#e5e7eb',
     },
     style,
   ];
 
-  const textStyle: TextStyle = {
-    fontSize,
-    lineHeight: fontSize * 1.2,
-  };
+  const fallbackTextStyle: StyleProp<TextStyle> = [
+    styles.fallbackText,
+    {
+      fontSize: getFallbackTextSize(),
+      color: isDark ? '#f9fafb' : '#374151',
+    },
+  ];
 
-  const fallbackText = fallback || alt?.charAt(0)?.toUpperCase() || 'U';
+  if (source) {
+    return (
+      <View style={avatarStyle}>
+        <Image source={source} style={[getSizeStyle(), styles.image]} />
+      </View>
+    );
+  }
 
   return (
-    <View style={containerStyle}>
-      {src ? (
-        <Image
-          source={{ uri: src }}
-          style={[
-            styles.image,
-            {
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: avatarSize / 2,
-            },
-          ]}
-          alt={alt}
-        />
-      ) : (
-        <Text style={[styles.fallbackText, textStyle]}>
-          {fallbackText}
-        </Text>
-      )}
+    <View style={avatarStyle}>
+      <Text style={fallbackTextStyle}>
+        {fallback ? fallback.charAt(0).toUpperCase() : '?'}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#e5e7eb',
+  base: {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -88,7 +76,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   fallbackText: {
-    color: '#374151',
     fontWeight: '600',
     textAlign: 'center',
   },

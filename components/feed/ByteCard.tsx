@@ -48,7 +48,7 @@ export function ByteCard({
     <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.93}>
       {/* Author info */}
       <View style={styles.authorRow}>
-        <Avatar src={author.avatar} size="sm" />
+        <Avatar source={{ uri: author.avatar }} size="sm" />
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>{author.name}</Text>
           <Text style={styles.timestamp}>{timestamp}</Text>

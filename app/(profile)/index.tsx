@@ -128,7 +128,7 @@ export default function ProfileScreen() {
         <View style={[styles.profileSection, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.profileHeader}>
             <Avatar
-              src={avatarUrl || undefined}
+              source={avatarUrl ? { uri: avatarUrl } : undefined}
               fallback={user?.username?.charAt(0).toUpperCase() || 'U'}
               size="xl"
             />

@@ -1,6 +1,7 @@
 export { useAuth } from './useAuth';
 export { useCreateByte } from './useCreateByte';
 export { useFeed } from './useFeed';
+export { logger, logError, withLogging } from './logger';
 
 // Discourse integration exports
 export { 

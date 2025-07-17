@@ -1,63 +1,89 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import { useTheme } from '@/components/shared/theme-provider';
 
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'solid' | 'outline';
-  action?: 'error' | 'warning' | 'success' | 'info' | 'muted';
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   style?: ViewStyle;
   textStyle?: TextStyle;
-  onPress?: () => void;
 }
 
 export function Badge({
   children,
-  variant = 'solid',
-  action = 'muted',
+  variant = 'default',
   size = 'md',
   style,
   textStyle,
-  onPress,
 }: BadgeProps) {
-  const containerStyle: ViewStyle[] = [
+  const { isDark } = useTheme();
+
+  const getVariantStyle = () => {
+    const baseStyles = {
+      default: {
+        backgroundColor: '#0ea5e9',
+      },
+      secondary: {
+        backgroundColor: isDark ? '#374151' : '#f1f5f9',
+      },
+      destructive: {
+        backgroundColor: '#ef4444',
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: isDark ? '#4b5563' : '#d1d5db',
+      },
+    };
+    return baseStyles[variant];
+  };
+
+  const getSizeStyle = () => {
+    switch (size) {
+      case 'sm': return { paddingHorizontal: 6, paddingVertical: 2, minHeight: 20 };
+      case 'md': return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
+      case 'lg': return { paddingHorizontal: 12, paddingVertical: 6, minHeight: 32 };
+      default: return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
+    }
+  };
+
+  const getVariantTextStyle = () => {
+    const baseTextStyles = {
+      default: { color: '#ffffff' },
+      secondary: { color: isDark ? '#f9fafb' : '#374151' },
+      destructive: { color: '#ffffff' },
+      outline: { color: isDark ? '#f9fafb' : '#374151' },
+    };
+    return baseTextStyles[variant];
+  };
+
+  const getSizeTextStyle = () => {
+    switch (size) {
+      case 'sm': return { fontSize: 11 };
+      case 'md': return { fontSize: 12 };
+      case 'lg': return { fontSize: 14 };
+      default: return { fontSize: 12 };
+    }
+  };
+
+  const badgeStyle: StyleProp<ViewStyle> = [
     styles.base,
-    styles[`${variant}${action.charAt(0).toUpperCase() + action.slice(1)}` as keyof typeof styles] as ViewStyle,
-    styles[`${size}Badge` as keyof typeof styles] as ViewStyle,
+    getVariantStyle(),
+    getSizeStyle(),
+    style,
   ];
-  
-  if (style) {
-    containerStyle.push(style);
-  }
 
-  const textStyleCombined: TextStyle[] = [
-    styles.baseText,
-    styles[`${variant}${action.charAt(0).toUpperCase() + action.slice(1)}Text` as keyof typeof styles] as TextStyle,
-    styles[`${size}Text` as keyof typeof styles] as TextStyle,
+  const badgeTextStyle: StyleProp<TextStyle> = [
+    styles.text,
+    getVariantTextStyle(),
+    getSizeTextStyle(),
+    textStyle,
   ];
-  
-  if (textStyle) {
-    textStyleCombined.push(textStyle);
-  }
-
-  if (onPress) {
-    return (
-      <TouchableOpacity style={containerStyle} onPress={onPress} activeOpacity={0.7}>
-        <Text style={textStyleCombined}>{children}</Text>
-      </TouchableOpacity>
-    );
-  }
 
   return (
-    <View style={containerStyle}>
-      <Text style={textStyleCombined}>{children}</Text>
+    <View style={badgeStyle}>
+      <Text style={badgeTextStyle}>{children}</Text>
     </View>
   );
 }
@@ -65,123 +91,13 @@ export function Badge({
 const styles = StyleSheet.create({
   base: {
     borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'flex-start',
   },
-  
-  // Solid variants
-  solidError: {
-    backgroundColor: '#ef4444',
-  },
-  solidWarning: {
-    backgroundColor: '#f59e0b',
-  },
-  solidSuccess: {
-    backgroundColor: '#10b981',
-  },
-  solidInfo: {
-    backgroundColor: '#3b82f6',
-  },
-  solidMuted: {
-    backgroundColor: '#6b7280',
-  },
-  
-  // Outline variants
-  outlineError: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#ef4444',
-  },
-  outlineWarning: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#f59e0b',
-  },
-  outlineSuccess: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#10b981',
-  },
-  outlineInfo: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#3b82f6',
-  },
-  outlineMuted: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#6b7280',
-  },
-  
-  // Size styles
-  smBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  mdBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  lgBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  
-  // Text styles
-  baseText: {
-    fontWeight: '500',
+  text: {
+    fontWeight: '600',
     textAlign: 'center',
-  },
-  
-  // Solid text colors
-  solidErrorText: {
-    color: '#ffffff',
-  },
-  solidWarningText: {
-    color: '#ffffff',
-  },
-  solidSuccessText: {
-    color: '#ffffff',
-  },
-  solidInfoText: {
-    color: '#ffffff',
-  },
-  solidMutedText: {
-    color: '#ffffff',
-  },
-  
-  // Outline text colors
-  outlineErrorText: {
-    color: '#ef4444',
-  },
-  outlineWarningText: {
-    color: '#f59e0b',
-  },
-  outlineSuccessText: {
-    color: '#10b981',
-  },
-  outlineInfoText: {
-    color: '#3b82f6',
-  },
-  outlineMutedText: {
-    color: '#6b7280',
-  },
-  
-  // Size text styles
-  smText: {
-    fontSize: 12,
-  },
-  mdText: {
-    fontSize: 14,
-  },
-  lgText: {
-    fontSize: 16,
   },
 });
 

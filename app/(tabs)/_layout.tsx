@@ -1,16 +1,19 @@
 import { Tabs } from 'expo-router';
 import { House, MagnifyingGlass, PlusCircle, Bell, GearSix } from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/components/shared/theme-provider';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const { isDark } = useTheme();
+  
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#0ea5e9',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarInactiveTintColor: isDark ? '#9ca3af' : '#64748b',
         tabBarStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: isDark ? '#1f2937' : '#fff',
           borderTopWidth: 0,
           height: 62 + insets.bottom,
           paddingBottom: 8 + insets.bottom,
@@ -19,7 +22,7 @@ export default function TabLayout() {
           paddingRight: Math.max(insets.right, 12),
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
+          shadowOpacity: isDark ? 0.3 : 0.06,
           shadowRadius: 8,
           elevation: 8,
         },

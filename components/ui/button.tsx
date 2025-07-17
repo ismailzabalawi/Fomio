@@ -9,6 +9,7 @@ import {
   View,
   StyleProp,
 } from 'react-native';
+import { useTheme } from '@/components/shared/theme-provider';
 
 export interface ButtonProps {
   children: React.ReactNode;
@@ -31,15 +32,50 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
+  const { isDark } = useTheme();
+
   const getVariantStyle = () => {
-    switch (variant) {
-      case 'destructive': return styles.destructiveButton;
-      case 'outline': return styles.outlineButton;
-      case 'secondary': return styles.secondaryButton;
-      case 'ghost': return styles.ghostButton;
-      case 'link': return styles.linkButton;
-      default: return styles.defaultButton;
-    }
+    const baseStyles = {
+      default: {
+        backgroundColor: '#0ea5e9',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      destructive: {
+        backgroundColor: '#ef4444',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: isDark ? '#374151' : '#d1d5db',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      secondary: {
+        backgroundColor: isDark ? '#374151' : '#f1f5f9',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      ghost: {
+        backgroundColor: 'transparent',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      link: {
+        backgroundColor: 'transparent',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+    };
+    return baseStyles[variant];
   };
 
   const getSizeStyle = () => {
@@ -52,14 +88,15 @@ export function Button({
   };
 
   const getVariantTextStyle = () => {
-    switch (variant) {
-      case 'destructive': return styles.destructiveText;
-      case 'outline': return styles.outlineText;
-      case 'secondary': return styles.secondaryText;
-      case 'ghost': return styles.ghostText;
-      case 'link': return styles.linkText;
-      default: return styles.defaultText;
-    }
+    const baseTextStyles = {
+      default: { color: '#ffffff' },
+      destructive: { color: '#ffffff' },
+      outline: { color: isDark ? '#f9fafb' : '#374151' },
+      secondary: { color: isDark ? '#f9fafb' : '#374151' },
+      ghost: { color: isDark ? '#f9fafb' : '#374151' },
+      link: { color: '#0ea5e9', textDecorationLine: 'underline' as const },
+    };
+    return baseTextStyles[variant];
   };
 
   const getSizeTextStyle = () => {
@@ -124,46 +161,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   
-  // Variant styles
-  defaultButton: {
-    backgroundColor: '#0ea5e9',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  destructiveButton: {
-    backgroundColor: '#ef4444',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  secondaryButton: {
-    backgroundColor: '#f1f5f9',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  ghostButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  linkButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 44,
-  },
-  
   // Size styles
   smButton: {
     paddingVertical: 8,
@@ -187,25 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  defaultText: {
-    color: '#ffffff',
-  },
-  destructiveText: {
-    color: '#ffffff',
-  },
-  outlineText: {
-    color: '#374151',
-  },
-  secondaryText: {
-    color: '#374151',
-  },
-  ghostText: {
-    color: '#374151',
-  },
-  linkText: {
-    color: '#0ea5e9',
-    textDecorationLine: 'underline',
   },
   
   // Size text styles

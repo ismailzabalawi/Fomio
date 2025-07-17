@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from './logger';
 
 export interface User {
   id: string;
@@ -51,7 +52,7 @@ export function useAuth() {
         });
       }
     } catch (error) {
-      console.error('Failed to load auth state:', error);
+      logger.error('Failed to load auth state', error);
       setAuthState({
         user: null,
         isLoading: false,
@@ -84,9 +85,10 @@ export function useAuth() {
         isAuthenticated: true,
       });
 
+      logger.auth('sign-in', true, { email, userId: mockUser.id });
       return { success: true };
     } catch (error) {
-      console.error('Sign in error:', error);
+      logger.auth('sign-in', false, { email, error });
       return { success: false, error: 'Failed to sign in' };
     }
   };
@@ -114,9 +116,10 @@ export function useAuth() {
         isAuthenticated: true,
       });
 
+      logger.auth('sign-up', true, { email, userId: mockUser.id });
       return { success: true };
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.auth('sign-up', false, { email, error });
       return { success: false, error: 'Failed to create account' };
     }
   };
@@ -129,8 +132,9 @@ export function useAuth() {
         isLoading: false,
         isAuthenticated: false,
       });
+      logger.auth('sign-out', true);
     } catch (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error', error);
     }
   };
 
@@ -144,8 +148,9 @@ export function useAuth() {
         ...prev,
         user: updatedUser,
       }));
+      logger.userAction('update-profile', { userId: updatedUser.id, updates: Object.keys(updates) });
     } catch (error) {
-      console.error('Update user error:', error);
+      logger.error('Update user error', error);
     }
   };
 

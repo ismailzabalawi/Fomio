@@ -230,7 +230,7 @@ export default function EditProfileScreen() {
         <View style={[styles.avatarSection, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.avatarContainer}>
             <Avatar
-              src={avatarUrl || undefined}
+              source={avatarUrl ? { uri: avatarUrl } : undefined}
               fallback={user.username.charAt(0).toUpperCase()}
               size="xl"
             />
