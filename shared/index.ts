@@ -3,6 +3,9 @@ export { useCreateByte } from './useCreateByte';
 export { useFeed } from './useFeed';
 export { logger, logError, withLogging } from './logger';
 
+// Design System exports
+export * from './design-system';
+
 // Discourse integration exports
 export { 
   discourseApi, 
