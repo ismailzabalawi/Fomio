@@ -1,0 +1,538 @@
+{
+  "summary": {
+    "bundleSize": "439.69 MB",
+    "totalDependencies": 26,
+    "totalFiles": 71,
+    "totalLines": 10273
+  },
+  "dependencies": {
+    "totalDependencies": 26,
+    "totalDevDependencies": 8,
+    "heavyDependencies": [
+      {
+        "name": "react-native",
+        "version": "0.74.5",
+        "size": "68.48 MB"
+      },
+      {
+        "name": "phosphor-react-native",
+        "version": "^3.0.0",
+        "size": "22.45 MB"
+      },
+      {
+        "name": "lucide-react-native",
+        "version": "^0.525.0",
+        "size": "17.1 MB"
+      },
+      {
+        "name": "@expo/vector-icons",
+        "version": "^14.0.2",
+        "size": "5.49 MB"
+      },
+      {
+        "name": "react-dom",
+        "version": "18.2.0",
+        "size": "4.29 MB"
+      },
+      {
+        "name": "react-native-reanimated",
+        "version": "~3.10.1",
+        "size": "3.65 MB"
+      },
+      {
+        "name": "react-native-gesture-handler",
+        "version": "~2.16.1",
+        "size": "3.36 MB"
+      },
+      {
+        "name": "react-native-web",
+        "version": "~0.19.10",
+        "size": "2.87 MB"
+      },
+      {
+        "name": "react-native-svg",
+        "version": "15.2.0",
+        "size": "2.71 MB"
+      },
+      {
+        "name": "react-native-screens",
+        "version": "3.31.1",
+        "size": "1.22 MB"
+      },
+      {
+        "name": "@gorhom/bottom-sheet",
+        "version": "^5.1.6",
+        "size": "1.2 MB"
+      },
+      {
+        "name": "expo-router",
+        "version": "~3.5.23",
+        "size": "1.02 MB"
+      }
+    ],
+    "unusedDependencies": [],
+    "recommendations": [
+      {
+        "type": "review",
+        "message": "Review heavy dependencies and consider alternatives or lazy loading",
+        "impact": "medium"
+      }
+    ]
+  },
+  "sourceCode": {
+    "totalFiles": 71,
+    "totalLines": 10273,
+    "largeFiles": [
+      {
+        "path": "app/(profile)/edit-profile.tsx",
+        "lines": 530,
+        "size": "15.39 KB"
+      },
+      {
+        "path": "app/(profile)/index.tsx",
+        "lines": 419,
+        "size": "12.1 KB"
+      },
+      {
+        "path": "app/feed/index.enhanced.tsx",
+        "lines": 398,
+        "size": "10.69 KB"
+      },
+      {
+        "path": "app/feed/index.optimized.tsx",
+        "lines": 496,
+        "size": "14.4 KB"
+      },
+      {
+        "path": "components/feed/ByteCard.enhanced.tsx",
+        "lines": 319,
+        "size": "8.63 KB"
+      },
+      {
+        "path": "components/shared/loading.enhanced.tsx",
+        "lines": 504,
+        "size": "10.54 KB"
+      },
+      {
+        "path": "shared/design-system.ts",
+        "lines": 446,
+        "size": "9.15 KB"
+      },
+      {
+        "path": "shared/discourseApi.ts",
+        "lines": 339,
+        "size": "8.88 KB"
+      },
+      {
+        "path": "shared/lazy-loading.tsx",
+        "lines": 429,
+        "size": "11.45 KB"
+      }
+    ],
+    "duplicateCode": [],
+    "optimizationOpportunities": [
+      {
+        "type": "performance",
+        "file": "app/(auth)/onboarding.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/(auth)/signin.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/(auth)/signup.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/(compose)/index.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/(profile)/edit-profile.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "organization",
+        "file": "app/(profile)/edit-profile.tsx",
+        "message": "Consider extracting styles to separate file",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/(profile)/index.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "organization",
+        "file": "app/(profile)/index.tsx",
+        "message": "Consider extracting styles to separate file",
+        "impact": "low"
+      },
+      {
+        "type": "cleanup",
+        "file": "app/feed/index.enhanced.tsx",
+        "message": "Remove console.log statements for production",
+        "impact": "low"
+      },
+      {
+        "type": "organization",
+        "file": "app/feed/index.enhanced.tsx",
+        "message": "Consider extracting styles to separate file",
+        "impact": "low"
+      },
+      {
+        "type": "cleanup",
+        "file": "app/feed/index.optimized.tsx",
+        "message": "Remove console.log statements for production",
+        "impact": "low"
+      },
+      {
+        "type": "organization",
+        "file": "app/feed/index.optimized.tsx",
+        "message": "Consider extracting styles to separate file",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "app/index.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/ExternalLink.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ExternalLink.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/StyledText.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/Themed.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/ByteBlogPage.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/ByteBlogPage.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/ByteCard.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/ByteCard.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/CommentItem.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/CommentItem.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/CommentSection.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/NewCommentInput.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/feed/NewCommentInput.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/nav/HeaderBar.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/nav/HeaderBar.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/error-boundary.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/error-boundary.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/loading.enhanced.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/loading.enhanced.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "organization",
+        "file": "components/shared/loading.enhanced.tsx",
+        "message": "Consider extracting styles to separate file",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/loading.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/loading.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/theme-provider.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/shared/theme-toggle.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/avatar.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/badge.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/button.enhanced.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/button.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/button.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/card.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/input.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/switch.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/tabs.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/tabs.tsx",
+        "message": "Consider using useCallback for event handlers",
+        "impact": "low"
+      },
+      {
+        "type": "performance",
+        "file": "components/ui/textarea.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/useClientOnlyValue.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/useClientOnlyValue.web.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "components/useColorScheme.web.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/lazy-loading.tsx",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/logger.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/useAuth.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/useCreateByte.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/useDiscourseSettings.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/useDiscourseUser.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "performance",
+        "file": "shared/useFeed.ts",
+        "message": "Consider using React.memo for this component",
+        "impact": "medium"
+      },
+      {
+        "type": "refactoring",
+        "message": "9 large files detected. Consider breaking them into smaller components.",
+        "impact": "medium"
+      },
+      {
+        "type": "architecture",
+        "message": "Consider implementing lazy loading for screens and components",
+        "impact": "high"
+      }
+    ]
+  },
+  "bundleSize": {
+    "dependencies": "439.26 MB",
+    "sourceCode": "264.26 KB",
+    "assets": "177.73 KB",
+    "total": "439.69 MB",
+    "raw": {
+      "dependencies": 460600644,
+      "sourceCode": 270601,
+      "assets": 181991,
+      "total": 461053236
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "bundle-size",
+      "message": "Bundle size is quite large. Implement code splitting and lazy loading.",
+      "actions": [
+        "Implement screen-level code splitting",
+        "Use dynamic imports for heavy components",
+        "Optimize dependencies and remove unused ones"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "message": "Multiple performance optimization opportunities detected.",
+      "actions": [
+        "Implement React.memo for components",
+        "Use useCallback for event handlers",
+        "Remove console.log statements"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "architecture",
+      "message": "Several large files detected that could benefit from refactoring.",
+      "actions": [
+        "Break large components into smaller ones",
+        "Extract reusable logic into custom hooks",
+        "Consider component composition patterns"
+      ]
+    }
+  ]
+}
