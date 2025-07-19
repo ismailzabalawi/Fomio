@@ -126,14 +126,17 @@ export function Button({
 
   return (
     <TouchableOpacity
+      testID="button-touchable"
       style={buttonStyle}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityRole="button"
     >
       <View style={styles.content}>
         {loading && (
           <ActivityIndicator
+            testID="button-loading-indicator"
             size="small"
             color={variant === 'default' ? '#ffffff' : '#0ea5e9'}
             style={styles.spinner}

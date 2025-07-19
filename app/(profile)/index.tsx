@@ -1,253 +1,489 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Image,
+  Alert,
+  RefreshControl
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { 
+  ArrowLeft, 
+  Gear, 
+  PencilSimple, 
+  Heart, 
+  ChatCircle, 
+  Bookmark, 
+  Share, 
+  Calendar,
+  MapPin,
+  Globe,
+  User,
+  Crown,
+  Star,
+  Trophy,
+  Users,
+  Hash,
+  Eye,
+  EyeSlash,
+  Bell,
+  BellSlash
+} from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
-import { useDiscourseUser } from '../../shared/useDiscourseUser';
-import { HeaderBar } from '../../components/nav';
-import { Avatar } from '../../components/ui/avatar';
-import { GearSix, PencilSimple } from 'phosphor-react-native';
+import { HeaderBar } from '../../components/nav/HeaderBar';
+import { discourseApi, DiscourseUser } from '../../shared/discourseApi';
+import { router } from 'expo-router';
 
-const mockRecentPosts = [
-  {
-    id: '1',
-    content: 'Just finished a great coding session! 🚀',
-    likes: 42,
-    comments: 8,
-    timestamp: '2h ago',
-  },
-  {
-    id: '2',
-    content: 'Beautiful sunset from my evening walk. Sometimes the simple moments are the most meaningful. 🌅',
-    likes: 67,
-    comments: 12,
-    timestamp: '1d ago',
-  },
-];
+interface ProfileStats {
+  posts: number;
+  topics: number;
+  likes: number;
+  followers: number;
+  following: number;
+  trustLevel: number;
+  badges: number;
+  timeRead: number;
+}
 
-export default function ProfileScreen() {
-  const { isDark } = useTheme();
-  const { 
-    user, 
-    loading, 
-    error, 
-    avatarUrl,
-    isAuthenticated 
-  } = useDiscourseUser();
-
+function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isDark ? '#09090b' : '#f8fafc',
-    cardBackground: isDark ? '#18181b' : '#fff',
-    text: isDark ? '#f4f4f5' : '#1e293b',
-    secondary: isDark ? '#a1a1aa' : '#64748b',
-    accent: isDark ? '#38bdf8' : '#0ea5e9',
-    border: isDark ? '#27272a' : '#e4e4e7',
-    username: isDark ? '#a1a1aa' : '#64748b',
-    bio: isDark ? '#a1a1aa' : '#475569',
-    statLabel: isDark ? '#a1a1aa' : '#64748b',
-    statNumber: isDark ? '#f4f4f5' : '#1e293b',
-    timestamp: isDark ? '#a1a1aa' : '#94a3b8',
-    editButton: isDark ? '#18181b' : 'transparent',
+    text: isDark ? '#9ca3af' : '#6b7280',
   };
 
-  const handleBack = () => {
-    router.back();
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+      {children}
+    </View>
+  );
+}
+
+function StatCard({ icon, value, label, color }: { 
+  icon: React.ReactNode; 
+  value: string | number; 
+  label: string; 
+  color: string; 
+}) {
+  const { isDark, isAmoled } = useTheme();
+  const colors = {
+    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    text: isDark ? '#f9fafb' : '#111827',
+    secondary: isDark ? '#9ca3af' : '#6b7280',
+    border: isDark ? '#374151' : '#e5e7eb',
   };
 
-  const handleSettings = () => {
-    router.push('/(profile)/settings' as any);
+  return (
+    <View style={[styles.statCard, { 
+      backgroundColor: colors.background, 
+      borderColor: colors.border 
+    }]}>
+      <View style={[styles.statIcon, { backgroundColor: `${color}20` }]}>
+        {icon}
+      </View>
+      <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+      <Text style={[styles.statLabel, { color: colors.secondary }]}>{label}</Text>
+    </View>
+  );
+}
+
+function ActionButton({ 
+  icon, 
+  title, 
+  subtitle, 
+  onPress, 
+  color = '#3b82f6' 
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  subtitle?: string; 
+  onPress: () => void; 
+  color?: string; 
+}) {
+  const { isDark, isAmoled } = useTheme();
+  const colors = {
+    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    text: isDark ? '#f9fafb' : '#111827',
+    secondary: isDark ? '#9ca3af' : '#6b7280',
+    border: isDark ? '#374151' : '#e5e7eb',
+  };
+
+  return (
+    <TouchableOpacity
+      style={[styles.actionButton, { 
+        backgroundColor: colors.background, 
+        borderColor: colors.border 
+      }]}
+      onPress={onPress}
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={title}
+    >
+      <View style={styles.actionLeft}>
+        <View style={[styles.actionIcon, { backgroundColor: `${color}20` }]}>
+          {icon}
+        </View>
+        <View style={styles.actionContent}>
+          <Text style={[styles.actionTitle, { color: colors.text }]}>{title}</Text>
+          {subtitle && (
+            <Text style={[styles.actionSubtitle, { color: colors.secondary }]}>
+              {subtitle}
+            </Text>
+          )}
+        </View>
+      </View>
+      <Text style={[styles.actionChevron, { color: colors.secondary }]}>›</Text>
+    </TouchableOpacity>
+  );
+}
+
+export default function ProfileScreen(): JSX.Element {
+  const { isDark, isAmoled } = useTheme();
+  const [user, setUser] = useState<DiscourseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState<ProfileStats>({
+    posts: 0,
+    topics: 0,
+    likes: 0,
+    followers: 0,
+    following: 0,
+    trustLevel: 0,
+    badges: 0,
+    timeRead: 0,
+  });
+  
+  const colors = {
+    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
+    card: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    text: isDark ? '#f9fafb' : '#111827',
+    secondary: isDark ? '#9ca3af' : '#6b7280',
+    border: isDark ? '#374151' : '#e5e7eb',
+    primary: isDark ? '#3b82f6' : '#0ea5e9',
+    accent: isDark ? '#8b5cf6' : '#7c3aed',
+    success: isDark ? '#10b981' : '#059669',
+    warning: isDark ? '#f59e0b' : '#d97706',
+    error: isDark ? '#ef4444' : '#dc2626',
+  };
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    setLoading(true);
+    try {
+      // Mock user data for now - replace with actual Discourse API call
+      const mockUser: DiscourseUser = {
+        id: 1,
+        username: 'alexchen',
+        name: 'Alex Chen',
+        email: 'alex@example.com',
+        avatar_template: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        bio_raw: 'Mobile developer passionate about React Native and user experience. Building the future of social platforms.',
+        location: 'San Francisco, CA',
+        website: 'https://alexchen.dev',
+        date_of_birth: '1995-03-15',
+        trust_level: 3,
+        badge_count: 5,
+        post_count: 42,
+        topic_count: 8,
+        likes_given: 156,
+        likes_received: 89,
+        time_read: 86400,
+        days_visited: 45,
+        last_seen_at: '2024-01-15T10:30:00Z',
+        created_at: '2023-06-01T00:00:00Z',
+        can_edit: true,
+        can_edit_username: false,
+        can_edit_email: true,
+        can_edit_name: true,
+      };
+
+      setUser(mockUser);
+      
+      // Mock stats
+      setStats({
+        posts: mockUser.post_count,
+        topics: mockUser.topic_count,
+        likes: mockUser.likes_received,
+        followers: 23,
+        following: 15,
+        trustLevel: mockUser.trust_level,
+        badges: mockUser.badge_count,
+        timeRead: Math.floor(mockUser.time_read / 3600), // Convert to hours
+      });
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+      Alert.alert('Error', 'Failed to load profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadProfile();
+    setRefreshing(false);
   };
 
   const handleEditProfile = () => {
     router.push('/(profile)/edit-profile' as any);
   };
 
-  // Show loading state
+  const handleSettings = () => {
+    router.push('/(profile)/settings' as any);
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  const getTrustLevelDisplay = (level: number) => {
+    switch (level) {
+      case 0: return 'New User';
+      case 1: return 'Basic User';
+      case 2: return 'Regular User';
+      case 3: return 'Leader';
+      case 4: return 'Elder';
+      default: return 'Unknown';
+    }
+  };
+
+  const getTrustLevelColor = (level: number) => {
+    switch (level) {
+      case 0: return colors.secondary;
+      case 1: return colors.primary;
+      case 2: return colors.success;
+      case 3: return colors.warning;
+      case 4: return colors.error;
+      default: return colors.secondary;
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <HeaderBar
-          title="Profile"
-          leftIcon={undefined}
-          onLeftPress={handleBack}
-          leftA11yLabel="Back"
-          rightIcon={<GearSix size={28} weight="bold" />}
-          onRightPress={handleSettings}
-          rightA11yLabel="Settings"
-          style={{ marginBottom: 4 }}
+        <HeaderBar 
+          title="Profile" 
+          showBackButton={true}
+          showProfileButton={false}
+          onBack={handleBack}
         />
-        <View style={[styles.centered, { backgroundColor: colors.background }]}>
-          <ActivityIndicator size="large" color={colors.accent} />
+        <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: colors.text }]}>Loading profile...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  // Show error state
-  if (error || !isAuthenticated) {
+  if (!user) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <HeaderBar
-          title="Profile"
-          leftIcon={undefined}
-          onLeftPress={handleBack}
-          leftA11yLabel="Back"
-          rightIcon={<GearSix size={28} weight="bold" />}
-          onRightPress={handleSettings}
-          rightA11yLabel="Settings"
-          style={{ marginBottom: 4 }}
+        <HeaderBar 
+          title="Profile" 
+          showBackButton={true}
+          showProfileButton={false}
+          onBack={handleBack}
         />
-        <View style={[styles.centered, { backgroundColor: colors.background }]}>
-          <Text style={[styles.errorText, { color: colors.text }]}>
-            {error || 'Please sign in to view your profile'}
-          </Text>
-          <TouchableOpacity
-            style={[styles.retryButton, { backgroundColor: colors.accent }]}
-            onPress={() => router.replace('/(auth)/signin' as any)}
-          >
-            <Text style={styles.retryButtonText}>Sign In</Text>
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: colors.text }]}>Failed to load profile</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
+            <Text style={[styles.retryText, { color: colors.primary }]}>Retry</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
-  // Show profile content
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar
-        title="Profile"
-        leftIcon={undefined}
-        onLeftPress={handleBack}
-        leftA11yLabel="Back"
-        style={{ marginBottom: 4 }}
+      <HeaderBar 
+        title="Profile" 
+        showBackButton={true}
+        showProfileButton={false}
+        onBack={handleBack}
       />
-
-      <ScrollView style={styles.content}>
-        <View style={[styles.profileSection, { backgroundColor: colors.cardBackground }]}>
-          <View style={styles.profileHeader}>
-            <Avatar
-              source={avatarUrl ? { uri: avatarUrl } : undefined}
-              fallback={user?.username?.charAt(0).toUpperCase() || 'U'}
-              size="xl"
-            />
-            <View style={styles.profileInfo}>
-              <Text style={[styles.name, { color: colors.text }]}>
-                {user?.name || user?.username || 'Unknown User'}
-              </Text>
-              <Text style={[styles.username, { color: colors.username }]}>
-                @{user?.username || 'unknown'}
-              </Text>
-              {user?.trust_level !== undefined && (
-                <Text style={[styles.trustLevel, { color: colors.accent }]}>
-                  Trust Level {user.trust_level}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          {user?.bio_raw && (
-            <Text style={[styles.bio, { color: colors.bio }]}>{user.bio_raw}</Text>
-          )}
-
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.statNumber }]}>
-                {user?.post_count || 0}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Posts</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.statNumber }]}>
-                {user?.topic_count || 0}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Topics</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.statNumber }]}>
-                {user?.likes_received || 0}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.statLabel }]}>Likes</Text>
-            </View>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.editButton, { borderColor: colors.accent, backgroundColor: colors.editButton }]}
-              onPress={handleEditProfile}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel="Edit Profile"
-              accessibilityHint="Edit your profile information"
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            >
-              <PencilSimple size={16} color={colors.accent} style={styles.buttonIcon} />
-              <Text style={[styles.editButtonText, { color: colors.accent }]}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Additional User Info */}
-          {(user?.location || user?.website) && (
-            <View style={styles.additionalInfo}>
-              {user.location && (
-                <Text style={[styles.infoText, { color: colors.secondary }]}>
-                  📍 {user.location}
-                </Text>
-              )}
-              {user.website && (
-                <Text style={[styles.infoText, { color: colors.accent }]}>
-                  🌐 {user.website}
-                </Text>
-              )}
-            </View>
-          )}
-
-          {/* Account Stats */}
-          <View style={styles.accountStats}>
-            <View style={styles.statRow}>
-              <Text style={[styles.statRowLabel, { color: colors.secondary }]}>Likes Given:</Text>
-              <Text style={[styles.statRowValue, { color: colors.text }]}>
-                {user?.likes_given || 0}
-              </Text>
-            </View>
-            <View style={styles.statRow}>
-              <Text style={[styles.statRowLabel, { color: colors.secondary }]}>Days Visited:</Text>
-              <Text style={[styles.statRowValue, { color: colors.text }]}>
-                {user?.days_visited || 0}
-              </Text>
-            </View>
-            <View style={styles.statRow}>
-              <Text style={[styles.statRowLabel, { color: colors.secondary }]}>Member Since:</Text>
-              <Text style={[styles.statRowValue, { color: colors.text }]}>
-                {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Recent Posts Section (Mock data for now) */}
-        <View style={[styles.postsSection, { backgroundColor: colors.cardBackground }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
-          <Text style={[styles.sectionSubtitle, { color: colors.secondary }]}>
-            Your recent posts and interactions will appear here
-          </Text>
+      
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
+        {/* Profile Header */}
+        <View style={[styles.profileHeader, { backgroundColor: colors.card }]}>
+          <Image 
+            source={{ uri: user.avatar_template }} 
+            style={styles.avatar}
+            accessible
+            accessibilityLabel={`${user.name}'s profile picture`}
+          />
           
-          {mockRecentPosts.map((post) => (
-            <View key={post.id} style={[styles.postCard, { backgroundColor: colors.background }]}>
-              <Text style={[styles.postContent, { color: colors.text }]}>{post.content}</Text>
-              <View style={styles.postActions}>
-                <View style={styles.actionItem}>
-                  <Text style={[styles.actionText, { color: colors.secondary }]}>❤️ {post.likes}</Text>
+          <View style={styles.profileInfo}>
+            <Text style={[styles.profileName, { color: colors.text }]}>{user.name}</Text>
+            <Text style={[styles.profileUsername, { color: colors.secondary }]}>@{user.username}</Text>
+            
+            {user.bio_raw && (
+              <Text style={[styles.profileBio, { color: colors.text }]} numberOfLines={3}>
+                {user.bio_raw}
+              </Text>
+            )}
+            
+            <View style={styles.profileMeta}>
+              {user.location && (
+                <View style={styles.metaItem}>
+                  <MapPin size={16} color={colors.secondary} weight="regular" />
+                  <Text style={[styles.metaText, { color: colors.secondary }]}>{user.location}</Text>
                 </View>
-                <View style={styles.actionItem}>
-                  <Text style={[styles.actionText, { color: colors.secondary }]}>💬 {post.comments}</Text>
+              )}
+              
+              {user.website && (
+                <View style={styles.metaItem}>
+                  <Globe size={16} color={colors.secondary} weight="regular" />
+                  <Text style={[styles.metaText, { color: colors.secondary }]}>{user.website}</Text>
                 </View>
-                <Text style={[styles.timestamp, { color: colors.timestamp }]}>{post.timestamp}</Text>
+              )}
+              
+              <View style={styles.metaItem}>
+                <Calendar size={16} color={colors.secondary} weight="regular" />
+                <Text style={[styles.metaText, { color: colors.secondary }]}>
+                  Joined {new Date(user.created_at).toLocaleDateString()}
+                </Text>
               </View>
             </View>
-          ))}
+            
+            <View style={styles.trustLevel}>
+              <Crown size={16} color={getTrustLevelColor(user.trust_level)} weight="fill" />
+              <Text style={[styles.trustLevelText, { color: getTrustLevelColor(user.trust_level) }]}>
+                {getTrustLevelDisplay(user.trust_level)}
+              </Text>
+            </View>
+          </View>
         </View>
+
+        {/* Stats Grid */}
+        <ProfileSection title="Activity">
+          <View style={styles.statsGrid}>
+            <StatCard 
+              icon={<ChatCircle size={20} color={colors.primary} weight="fill" />}
+              value={stats.posts}
+              label="Posts"
+              color={colors.primary}
+            />
+            <StatCard 
+              icon={<Hash size={20} color={colors.accent} weight="fill" />}
+              value={stats.topics}
+              label="Topics"
+              color={colors.accent}
+            />
+            <StatCard 
+              icon={<Heart size={20} color={colors.error} weight="fill" />}
+              value={stats.likes}
+              label="Likes"
+              color={colors.error}
+            />
+            <StatCard 
+              icon={<Users size={20} color={colors.success} weight="fill" />}
+              value={stats.followers}
+              label="Followers"
+              color={colors.success}
+            />
+            <StatCard 
+              icon={<Trophy size={20} color={colors.warning} weight="fill" />}
+              value={stats.badges}
+              label="Badges"
+              color={colors.warning}
+            />
+            <StatCard 
+              icon={<Star size={20} color={colors.primary} weight="fill" />}
+              value={`${stats.timeRead}h`}
+              label="Time Read"
+              color={colors.primary}
+            />
+          </View>
+        </ProfileSection>
+
+        {/* Actions */}
+        <ProfileSection title="Account">
+          <ActionButton
+            icon={<PencilSimple size={24} color={colors.primary} weight="regular" />}
+            title="Edit Profile"
+            subtitle="Update your information and avatar"
+            onPress={handleEditProfile}
+            color={colors.primary}
+          />
+          
+          <ActionButton
+            icon={<Gear size={24} color={colors.accent} weight="regular" />}
+            title="Settings"
+            subtitle="Manage your preferences and privacy"
+            onPress={handleSettings}
+            color={colors.accent}
+          />
+          
+          <ActionButton
+            icon={<Bell size={24} color={colors.warning} weight="regular" />}
+            title="Notification Preferences"
+            subtitle="Control what you're notified about"
+            onPress={() => console.log('Open notification preferences')}
+            color={colors.warning}
+          />
+          
+          <ActionButton
+            icon={<Eye size={24} color={colors.success} weight="regular" />}
+            title="Privacy Settings"
+            subtitle="Manage your privacy and visibility"
+            onPress={() => console.log('Open privacy settings')}
+            color={colors.success}
+          />
+        </ProfileSection>
+
+        {/* Account Info */}
+        <ProfileSection title="Account Information">
+          <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Email</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{user.email}</Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Trust Level</Text>
+              <Text style={[styles.infoValue, { color: getTrustLevelColor(user.trust_level) }]}>
+                {getTrustLevelDisplay(user.trust_level)}
+              </Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Member Since</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {new Date(user.created_at).toLocaleDateString()}
+              </Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Last Seen</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {new Date(user.last_seen_at).toLocaleDateString()}
+              </Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Days Visited</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{user.days_visited}</Text>
+            </View>
+          </View>
+        </ProfileSection>
       </ScrollView>
     </SafeAreaView>
   );
@@ -257,162 +493,194 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  centered: {
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 32,
+  },
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
-  },
-  content: {
-    flex: 1,
-  },
-  profileSection: {
-    padding: 24,
-    marginBottom: 8,
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  profileInfo: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  username: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  trustLevel: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  bio: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-    paddingVertical: 16,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  statLabel: {
-    fontSize: 14,
-    marginTop: 4,
-  },
-  buttonContainer: {
-    marginBottom: 20,
-  },
-  editButton: {
-    flexDirection: 'row',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  buttonIcon: {
-    marginRight: 8,
-  },
-  editButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  additionalInfo: {
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  accountStats: {
-    borderTopWidth: 1,
-    borderTopColor: '#e4e4e7',
-    paddingTop: 16,
-  },
-  statRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  statRowLabel: {
-    fontSize: 14,
-  },
-  statRowValue: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  postsSection: {
-    padding: 24,
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  postCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  postContent: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  postActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  actionItem: {
-    marginRight: 16,
-  },
-  actionText: {
-    fontSize: 14,
-  },
-  timestamp: {
-    fontSize: 12,
-    marginLeft: 'auto',
   },
   loadingText: {
-    marginTop: 16,
     fontSize: 16,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   errorText: {
     fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 20,
   },
   retryButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3b82f6',
   },
-  retryButtonText: {
-    color: 'white',
+  retryText: {
     fontSize: 16,
     fontWeight: '600',
   },
-});
-
+  profileHeader: {
+    margin: 16,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 16,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  profileUsername: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  profileBio: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  profileMeta: {
+    marginBottom: 12,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    gap: 8,
+  },
+  metaText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  trustLevel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  trustLevelText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    marginHorizontal: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: 16,
+    gap: 12,
+  },
+  statCard: {
+    width: '47%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  statIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginBottom: 8,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  actionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  actionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  actionContent: {
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  actionChevron: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  infoCard: {
+    marginHorizontal: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  infoLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+}); 

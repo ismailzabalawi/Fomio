@@ -4,27 +4,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../components/shared/theme-provider';
 
-export default function HomeScreen() {
+interface WelcomeScreenProps {}
+
+export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
   const { isDark } = useTheme();
+  
   const colors = {
-    background: isDark ? '#18181b' : '#fff',
+    background: isDark ? '#18181b' : '#ffffff',
     primary: isDark ? '#38bdf8' : '#0ea5e9',
     text: isDark ? '#f4f4f5' : '#1e293b',
     secondary: isDark ? '#a1a1aa' : '#64748b',
-    buttonText: isDark ? '#fff' : '#fff',
+    buttonText: isDark ? '#ffffff' : '#ffffff',
     border: isDark ? '#334155' : '#0ea5e9',
   };
 
-  const handleGetStarted = () => {
+  const handleGetStarted = (): void => {
     router.push('/(auth)/onboarding');
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = (): void => {
     router.push('/(auth)/signin');
   };
 
-  const handleExplore = () => {
-    router.push('/feed');
+  const handleExplore = (): void => {
+    router.push('/(tabs)');
   };
 
   return (
@@ -32,13 +35,17 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.primary }]}>Welcome to Fomio</Text>
-          <Text style={[styles.subtitle, { color: colors.secondary }]}>Share your thoughts, connect with others, and discover amazing content.</Text>
+          <Text style={[styles.subtitle, { color: colors.secondary }]}>
+            Share your thoughts, connect with others, and discover amazing content.
+          </Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.hero}>
             <Text style={[styles.heroTitle, { color: colors.text }]}>Fomio</Text>
-            <Text style={[styles.heroSubtitle, { color: colors.secondary }]}>Your social platform for sharing and connecting</Text>
+            <Text style={[styles.heroSubtitle, { color: colors.secondary }]}>
+              Your social platform for sharing and connecting
+            </Text>
           </View>
 
           <View style={styles.buttonContainer}>
@@ -51,7 +58,9 @@ export default function HomeScreen() {
               accessibilityHint="Begin onboarding for Fomio"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.primaryButtonText, { color: colors.buttonText }]}>Get Started</Text>
+              <Text style={[styles.primaryButtonText, { color: colors.buttonText }]}>
+                Get Started
+              </Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -63,7 +72,9 @@ export default function HomeScreen() {
               accessibilityHint="Sign in to your Fomio account"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>Sign In</Text>
+              <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>
+                Sign In
+              </Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -75,7 +86,9 @@ export default function HomeScreen() {
               accessibilityHint="Browse Fomio without signing in"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.ghostButtonText, { color: colors.secondary }]}>Explore Without Account</Text>
+              <Text style={[styles.ghostButtonText, { color: colors.secondary }]}>
+                Explore Without Account
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

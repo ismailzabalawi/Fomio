@@ -24,16 +24,16 @@ interface CommentItemProps {
 }
 
 export function CommentItem({ comment, isReply, onLike, onReply }: CommentItemProps) {
-  const { isDark } = useTheme();
+  const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isDark ? '#23232b' : '#f8fafc',
+    background: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
     text: isDark ? '#f4f4f5' : '#17131B',
     secondary: isDark ? '#a1a1aa' : '#5C5D67',
     action: isDark ? '#a1a1aa' : '#17131B',
     divider: isDark ? '#23232b' : '#e2e8f0',
   };
   return (
-    <View style={[styles.row, isReply && styles.replyRow]}> 
+    <View style={[styles.row, { borderBottomColor: colors.divider }, isReply && styles.replyRow]}> 
       <Image source={{ uri: comment.author.avatar }} style={styles.avatar} accessibilityLabel={`${comment.author.name}'s avatar`} />
       <View style={styles.contentBlock}>
         <View style={styles.headerRow}>
@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingRight: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   replyRow: {
     marginLeft: 44,

@@ -1,29 +1,12 @@
+import React from 'react';
 import { Stack } from 'expo-router';
 
-export default function AuthLayout() {
+export default function AuthLayout(): JSX.Element {
   return (
-    <Stack>
-      <Stack.Screen 
-        name="onboarding" 
-        options={{ 
-          headerShown: false,
-          title: 'Welcome'
-        }} 
-      />
-      <Stack.Screen 
-        name="signin" 
-        options={{ 
-          headerShown: false,
-          title: 'Sign In'
-        }} 
-      />
-      <Stack.Screen 
-        name="signup" 
-        options={{ 
-          headerShown: false,
-          title: 'Sign Up'
-        }} 
-      />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="onboarding" />
+      <Stack.Screen name="signin" />
+      <Stack.Screen name="signup" />
     </Stack>
   );
 }

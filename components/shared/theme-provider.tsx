@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '@/shared/logger';
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark' | 'amoled' | 'system';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -16,6 +16,7 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   isDark: boolean;
+  isAmoled: boolean;
 };
 
 const initialState: ThemeProviderState = {
@@ -23,6 +24,7 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
   toggleTheme: () => null,
   isDark: false,
+  isAmoled: false,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -51,7 +53,8 @@ export function ThemeProvider({
     loadTheme();
   }, [storageKey]);
 
-  const isDark = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  const isDark = theme === 'dark' || theme === 'amoled' || (theme === 'system' && systemTheme === 'dark');
+  const isAmoled = theme === 'amoled';
 
   const value = {
     theme,
@@ -75,6 +78,7 @@ export function ThemeProvider({
       }
     },
     isDark,
+    isAmoled,
   };
 
   return (

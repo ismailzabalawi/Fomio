@@ -32,7 +32,7 @@ export default function SignInScreen() {
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      router.replace('/feed');
+      router.replace('/(tabs)');
     }, 1000);
   };
 

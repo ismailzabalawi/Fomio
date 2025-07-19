@@ -56,6 +56,13 @@ jest.mock('react-native-reanimated', () => {
   // So we override it with a no-op
   Reanimated.default.call = () => {};
   
+  // Add missing methods that might be used
+  Reanimated.default.useSharedValue = (initialValue) => ({ value: initialValue });
+  Reanimated.default.useAnimatedStyle = () => ({});
+  Reanimated.default.withTiming = (value) => value;
+  Reanimated.default.withSpring = (value) => value;
+  Reanimated.default.runOnJS = (fn) => fn;
+  
   return Reanimated;
 });
 
@@ -67,6 +74,21 @@ jest.mock('react-native/Libraries/Utilities/Dimensions', () => ({
   get: jest.fn(() => ({ width: 390, height: 844 })),
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
+}));
+
+// Mock PixelRatio
+jest.mock('react-native/Libraries/Utilities/PixelRatio', () => ({
+  get: jest.fn(() => 1),
+  roundToNearestPixel: jest.fn((value) => value),
+  getFontScale: jest.fn(() => 1),
+  getPixelSizeForLayoutSize: jest.fn((size) => size),
+}));
+
+// Mock StyleSheet
+jest.mock('react-native/Libraries/StyleSheet/StyleSheet', () => ({
+  create: jest.fn((styles) => styles),
+  hairlineWidth: 1,
+  flatten: jest.fn((style) => style),
 }));
 
 // Global test utilities

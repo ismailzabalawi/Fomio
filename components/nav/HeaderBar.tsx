@@ -1,77 +1,88 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { useTheme } from '../shared/theme-provider';
-import { ArrowLeft, GearSix } from 'phosphor-react-native';
+import { ArrowLeft, UserCircle } from 'phosphor-react-native';
 import { router } from 'expo-router';
 
 export interface HeaderBarProps {
   title: string;
+  showBackButton?: boolean;
   onBack?: () => void;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  onRightPress?: () => void;
-  onLeftPress?: () => void;
-  rightA11yLabel?: string;
-  leftA11yLabel?: string;
+  showProfileButton?: boolean;
+  onProfilePress?: () => void;
   style?: ViewStyle;
 }
 
-// UI Spec: HeaderBar — Consistent navigation bar with title, left/right actions, and theming. Accessible and padded for touch.
+// UI Spec: HeaderBar — Three-section header with navigation, title, and profile. Accessible and themed.
 export function HeaderBar({
   title,
+  showBackButton = true,
   onBack,
-  leftIcon,
-  rightIcon,
-  onRightPress,
-  onLeftPress,
-  rightA11yLabel,
-  leftA11yLabel,
+  showProfileButton = true,
+  onProfilePress,
   style,
 }: HeaderBarProps) {
-  const { isDark } = useTheme();
+  const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isDark ? '#18181b' : '#fff',
+    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#fff'),
     text: isDark ? '#f4f4f5' : '#1e293b',
-    divider: isDark ? '#334155' : '#e2e8f0',
+    divider: isAmoled ? '#000000' : (isDark ? '#334155' : '#e2e8f0'),
   };
 
-  function handleLeftPress() {
-    if (onBack) return onBack();
-    if (onLeftPress) return onLeftPress();
-    router.back();
+  function handleBackPress() {
+    if (onBack) {
+      onBack();
+    } else {
+      router.back();
+    }
+  }
+
+  function handleProfilePress() {
+    if (onProfilePress) {
+      onProfilePress();
+    } else {
+      // Navigate to profile page
+      router.push('/(profile)/' as any);
+    }
   }
 
   return (
     <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.divider }, style]}>
+      {/* Left Section - Navigation */}
       <View style={styles.side}>
-        {(onBack || onLeftPress || leftIcon) && (
+        {showBackButton && (
           <TouchableOpacity
-            onPress={handleLeftPress}
+            onPress={handleBackPress}
             style={styles.iconButton}
             accessible
             accessibilityRole="button"
-            accessibilityLabel={leftA11yLabel || 'Back'}
-            accessibilityHint={onBack ? 'Go back to previous screen' : undefined}
+            accessibilityLabel="Go back"
+            accessibilityHint="Go back to previous screen"
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            {leftIcon || <ArrowLeft size={28} color={colors.text} weight="bold" />}
+            <ArrowLeft size={28} color={colors.text} weight="bold" />
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Center Section - Title */}
       <Text style={[styles.title, { color: colors.text }]} numberOfLines={1} accessibilityRole="header">
         {title}
       </Text>
+
+      {/* Right Section - Profile */}
       <View style={styles.side}>
-        {rightIcon && (
+        {showProfileButton && (
           <TouchableOpacity
-            onPress={onRightPress}
+            onPress={handleProfilePress}
             style={styles.iconButton}
             accessible
             accessibilityRole="button"
-            accessibilityLabel={rightA11yLabel || 'Action'}
+            accessibilityLabel="Profile"
+            accessibilityHint="Open profile page"
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
-            {rightIcon}
+            <UserCircle size={28} color={colors.text} weight="bold" />
           </TouchableOpacity>
         )}
       </View>

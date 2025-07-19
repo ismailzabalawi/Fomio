@@ -37,16 +37,16 @@ export default function OnboardingScreen() {
     buttonText: isDark ? '#fff' : '#fff',
   };
 
-  const handleNext = () => {
+  const handleNext = (): void => {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      router.push('/(auth)/signup');
+      router.replace('/(tabs)');
     }
   };
 
-  const handleSkip = () => {
-    router.push('/(auth)/signup');
+  const handleSkip = (): void => {
+    router.replace('/(tabs)');
   };
 
   return (

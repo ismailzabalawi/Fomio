@@ -39,7 +39,7 @@ export default function SignUpScreen() {
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      router.replace('/feed');
+      router.replace('/(tabs)');
     }, 1000);
   };
 

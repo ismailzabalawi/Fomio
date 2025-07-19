@@ -9,13 +9,14 @@ interface NewCommentInputProps {
 }
 
 export function NewCommentInput({ onSend }: NewCommentInputProps) {
-  const { isDark } = useTheme();
+  const { isDark, isAmoled } = useTheme();
   const [text, setText] = useState('');
   const colors = {
-    background: isDark ? '#23232b' : '#f8fafc',
+    background: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
     text: isDark ? '#f4f4f5' : '#17131B',
     placeholder: isDark ? '#a1a1aa' : '#5C5D67',
     accent: isDark ? '#38bdf8' : '#0ea5e9',
+    border: isDark ? '#374151' : '#e2e8f0',
   };
   function handleSend() {
     if (text.trim().length > 0) {
@@ -24,7 +25,7 @@ export function NewCommentInput({ onSend }: NewCommentInputProps) {
     }
   }
   return (
-    <View style={[styles.inputRow, { backgroundColor: colors.background }]}> 
+    <View style={[styles.inputRow, { backgroundColor: colors.background, borderColor: colors.border }]}> 
       <TextInput
         style={[styles.input, { color: colors.text }]}
         placeholder="Add a comment..."
@@ -58,7 +59,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 4,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
   },
   input: {
     flex: 1,

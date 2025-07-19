@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
+import { router } from 'expo-router';
 
-export default function EditProfileScreen(): JSX.Element {
+export default function ProfileSettingsScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
   
   const colors = {
@@ -13,17 +14,22 @@ export default function EditProfileScreen(): JSX.Element {
     secondary: isDark ? '#a1a1aa' : '#64748b',
   };
 
+  useEffect(() => {
+    // Redirect to main settings page
+    router.replace('/(tabs)/settings');
+  }, []);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <HeaderBar 
-        title="Edit Profile" 
+        title="Settings" 
         showBackButton={true}
         showProfileButton={false}
       />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Redirecting...</Text>
         <Text style={[styles.subtitle, { color: colors.secondary }]}>
-          Edit profile functionality coming soon...
+          Taking you to settings...
         </Text>
       </View>
     </SafeAreaView>

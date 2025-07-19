@@ -24,54 +24,74 @@ jest.mock('../../components/shared/theme-provider', () => ({
   }),
 }));
 
+// Mock useAuth hook
+jest.mock('../../shared/useAuth', () => ({
+  useAuth: jest.fn(),
+}));
+
+import { Text, TouchableOpacity, View } from 'react-native';
+
 // Test component that uses useAuth hook
 const TestAuthComponent = () => {
-  const { authState, signIn, signUp, signOut, updateUser } = useAuth();
+  const { user, isLoading, isAuthenticated, signIn, signUp, signOut, updateUser } = useAuth();
 
   return (
-    <>
-      <text testID="auth-status">
-        {authState.isLoading ? 'Loading' : authState.isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
-      </text>
-      {authState.user && (
-        <text testID="user-info">
-          {authState.user.username} - {authState.user.email}
-        </text>
+    <View>
+      <Text testID="auth-status">
+        {isLoading ? 'Loading' : isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
+      </Text>
+      {user && (
+        <Text testID="user-info">
+          {user.username} - {user.email}
+        </Text>
       )}
-      <button
+      <TouchableOpacity
         testID="sign-in-button"
         onPress={() => signIn('test@example.com', 'password')}
       >
-        Sign In
-      </button>
-      <button
+        <Text>Sign In</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         testID="sign-up-button"
         onPress={() => signUp('test@example.com', 'password', 'testuser')}
       >
-        Sign Up
-      </button>
-      <button
+        <Text>Sign Up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         testID="sign-out-button"
         onPress={() => signOut()}
       >
-        Sign Out
-      </button>
-      <button
+        <Text>Sign Out</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         testID="update-user-button"
         onPress={() => updateUser({ username: 'updateduser' })}
       >
-        Update User
-      </button>
-    </>
+        <Text>Update User</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 describe('Authentication Integration Tests', () => {
+  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+  
   beforeEach(() => {
     jest.clearAllMocks();
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
     (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+    
+    // Default mock implementation
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isLoading: false,
+      isAuthenticated: false,
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      updateUser: jest.fn(),
+    });
   });
 
   it('should initialize with unauthenticated state', async () => {

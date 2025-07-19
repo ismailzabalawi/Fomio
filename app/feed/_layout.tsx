@@ -1,23 +1,18 @@
 import { Stack } from 'expo-router';
 
-export default function FeedLayout() {
+// UI Spec: Feed Layout — Provides navigation structure for feed routes
+// Configures headers and navigation behavior for byte detail screens
+export default function FeedLayout(): JSX.Element {
   return (
     <Stack>
-      <Stack.Screen 
-        name="index" 
-        options={{ 
+      <Stack.Screen
+        name="[byteId]"
+        options={{
           headerShown: false,
-          title: 'Feed'
-        }} 
-      />
-      <Stack.Screen 
-        name="[byteId]" 
-        options={{ 
-          headerShown: false,
-          title: 'Byte Details'
-        }} 
+          presentation: 'card',
+          animation: 'slide_from_right',
+        }}
       />
     </Stack>
   );
-}
-
+} 

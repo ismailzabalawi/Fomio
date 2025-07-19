@@ -4,6 +4,7 @@ import { useTheme } from '../shared/theme-provider';
 import { Heart, ChatCircle, BookmarkSimple } from 'phosphor-react-native';
 import { CommentItem, Comment } from './CommentItem';
 import { NewCommentInput } from './NewCommentInput';
+import { HeaderBar } from '../nav/HeaderBar';
 
 export interface ByteBlogPageProps {
   author: {
@@ -40,12 +41,12 @@ export function ByteBlogPage({
   onBookmark,
   initialCommentsVisible = false,
 }: ByteBlogPageProps) {
-  const { isDark } = useTheme();
+  const { isDark, isAmoled } = useTheme();
   const [isCommentsVisible, setIsCommentsVisible] = useState(initialCommentsVisible);
   const flatListRef = useRef<import('react-native').FlatList>(null);
   const colors = {
-    background: isDark ? '#18181b' : '#fff',
-    card: isDark ? '#23232b' : '#f8fafc',
+    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#fff'),
+    card: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
     text: isDark ? '#f4f4f5' : '#17131B',
     secondary: isDark ? '#a1a1aa' : '#5C5D67',
     accent: isDark ? '#38bdf8' : '#0ea5e9',
@@ -111,6 +112,13 @@ export function ByteBlogPage({
       keyExtractor={item => item.id}
       ListHeaderComponent={
         <View style={[styles.headerContainer, { backgroundColor: colors.background }]}> 
+          {/* HeaderBar */}
+          <HeaderBar 
+            title="Byte Details" 
+            showBackButton={true}
+            showProfileButton={true}
+          />
+          
           {/* Author & Teret Title */}
           <View style={styles.authorRow}>
             <Image source={{ uri: author.avatar }} style={styles.avatar} accessibilityLabel={`${author.name}'s avatar`} />
