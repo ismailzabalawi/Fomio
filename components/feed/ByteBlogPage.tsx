@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '../shared/theme-provider';
 import { Heart, ChatCircle, BookmarkSimple } from 'phosphor-react-native';
 import { CommentItem, Comment } from './CommentItem';
 import { NewCommentInput } from './NewCommentInput';
 import { HeaderBar } from '../nav/HeaderBar';
+import { useTopic } from '../../hooks';
+import { useLocalSearchParams } from 'expo-router';
 
 export interface ByteBlogPageProps {
   author: {
@@ -44,6 +46,22 @@ export function ByteBlogPage({
   const { isDark, isAmoled } = useTheme();
   const [isCommentsVisible, setIsCommentsVisible] = useState(initialCommentsVisible);
   const flatListRef = useRef<import('react-native').FlatList>(null);
+  
+  // Get topic ID from route params and fetch real data
+  const { byteId } = useLocalSearchParams<{ byteId: string }>();
+  const topicId = parseInt(byteId || '1', 10);
+  const { data: topicData, isLoading, error } = useTopic(topicId);
+  
+  // Use real topic data if available, fallback to props
+  const realTitle = topicData?.post_stream?.posts[0]?.topic_title || title;
+  const realAuthor = topicData?.post_stream?.posts[0] ? {
+    name: topicData.post_stream.posts[0].username,
+    avatar: `https://meta.techrebels.info${topicData.post_stream.posts[0].avatar_template.replace('{size}', '150')}`,
+  } : author;
+  const realContent = topicData?.post_stream?.posts[0]?.cooked ? [
+    { type: 'paragraph' as const, text: topicData.post_stream.posts[0].cooked.replace(/<[^>]*>/g, '') }
+  ] : content;
+  const realComments = topicData?.post_stream?.posts?.length ? topicData.post_stream.posts.length - 1 : comments;
   const colors = {
     background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#fff'),
     card: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
@@ -105,6 +123,38 @@ export function ByteBlogPage({
     }
   }, [initialCommentsVisible]);
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <HeaderBar title="Loading..." showBackButton={true} showProfileButton={true} />
+        <View style={styles.loadingContent}>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.loadingText, { color: colors.secondary }]}>
+            Loading topic...
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+        <HeaderBar title="Error" showBackButton={true} showProfileButton={true} />
+        <View style={styles.errorContent}>
+          <Text style={[styles.errorText, { color: '#ef4444' }]}>
+            Failed to load topic
+          </Text>
+          <Text style={[styles.errorSubtext, { color: colors.secondary }]}>
+            {error.message}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <FlatList
       ref={flatListRef}
@@ -114,16 +164,16 @@ export function ByteBlogPage({
         <View style={[styles.headerContainer, { backgroundColor: colors.background }]}> 
           {/* HeaderBar */}
           <HeaderBar 
-            title="Byte Details" 
+            title={realTitle} 
             showBackButton={true}
             showProfileButton={true}
           />
           
           {/* Author & Teret Title */}
           <View style={styles.authorRow}>
-            <Image source={{ uri: author.avatar }} style={styles.avatar} accessibilityLabel={`${author.name}'s avatar`} />
+            <Image source={{ uri: realAuthor.avatar }} style={styles.avatar} accessibilityLabel={`${realAuthor.name}'s avatar`} />
             <View style={styles.authorInfo}>
-              <Text style={[styles.authorName, { color: colors.text }]}>{author.name}</Text>
+              <Text style={[styles.authorName, { color: colors.text }]}>{realAuthor.name}</Text>
               <Text style={[styles.teret, { color: colors.topic }]}>{teretTitle}</Text>
             </View>
           </View>
@@ -132,10 +182,10 @@ export function ByteBlogPage({
             <Image source={{ uri: coverImage }} style={styles.coverImage} resizeMode="cover" accessibilityLabel="Cover image" />
           )}
           {/* Title */}
-          <Text style={[styles.title, { color: colors.heading }]}>{title}</Text>
+          <Text style={[styles.title, { color: colors.heading }]}>{realTitle}</Text>
           {/* Content */}
           <View style={styles.contentBlock}>
-            {content.map((block, idx) =>
+            {realContent.map((block, idx) =>
               block.type === 'heading' ? (
                 <Text key={idx} style={[styles.heading, { color: colors.heading }]}>{block.text}</Text>
               ) : (
@@ -164,7 +214,7 @@ export function ByteBlogPage({
               accessibilityHint={isCommentsVisible ? 'Hides the comment section' : 'Shows the comment section'}
             >
               <ChatCircle size={24} weight={isCommentsVisible ? 'fill' : 'regular'} color={colors.action} />
-              <Text style={[styles.actionText, { color: colors.action }]}>{comments}</Text>
+              <Text style={[styles.actionText, { color: colors.action }]}>{realComments}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
@@ -265,5 +315,38 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 6,
     fontWeight: '500',
+  },
+  loadingContainer: {
+    flex: 1,
+  },
+  loadingContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  errorContainer: {
+    flex: 1,
+  },
+  errorContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  errorSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#6b7280',
   },
 }); 

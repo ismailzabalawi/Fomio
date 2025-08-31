@@ -3,6 +3,7 @@ import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../components/shared/theme-provider';
+import { ReactQueryTest } from '../components/shared/react-query-test';
 
 interface WelcomeScreenProps {}
 
@@ -47,6 +48,9 @@ export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
               Your social platform for sharing and connecting
             </Text>
           </View>
+
+          {/* React Query Test Component */}
+          <ReactQueryTest colors={colors} />
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity

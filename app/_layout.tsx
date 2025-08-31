@@ -9,6 +9,7 @@ import '../global.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { ThemeProvider } from '@/components/shared/theme-provider';
+import { QueryProvider } from '@/components/shared/query-provider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,23 +47,25 @@ function RootLayoutNav(): JSX.Element {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider defaultTheme="system">
-      <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack 
-          screenOptions={{ 
-            headerShown: false,
-            contentStyle: {
-              backgroundColor: 'transparent',
+    <QueryProvider>
+      <ThemeProvider defaultTheme="system">
+        <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack 
+            screenOptions={{ 
+              headerShown: false,
+              contentStyle: {
+                backgroundColor: 'transparent',
             },
           }}
         >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="feed" />
-        </Stack>
-      </NavigationThemeProvider>
-    </ThemeProvider>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="feed" />
+          </Stack>
+        </NavigationThemeProvider>
+      </ThemeProvider>
+    </QueryProvider>
   );
 }
 
