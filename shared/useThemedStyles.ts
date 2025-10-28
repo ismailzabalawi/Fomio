@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import { useTheme } from '../components/shared/theme-provider';
-import { getThemeColors, createThemedStyles, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from './theme-constants';
+import {
+  getThemeColors,
+  createThemedStyles,
+  SPACING,
+  TYPOGRAPHY,
+  BORDER_RADIUS,
+  SHADOWS,
+} from './theme-constants';
 
 /**
  * Custom hook for consistent theming across components
@@ -8,10 +15,10 @@ import { getThemeColors, createThemedStyles, SPACING, TYPOGRAPHY, BORDER_RADIUS,
  */
 export const useThemedStyles = () => {
   const { isDark } = useTheme();
-  
+
   const colors = useMemo(() => getThemeColors(isDark), [isDark]);
   const commonStyles = useMemo(() => createThemedStyles(isDark), [isDark]);
-  
+
   return {
     colors,
     commonStyles,
@@ -28,8 +35,9 @@ export const useThemedStyles = () => {
  * Reduces boilerplate in component styling
  */
 export const useComponentStyles = () => {
-  const { colors, spacing, typography, borderRadius, shadows, isDark } = useThemedStyles();
-  
+  const { colors, spacing, typography, borderRadius, shadows, isDark } =
+    useThemedStyles();
+
   return {
     // Button styles
     button: {
@@ -54,7 +62,7 @@ export const useComponentStyles = () => {
         backgroundColor: 'transparent',
       },
     },
-    
+
     // Input styles
     input: {
       base: {
@@ -74,7 +82,7 @@ export const useComponentStyles = () => {
         borderColor: colors.destructive,
       },
     },
-    
+
     // Card styles
     card: {
       base: {
@@ -87,7 +95,7 @@ export const useComponentStyles = () => {
         ...shadows.md,
       },
     },
-    
+
     // Text styles
     text: {
       primary: {
@@ -110,4 +118,3 @@ export const useComponentStyles = () => {
     },
   };
 };
-

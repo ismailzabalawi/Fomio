@@ -3,9 +3,19 @@
  * Advanced lazy loading and code splitting for optimal performance
  */
 
-import React, { Suspense, lazy, ComponentType, useState, useEffect, useRef } from 'react';
+import React, {
+  Suspense,
+  lazy,
+  ComponentType,
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
 import { View, Image, ImageProps, Dimensions } from 'react-native';
-import { LoadingSpinnerEnhanced, SkeletonEnhanced } from '../components/shared/loading.enhanced';
+import {
+  LoadingSpinnerEnhanced,
+  SkeletonEnhanced,
+} from '../components/shared/loading.enhanced';
 import { logger } from './logger';
 import { performanceMonitor } from './performance-monitor';
 
@@ -39,31 +49,33 @@ export function createLazyComponent<T extends ComponentType<any>>(
   // Create lazy component
   const LazyComponent = lazy(() => {
     const startTime = performance.now();
-    
+
     return importFn()
       .then((module) => {
         const loadTime = performance.now() - startTime;
-        logger.info(`Lazy component loaded: ${chunkName} in ${loadTime.toFixed(2)}ms`);
-        
+        logger.info(
+          `Lazy component loaded: ${chunkName} in ${loadTime.toFixed(2)}ms`
+        );
+
         // Track chunk loading performance
         performanceMonitor.trackNetworkRequest(
           `Chunk: ${chunkName}`,
           loadTime,
           true
         );
-        
+
         return module;
       })
       .catch((error) => {
         const loadTime = performance.now() - startTime;
         logger.error(`Failed to load lazy component: ${chunkName}`, error);
-        
+
         performanceMonitor.trackNetworkRequest(
           `Chunk: ${chunkName}`,
           loadTime,
           false
         );
-        
+
         throw error;
       });
   });
@@ -85,7 +97,7 @@ export function createLazyComponent<T extends ComponentType<any>>(
 
     const retry = () => {
       setError(null);
-      setRetryCount(prev => prev + 1);
+      setRetryCount((prev) => prev + 1);
     };
 
     if (error && ErrorBoundary) {
@@ -100,7 +112,7 @@ export function createLazyComponent<T extends ComponentType<any>>(
   };
 
   WrappedComponent.displayName = `Lazy(${chunkName})`;
-  
+
   return WrappedComponent;
 }
 
@@ -147,16 +159,16 @@ export function LazyImage({
 
     // Check visibility after a short delay
     const timer = setTimeout(checkVisibility, 100);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
   const handleLoad = () => {
     const loadTime = performance.now() - loadStartTime.current;
     setIsLoaded(true);
-    
+
     logger.info(`Image loaded in ${loadTime.toFixed(2)}ms`);
-    
+
     // Track image loading performance
     if (typeof source === 'object' && source.uri) {
       performanceMonitor.trackNetworkRequest(
@@ -165,16 +177,16 @@ export function LazyImage({
         true
       );
     }
-    
+
     onLoad?.();
   };
 
   const handleError = (error: any) => {
     const loadTime = performance.now() - loadStartTime.current;
     setHasError(true);
-    
+
     logger.error('Image failed to load', error);
-    
+
     if (typeof source === 'object' && source.uri) {
       performanceMonitor.trackNetworkRequest(
         `Image: ${source.uri}`,
@@ -182,7 +194,7 @@ export function LazyImage({
         false
       );
     }
-    
+
     onError?.(error);
   };
 
@@ -195,11 +207,7 @@ export function LazyImage({
     return (
       <View ref={viewRef} style={style}>
         {placeholder || (
-          <SkeletonEnhanced
-            width="100%"
-            height={200}
-            animated={isVisible}
-          />
+          <SkeletonEnhanced width="100%" height={200} animated={isVisible} />
         )}
         {isVisible && !hasError && (
           <Image
@@ -218,8 +226,20 @@ export function LazyImage({
   // Show error state
   if (hasError) {
     return (
-      <View ref={viewRef} style={[style, { backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' }]}>
-        {placeholder || <SkeletonEnhanced width="100%" height={200} animated={false} />}
+      <View
+        ref={viewRef}
+        style={[
+          style,
+          {
+            backgroundColor: '#f3f4f6',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+        ]}
+      >
+        {placeholder || (
+          <SkeletonEnhanced width="100%" height={200} animated={false} />
+        )}
       </View>
     );
   }
@@ -260,11 +280,15 @@ export function createLazyScreen(
   return createLazyComponent(importFn, {
     ...options,
     chunkName: `Screen_${screenName}`,
-    fallback: options.fallback || (() => (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <LoadingSpinnerEnhanced />
-      </View>
-    )),
+    fallback:
+      options.fallback ||
+      (() => (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <LoadingSpinnerEnhanced />
+        </View>
+      )),
   });
 }
 
@@ -332,7 +356,10 @@ export function VirtualizedList({
 }: VirtualizedListProps) {
   const [scrollOffset, setScrollOffset] = useState(0);
 
-  const visibleStart = Math.max(0, Math.floor(scrollOffset / itemHeight) - overscan);
+  const visibleStart = Math.max(
+    0,
+    Math.floor(scrollOffset / itemHeight) - overscan
+  );
   const visibleEnd = Math.min(
     data.length,
     Math.ceil((scrollOffset + containerHeight) / itemHeight) + overscan
@@ -414,4 +441,3 @@ export const memoryOptimizer = {
     }
   },
 };
-

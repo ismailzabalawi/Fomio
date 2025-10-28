@@ -1,6 +1,10 @@
 import 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -10,6 +14,10 @@ import '../global.css';
 import { useColorScheme } from '@/components/useColorScheme';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { QueryProvider } from '@/components/shared/query-provider';
+import { ApolloProvider } from '@/components/shared/apollo-provider';
+import { DataProvider } from '../data/provider';
+import { AuthProvider } from '../components/shared/auth-provider';
+import { ErrorBanner } from '../components/shared/error-banner';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -40,7 +48,15 @@ export default function RootLayout(): JSX.Element | null {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <DataProvider>
+      <ApolloProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </ApolloProvider>
+    </DataProvider>
+  );
 }
 
 function RootLayoutNav(): JSX.Element {
@@ -49,15 +65,18 @@ function RootLayoutNav(): JSX.Element {
   return (
     <QueryProvider>
       <ThemeProvider defaultTheme="system">
-        <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack 
-            screenOptions={{ 
+        <NavigationThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <ErrorBanner />
+          <Stack
+            screenOptions={{
               headerShown: false,
               contentStyle: {
                 backgroundColor: 'transparent',
-            },
-          }}
-        >
+              },
+            }}
+          >
             <Stack.Screen name="index" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="(auth)" />
@@ -68,4 +87,3 @@ function RootLayoutNav(): JSX.Element {
     </QueryProvider>
   );
 }
-

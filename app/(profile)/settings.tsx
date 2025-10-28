@@ -7,9 +7,9 @@ import { router } from 'expo-router';
 
 export default function ProfileSettingsScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
     text: isDark ? '#f4f4f5' : '#1e293b',
     secondary: isDark ? '#a1a1aa' : '#64748b',
   };
@@ -20,14 +20,18 @@ export default function ProfileSettingsScreen(): JSX.Element {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Settings" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Settings"
         showBackButton={true}
         showProfileButton={false}
       />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>Redirecting...</Text>
+        <Text style={[styles.title, { color: colors.text }]}>
+          Redirecting...
+        </Text>
         <Text style={[styles.subtitle, { color: colors.secondary }]}>
           Taking you to settings...
         </Text>
@@ -55,4 +59,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-}); 
+});

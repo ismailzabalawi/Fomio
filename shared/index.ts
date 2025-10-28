@@ -2,13 +2,14 @@ export { useAuth } from './useAuth';
 export { useCreateByte } from './useCreateByte';
 export { useFeed } from './useFeed';
 export { logger, logError, withLogging } from './logger';
+export { SessionStorage } from './session-storage';
 
 // Design System exports
 export * from './design-system';
 
 // Performance Optimization exports
 export * from './performance-monitor';
-export { 
+export {
   memoryOptimizer,
   useMemoryOptimization,
   useTrackedTimeout,
@@ -22,19 +23,8 @@ export * from './error-handling';
 export * from './offline-support';
 export * from './form-validation';
 
-// Discourse integration exports
-export { 
-  discourseApi, 
-  DiscourseApiService,
-  type DiscourseConfig,
-  type DiscourseUser,
-  type UserSettings,
-  type DiscourseApiResponse,
-  type LoginResponse
-} from './discourseApi';
-
-export { 
+// BFF integration exports (replacing old Discourse integration)
+export {
   useDiscourseUser,
-  type UseDiscourseUserReturn 
+  type UseDiscourseUserReturn,
 } from './useDiscourseUser';
-

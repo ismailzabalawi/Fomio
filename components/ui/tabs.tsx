@@ -41,7 +41,13 @@ export interface TabsContentProps {
   style?: ViewStyle;
 }
 
-export function Tabs({ children, defaultValue, value, onValueChange, style }: TabsProps) {
+export function Tabs({
+  children,
+  defaultValue,
+  value,
+  onValueChange,
+  style,
+}: TabsProps) {
   const [activeTab, setActiveTab] = React.useState(value || defaultValue || '');
 
   const handleTabChange = (newValue: string) => {
@@ -57,22 +63,21 @@ export function Tabs({ children, defaultValue, value, onValueChange, style }: Ta
 
   return (
     <TabsContext.Provider value={{ activeTab, onTabChange: handleTabChange }}>
-      <View style={[styles.container, style]}>
-        {children}
-      </View>
+      <View style={[styles.container, style]}>{children}</View>
     </TabsContext.Provider>
   );
 }
 
 export function TabsList({ children, style }: TabsListProps) {
-  return (
-    <View style={[styles.tabsList, style]}>
-      {children}
-    </View>
-  );
+  return <View style={[styles.tabsList, style]}>{children}</View>;
 }
 
-export function TabsTrigger({ children, value, style, textStyle }: TabsTriggerProps) {
+export function TabsTrigger({
+  children,
+  value,
+  style,
+  textStyle,
+}: TabsTriggerProps) {
   const context = useContext(TabsContext);
   if (!context) {
     throw new Error('TabsTrigger must be used within a Tabs component');
@@ -83,11 +88,7 @@ export function TabsTrigger({ children, value, style, textStyle }: TabsTriggerPr
 
   return (
     <TouchableOpacity
-      style={[
-        styles.tabsTrigger,
-        isActive && styles.tabsTriggerActive,
-        style,
-      ]}
+      style={[styles.tabsTrigger, isActive && styles.tabsTriggerActive, style]}
       onPress={() => onTabChange(value)}
       activeOpacity={0.7}
     >
@@ -111,16 +112,12 @@ export function TabsContent({ children, value, style }: TabsContentProps) {
   }
 
   const { activeTab } = context;
-  
+
   if (activeTab !== value) {
     return null;
   }
 
-  return (
-    <View style={[styles.tabsContent, style]}>
-      {children}
-    </View>
-  );
+  return <View style={[styles.tabsContent, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -165,4 +162,3 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 });
-

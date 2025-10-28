@@ -1,9 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  Pressable,
+} from 'react-native';
 import { useTheme } from '../shared/theme-provider';
 import { ArrowLeft, UserCircle, House } from 'phosphor-react-native';
 import { router } from 'expo-router';
-
 
 export interface HeaderBarProps {
   title: string;
@@ -31,16 +38,16 @@ export function HeaderBar({
   variant = 'default',
 }: HeaderBarProps) {
   const { isDark, isAmoled } = useTheme();
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#0f0f23' : '#ffffff'),
-    backgroundSecondary: isAmoled ? '#0a0a0a' : (isDark ? '#1a1a2e' : '#f8fafc'),
+    background: isAmoled ? '#000000' : isDark ? '#0f0f23' : '#ffffff',
+    backgroundSecondary: isAmoled ? '#0a0a0a' : isDark ? '#1a1a2e' : '#f8fafc',
     text: isDark ? '#f8fafc' : '#0f172a',
     textSecondary: isDark ? '#94a3b8' : '#475569',
     accent: isDark ? '#38bdf8' : '#0ea5e9',
     accentLight: isDark ? '#7dd3fc' : '#38bdf8',
-    divider: isAmoled ? '#1a1a1a' : (isDark ? '#1e293b' : '#e2e8f0'),
-    shadow: isAmoled ? '#000000' : (isDark ? '#000000' : '#000000'),
+    divider: isAmoled ? '#1a1a1a' : isDark ? '#1e293b' : '#e2e8f0',
+    shadow: isAmoled ? '#000000' : isDark ? '#000000' : '#000000',
   };
 
   const getBackgroundStyle = () => {
@@ -100,7 +107,7 @@ export function HeaderBar({
             onPress={handleBackPress}
             style={({ pressed }) => [
               styles.iconButton,
-              pressed && styles.iconButtonPressed
+              pressed && styles.iconButtonPressed,
             ]}
             accessible
             accessibilityRole="button"
@@ -119,7 +126,7 @@ export function HeaderBar({
             style={({ pressed }) => [
               styles.iconButton,
               styles.homeButton,
-              pressed && styles.iconButtonPressed
+              pressed && styles.iconButtonPressed,
             ]}
             accessible
             accessibilityRole="button"
@@ -136,15 +143,17 @@ export function HeaderBar({
 
       {/* Center Section - Title */}
       <View style={styles.titleContainer}>
-        <Text 
-          style={[styles.title, { color: colors.text }]} 
-          numberOfLines={1} 
+        <Text
+          style={[styles.title, { color: colors.text }]}
+          numberOfLines={1}
           accessibilityRole="header"
         >
           {title}
         </Text>
         {variant === 'elevated' && (
-          <View style={[styles.titleUnderline, { backgroundColor: colors.accent }]} />
+          <View
+            style={[styles.titleUnderline, { backgroundColor: colors.accent }]}
+          />
         )}
       </View>
 
@@ -156,7 +165,7 @@ export function HeaderBar({
             style={({ pressed }) => [
               styles.iconButton,
               styles.profileButton,
-              pressed && styles.iconButtonPressed
+              pressed && styles.iconButtonPressed,
             ]}
             accessible
             accessibilityRole="button"
@@ -233,4 +242,4 @@ const styles = StyleSheet.create({
   profileIconContainer: {
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
   } as ViewStyle,
-}); 
+});

@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -191,7 +191,41 @@
 <a name='L126'></a><a href='#L126'>126</a>
 <a name='L127'></a><a href='#L127'>127</a>
 <a name='L128'></a><a href='#L128'>128</a>
-<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -237,6 +271,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,7 +297,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -344,24 +402,45 @@ interface CommentItemProps {
   onReply?: (id: string) =&gt; void;
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >CommentItem(</span>{ comment, isReply, onLike, onReply }: CommentItemProps) {
-  const { isDark } = <span class="cstat-no" title="statement not covered" >useTheme();</span>
+export function <span class="fstat-no" title="function not covered" >CommentItem(</span>{
+  comment,
+  isReply,
+  onLike,
+  onReply,
+}: CommentItemProps) {
+  const { isDark, isAmoled } = <span class="cstat-no" title="statement not covered" >useTheme();</span>
   const colors = <span class="cstat-no" title="statement not covered" >{</span>
-    background: isDark ? '#23232b' : '#f8fafc',
+    background: isAmoled ? '#000000' : isDark ? '#23232b' : '#f8fafc',
     text: isDark ? '#f4f4f5' : '#17131B',
     secondary: isDark ? '#a1a1aa' : '#5C5D67',
     action: isDark ? '#a1a1aa' : '#17131B',
     divider: isDark ? '#23232b' : '#e2e8f0',
   };
 <span class="cstat-no" title="statement not covered" >  return (</span>
-    &lt;View style={[styles.row, isReply &amp;&amp; styles.replyRow]}&gt; 
-      &lt;Image source={{ uri: comment.author.avatar }} style={styles.avatar} accessibilityLabel={`${comment.author.name}'s avatar`} /&gt;
+    &lt;View
+      style={[
+        styles.row,
+        { borderBottomColor: colors.divider },
+        isReply &amp;&amp; styles.replyRow,
+      ]}
+    &gt;
+      &lt;Image
+        source={{ uri: comment.author.avatar }}
+        style={styles.avatar}
+        accessibilityLabel={`${comment.author.name}'s avatar`}
+      /&gt;
       &lt;View style={styles.contentBlock}&gt;
         &lt;View style={styles.headerRow}&gt;
-          &lt;Text style={[styles.author, { color: colors.text }]}&gt;{comment.author.name}&lt;/Text&gt;
-          &lt;Text style={[styles.time, { color: colors.secondary }]}&gt;{comment.createdAt}&lt;/Text&gt;
+          &lt;Text style={[styles.author, { color: colors.text }]}&gt;
+            {comment.author.name}
+          &lt;/Text&gt;
+          &lt;Text style={[styles.time, { color: colors.secondary }]}&gt;
+            {comment.createdAt}
+          &lt;/Text&gt;
         &lt;/View&gt;
-        &lt;Text style={[styles.text, { color: colors.text }]}&gt;{comment.content}&lt;/Text&gt;
+        &lt;Text style={[styles.text, { color: colors.text }]}&gt;
+          {comment.content}
+        &lt;/Text&gt;
         &lt;View style={styles.actions}&gt;
           &lt;TouchableOpacity
             style={styles.actionBtn}
@@ -370,8 +449,14 @@ export function <span class="fstat-no" title="function not covered" >CommentItem
             accessibilityRole="button"
             accessibilityLabel="Like comment"
           &gt;
-            &lt;Heart size={18} weight={comment.likes &gt; 0 ? 'fill' : 'regular'} color={colors.action} /&gt;
-            &lt;Text style={[styles.actionText, { color: colors.action }]}&gt;{comment.likes}&lt;/Text&gt;
+            &lt;Heart
+              size={18}
+              weight={comment.likes &gt; 0 ? 'fill' : 'regular'}
+              color={colors.action}
+            /&gt;
+            &lt;Text style={[styles.actionText, { color: colors.action }]}&gt;
+              {comment.likes}
+            &lt;/Text&gt;
           &lt;/TouchableOpacity&gt;
           &lt;TouchableOpacity
             style={styles.actionBtn}
@@ -381,7 +466,9 @@ export function <span class="fstat-no" title="function not covered" >CommentItem
             accessibilityLabel="Reply to comment"
           &gt;
             &lt;ChatCircle size={18} weight="regular" color={colors.action} /&gt;
-            &lt;Text style={[styles.actionText, { color: colors.action }]}&gt;Reply&lt;/Text&gt;
+            &lt;Text style={[styles.actionText, { color: colors.action }]}&gt;
+              Reply
+            &lt;/Text&gt;
           &lt;/TouchableOpacity&gt;
         &lt;/View&gt;
       &lt;/View&gt;
@@ -396,7 +483,6 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
     paddingVertical: 12,
     paddingRight: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   replyRow: {
     marginLeft: 44,
@@ -447,14 +533,15 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
     marginLeft: 4,
     fontWeight: '500',
   },
-}); </pre></td></tr></table></pre>
+});
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-17T23:11:51.723Z
+                at 2025-10-28T10:36:17.490Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

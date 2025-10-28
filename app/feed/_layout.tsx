@@ -15,4 +15,4 @@ export default function FeedLayout(): JSX.Element {
       />
     </Stack>
   );
-} 
+}

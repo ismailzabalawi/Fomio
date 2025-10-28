@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { discourseApi } from '../api';
+import { bffFetch } from '../lib/apiClient';
 
 export function useUserInteractions() {
   const queryClient = useQueryClient();
 
   // Like/Unlike a post
   const likeMutation = useMutation({
-    mutationFn: (postId: number) => discourseApi.toggleLike(postId),
+    mutationFn: (postId: number) =>
+      bffFetch(`/posts/${postId}/like`, { method: 'POST' }),
     onSuccess: (_, postId) => {
       // Invalidate related queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['topic'] });
@@ -20,7 +21,8 @@ export function useUserInteractions() {
 
   // Bookmark/Unbookmark a topic
   const bookmarkMutation = useMutation({
-    mutationFn: (topicId: number) => discourseApi.toggleBookmark(topicId),
+    mutationFn: (topicId: number) =>
+      bffFetch(`/topics/${topicId}/bookmark`, { method: 'POST' }),
     onSuccess: (_, topicId) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['topic', topicId] });

@@ -6,17 +6,19 @@ import { HeaderBar } from '../../components/nav/HeaderBar';
 
 export default function EditProfileScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
     text: isDark ? '#f4f4f5' : '#1e293b',
     secondary: isDark ? '#a1a1aa' : '#64748b',
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Edit Profile" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Edit Profile"
         showBackButton={true}
         showProfileButton={false}
       />
@@ -49,4 +51,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-}); 
+});

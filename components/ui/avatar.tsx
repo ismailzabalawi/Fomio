@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  StyleProp,
+} from 'react-native';
 import { useTheme } from '@/components/shared/theme-provider';
 
 export interface AvatarProps {
@@ -14,21 +22,31 @@ export function Avatar({ source, size = 'md', fallback, style }: AvatarProps) {
 
   const getSizeStyle = () => {
     switch (size) {
-      case 'sm': return { width: 32, height: 32, borderRadius: 16 };
-      case 'md': return { width: 40, height: 40, borderRadius: 20 };
-      case 'lg': return { width: 56, height: 56, borderRadius: 28 };
-      case 'xl': return { width: 80, height: 80, borderRadius: 40 };
-      default: return { width: 40, height: 40, borderRadius: 20 };
+      case 'sm':
+        return { width: 32, height: 32, borderRadius: 16 };
+      case 'md':
+        return { width: 40, height: 40, borderRadius: 20 };
+      case 'lg':
+        return { width: 56, height: 56, borderRadius: 28 };
+      case 'xl':
+        return { width: 80, height: 80, borderRadius: 40 };
+      default:
+        return { width: 40, height: 40, borderRadius: 20 };
     }
   };
 
   const getFallbackTextSize = () => {
     switch (size) {
-      case 'sm': return 12;
-      case 'md': return 16;
-      case 'lg': return 20;
-      case 'xl': return 28;
-      default: return 16;
+      case 'sm':
+        return 12;
+      case 'md':
+        return 16;
+      case 'lg':
+        return 20;
+      case 'xl':
+        return 28;
+      default:
+        return 16;
     }
   };
 
@@ -80,4 +98,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-

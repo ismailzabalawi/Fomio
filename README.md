@@ -1,51 +1,59 @@
 # Fomio Mobile - React Native App
 
-A mobile-native version of the Fomio social media platform, migrated from Next.js to React Native using Expo, Gluestack UI, and NativeWind.
+A mobile-native version of the Fomio social media platform, built with React Native using Expo, Apollo GraphQL, and NativeWind. The app integrates with a Discourse backend through a unified data layer that supports both REST and GraphQL APIs.
 
-## 🚀 Features
+## 🚀 Current Status
+
+**Version**: 0.0.100 (Pre-Launch Audit Phase)  
+**Status**: In development - preparing for beta release  
+**Architecture**: Unified data layer with REST/GraphQL fallback
+
+## 📱 Features
 
 - **Cross-platform**: Runs on iOS, Android, and Web
-- **Modern UI**: Built with Gluestack UI components
+- **Unified Data Layer**: Automatic fallback from GraphQL to REST API
+- **Modern UI**: Built with custom components and NativeWind
 - **Dark/Light Mode**: Automatic theme switching with manual override
 - **Responsive Design**: Optimized for mobile devices
 - **Type-safe**: Full TypeScript support
 - **File-based Routing**: Using Expo Router for intuitive navigation
+- **Authentication**: WebView-based Discourse authentication
+- **Real-time Updates**: Apollo GraphQL with optimistic updates
 
-## 📱 Screens
+## 🏗 Architecture
+
+### Data Layer
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   UI Components │    │   Data Provider  │    │   BFF Server    │
+│                 │◄───┤                  │◄───┤   (GraphQL)     │
+│  - Feed Screen  │    │  - Health Check  │    │                 │
+│  - Compose      │    │  - Auto Fallback │    └─────────────────┘
+│  - Profile      │    │  - Unified API   │             │
+└─────────────────┘    └──────────────────┘             │
+                                │                        │
+                                ▼                        ▼
+                       ┌──────────────────┐    ┌─────────────────┐
+                       │   REST Adapter   │    │ Discourse API   │
+                       │   (Fallback)     │◄───┤   (REST)       │
+                       └──────────────────┘    └─────────────────┘
+```
 
 ### Authentication Flow
-- **Home Screen** (`/`) - Welcome page with app introduction
-- **Onboarding** (`/(auth)/onboarding`) - Multi-step introduction
-- **Sign In** (`/(auth)/signin`) - User authentication
-- **Sign Up** (`/(auth)/signup`) - Account creation
 
-### Main App Flow
-- **Feed** (`/feed`) - Main content feed with bytes
-- **Byte Details** (`/feed/[byteId]`) - Individual byte view with comments
-- **Compose** (`/(compose)`) - Create new bytes
-- **Profile** (`/(profile)`) - User profile and settings
-
-## 🛠 Tech Stack
-
-### Core Framework
-- **React Native** - Mobile app framework
-- **Expo** - Development platform and tooling
-- **Expo Router** - File-based navigation
-
-### UI & Styling
-- **Gluestack UI** - Component library
-- **NativeWind** - Tailwind CSS for React Native
-- **Lucide React Native** - Icon system
-
-### State Management
-- **Zustand** - Lightweight state management
-- **AsyncStorage** - Local data persistence
-- **Custom Hooks** - Shared business logic
-
-### Development
-- **TypeScript** - Type safety
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
+```
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+│   Sign In   │───►│   WebView    │───►│  Discourse  │
+│   Screen    │    │   Auth       │    │   Backend   │
+└─────────────┘    └──────────────┘    └─────────────┘
+       │                   │                   │
+       ▼                   ▼                   ▼
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+│   Session   │◄───│   Token      │◄───│   Cookies    │
+│   Storage   │    │   Extraction │    │   & CSRF     │
+└─────────────┘    └──────────────┘    └─────────────┘
+```
 
 ## 📁 Project Structure
 
@@ -57,250 +65,246 @@ FomioMobile/
 │   │   ├── onboarding.tsx
 │   │   ├── signin.tsx
 │   │   └── signup.tsx
+│   ├── (tabs)/                   # Main app tabs
+│   │   ├── index.tsx             # Feed screen
+│   │   ├── compose.tsx           # Create post
+│   │   ├── notifications.tsx     # Notifications
+│   │   └── settings.tsx          # Settings
 │   ├── feed/                     # Feed screens
-│   │   ├── _layout.tsx
-│   │   ├── index.tsx
-│   │   └── [byteId].tsx
+│   │   └── [byteId].tsx          # Byte detail
 │   ├── (profile)/                # Profile screens
-│   │   ├── _layout.tsx
-│   │   └── index.tsx
+│   │   ├── index.tsx
+│   │   └── edit-profile.tsx
 │   ├── _layout.tsx               # Root layout
-│   ├── index.tsx                 # Home screen
-│   └── compose.tsx               # Compose screen
+│   └── index.tsx                 # Home screen
 ├── components/                   # Reusable components
 │   ├── ui/                       # UI components
 │   │   ├── button.tsx
 │   │   ├── input.tsx
 │   │   ├── card.tsx
-│   │   ├── avatar.tsx
-│   │   ├── badge.tsx
-│   │   ├── tabs.tsx
-│   │   ├── switch.tsx
-│   │   ├── textarea.tsx
-│   │   └── index.ts
+│   │   └── ...
+│   ├── feed/                     # Feed-specific components
+│   │   ├── ByteCard.tsx
+│   │   └── ByteBlogPage.tsx
 │   └── shared/                   # Shared components
 │       ├── theme-provider.tsx
-│       └── theme-toggle.tsx
-├── shared/                       # Business logic hooks
-│   ├── useAuth.ts
-│   ├── useCreateByte.ts
+│       ├── apollo-provider.tsx
+│       ├── auth-provider.tsx
+│       └── ...
+├── data/                         # Data layer (NEW)
+│   ├── client.ts                 # Data client interface
+│   ├── rest.ts                   # REST implementation
+│   ├── gql.ts                    # GraphQL implementation
+│   └── provider.tsx              # Runtime provider
+├── hooks/                        # Custom hooks
 │   ├── useFeed.ts
-│   └── index.ts
-├── theme/                        # Theme configuration
-│   └── gluestack-ui.config.ts
-├── assets/                       # Static assets
-├── global.css                    # Global styles
-├── tailwind.config.js            # Tailwind configuration
-├── nativewind.config.ts          # NativeWind configuration
-└── package.json
+│   ├── useAuth.ts
+│   ├── useCreatePost.ts
+│   └── ...
+├── lib/                          # Core libraries
+│   ├── apollo.ts                 # Apollo Client setup
+│   ├── auth.ts                   # Authentication logic
+│   └── apiClient.ts              # API client
+├── shared/                       # Shared utilities
+│   ├── form-validation.tsx
+│   ├── logger.ts
+│   └── theme-constants.ts
+├── CHANGELOG.md                  # Version history
+├── PRE_LAUNCH_AUDIT.md           # Audit checklist
+└── README.md                     # This file
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 - Expo CLI (`npm install -g @expo/cli`)
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd FomioMobile
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+4. **Start the development server**
+
    ```bash
    npm start
    ```
 
-4. **Run on different platforms**
+5. **Run on different platforms**
    - **iOS**: Press `i` or run `npm run ios`
    - **Android**: Press `a` or run `npm run android`
    - **Web**: Press `w` or run `npm run web`
 
-### Development
+## 🔧 Environment Configuration
 
-- **Start development server**: `npm start`
-- **Run on iOS simulator**: `npm run ios`
-- **Run on Android emulator**: `npm run android`
-- **Run on web**: `npm run web`
-- **Run tests**: `npm test`
+Create a `.env` file in the root directory:
 
-## 🎨 UI Components
+```bash
+# API Configuration
+EXPO_PUBLIC_API_MODE=rest                    # "rest" or "bff"
+EXPO_PUBLIC_BFF_URL=http://localhost:8080    # BFF GraphQL server URL
+EXPO_PUBLIC_DISCOURSE_API=https://meta.techrebels.info  # Discourse API URL
 
-### Available Components
+# Deep Linking
+EXPO_PUBLIC_DEEP_LINK_SCHEME=fomio          # Deep link scheme
+```
 
-All components are built with Gluestack UI and support light/dark themes:
+**Note**: After changing environment variables, restart the Expo development server.
 
-- **Button** - Various styles and sizes
-- **Input** - Text input with validation
-- **Card** - Content containers
-- **Avatar** - User profile images
-- **Badge** - Labels and tags
-- **Tabs** - Navigation tabs
-- **Switch** - Toggle controls
-- **Textarea** - Multi-line text input
+## 🛠 Development Scripts
 
-### Usage Example
+```bash
+# Development
+npm start                    # Start Expo dev server
+npm run ios                  # Run on iOS simulator
+npm run android              # Run on Android emulator
+npm run web                  # Run on web
 
-```tsx
-import { Button, Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
+# Code Quality
+npm run lint                 # Run ESLint
+npm run fmt                  # Format code with Prettier
+npm run typecheck            # Run TypeScript compiler
+npm run doctor               # Run Expo doctor
 
-function MyComponent() {
+# Testing
+npm test                     # Run tests
+npm run test:coverage        # Run tests with coverage
+npm run test:watch           # Run tests in watch mode
+
+# Analysis
+npm run deps:unused          # Find unused dependencies
+npm run types:unused         # Find unused TypeScript exports
+npm run release              # Generate new version
+```
+
+## 📊 Data Layer Usage
+
+The app uses a unified data layer that automatically falls back from GraphQL to REST:
+
+```typescript
+import { useData } from '../data/provider';
+
+function FeedScreen() {
+  const data = useData();
+  const [topics, setTopics] = useState([]);
+
+  useEffect(() => {
+    // This will use GraphQL if BFF is available, REST otherwise
+    data.getFeed().then(setTopics);
+  }, []);
+
+  return <FlatList data={topics} renderItem={TopicCard} />;
+}
+```
+
+## 🔐 Authentication
+
+The app uses WebView-based authentication with Discourse:
+
+```typescript
+import { useAuth } from '../hooks/useAuth';
+
+function SignInScreen() {
+  const { startLogin, isAuthenticated } = useAuth();
+
+  const handleSignIn = async () => {
+    await startLogin(); // Opens WebView for Discourse auth
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Welcome</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Button onPress={() => console.log('Pressed!')}>
-          Click me
-        </Button>
-      </CardContent>
-    </Card>
+    <Button onPress={handleSignIn}>
+      Sign In to TechRebels
+    </Button>
   );
 }
 ```
 
-## 🔧 Configuration
+## 🎨 Theming
 
-### Theme Configuration
+The app supports automatic dark/light mode switching:
 
-The app supports automatic dark/light mode switching based on system preferences, with manual override available.
+```typescript
+import { useTheme } from '../components/shared/theme-provider';
 
-**Theme Provider Setup:**
-```tsx
-import { ThemeProvider } from '@/components/shared/theme-provider';
+function MyComponent() {
+  const { isDark, isAmoled } = useTheme();
 
-export default function App() {
   return (
-    <ThemeProvider defaultTheme="system">
-      {/* Your app content */}
-    </ThemeProvider>
+    <View style={{
+      backgroundColor: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff')
+    }}>
+      {/* Content */}
+    </View>
   );
 }
 ```
 
-### NativeWind Configuration
+## 🧪 Testing
 
-Tailwind classes are configured for React Native through NativeWind. The configuration includes:
+```bash
+# Run all tests
+npm test
 
-- Custom color palette
-- Typography scales
-- Spacing system
-- Responsive breakpoints
+# Run specific test files
+npm test -- __tests__/api/discourse.test.ts
 
-## 📱 State Management
-
-### Authentication
-
-```tsx
-import { useAuth } from '@/shared';
-
-function MyComponent() {
-  const { user, isAuthenticated, signIn, signOut } = useAuth();
-  
-  // Use authentication state and methods
-}
+# Run with coverage
+npm run test:coverage
 ```
 
-### Feed Management
+## 📱 Platform Support
 
-```tsx
-import { useFeed } from '@/shared';
-
-function FeedComponent() {
-  const { bytes, isLoading, refreshFeed, toggleLike } = useFeed();
-  
-  // Use feed state and methods
-}
-```
-
-### Byte Creation
-
-```tsx
-import { useCreateByte } from '@/shared';
-
-function ComposeComponent() {
-  const { createByte, isCreating, validateByte } = useCreateByte();
-  
-  // Use byte creation methods
-}
-```
-
-## 🔄 Migration Notes
-
-This project was migrated from a Next.js web application to React Native. Key changes include:
-
-### Framework Migration
-- **Next.js** → **Expo with Expo Router**
-- **ShadCN UI** → **Gluestack UI**
-- **Tailwind CSS** → **NativeWind**
-- **Lucide React** → **Lucide React Native**
-
-### Architecture Preservation
-- Maintained original page structure and navigation flow
-- Preserved component hierarchy and design patterns
-- Kept business logic and state management patterns
-- Maintained TypeScript type safety
-
-### Mobile Optimizations
-- Touch-friendly interface elements
-- Mobile-specific navigation patterns
-- Responsive design for various screen sizes
-- Platform-specific optimizations
+- **iOS**: iPhone, iPad (with split view support)
+- **Android**: Phone, tablet (Material Design)
+- **Web**: Chrome, Safari, Firefox (PWA ready)
 
 ## 🚀 Deployment
 
-### Expo Application Services (EAS)
-
-1. **Install EAS CLI**
-   ```bash
-   npm install -g eas-cli
-   ```
-
-2. **Configure EAS**
-   ```bash
-   eas build:configure
-   ```
-
-3. **Build for production**
-   ```bash
-   # iOS
-   eas build --platform ios
-   
-   # Android
-   eas build --platform android
-   
-   # Both platforms
-   eas build --platform all
-   ```
-
-### Web Deployment
-
-The app can also be deployed as a web application:
+### Development Builds
 
 ```bash
-npm run build:web
+# iOS
+eas build --platform ios --profile development
+
+# Android
+eas build --platform android --profile development
 ```
 
-## 📝 TODO / Future Enhancements
+### Production Builds
 
-- [ ] Implement actual API integration
-- [ ] Add push notifications
-- [ ] Implement image/media upload
-- [ ] Add offline support with caching
-- [ ] Implement real-time features
-- [ ] Add comprehensive testing
-- [ ] Performance optimizations
-- [ ] Accessibility improvements
+```bash
+# iOS
+eas build --platform ios --profile production
+
+# Android
+eas build --platform android --profile production
+```
+
+## 📚 Documentation
+
+- [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
+- [PRE_LAUNCH_AUDIT.md](./PRE_LAUNCH_AUDIT.md) - Current audit progress
+- [docs/archive/](./docs/archive/) - Archived implementation docs
 
 ## 🤝 Contributing
 
@@ -316,10 +320,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Original FomioNext web application
-- Expo team for the excellent development platform
-- Gluestack UI for the component library
-- NativeWind for Tailwind CSS integration
+- Discourse team for the excellent forum platform
+- Expo team for the development platform
+- Apollo GraphQL team for the client library
 - React Native community for the ecosystem
-
-# FomioMobile
+- TechRebels community for inspiration and feedback

@@ -31,7 +31,9 @@ export function useCreateByte() {
   const [isCreating, setIsCreating] = useState(false);
   const { user } = useAuth();
 
-  const createByte = async (data: CreateByteData): Promise<{ success: boolean; byte?: Byte; error?: string }> => {
+  const createByte = async (
+    data: CreateByteData
+  ): Promise<{ success: boolean; byte?: Byte; error?: string }> => {
     if (!user) {
       return { success: false, error: 'User not authenticated' };
     }
@@ -69,7 +71,7 @@ export function useCreateByte() {
       };
 
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setIsCreating(false);
       return { success: true, byte: newByte };
@@ -80,7 +82,9 @@ export function useCreateByte() {
     }
   };
 
-  const validateContent = (content: string): { isValid: boolean; error?: string } => {
+  const validateContent = (
+    content: string
+  ): { isValid: boolean; error?: string } => {
     if (!content.trim()) {
       return { isValid: false, error: 'Content cannot be empty' };
     }
@@ -92,7 +96,9 @@ export function useCreateByte() {
     return { isValid: true };
   };
 
-  const validateTags = (tags: string[]): { isValid: boolean; error?: string } => {
+  const validateTags = (
+    tags: string[]
+  ): { isValid: boolean; error?: string } => {
     if (tags.length > 5) {
       return { isValid: false, error: 'Maximum 5 tags allowed' };
     }
@@ -101,16 +107,21 @@ export function useCreateByte() {
       if (tag.length > 20) {
         return { isValid: false, error: 'Tag cannot exceed 20 characters' };
       }
-      
+
       if (!/^[a-zA-Z0-9_]+$/.test(tag)) {
-        return { isValid: false, error: 'Tags can only contain letters, numbers, and underscores' };
+        return {
+          isValid: false,
+          error: 'Tags can only contain letters, numbers, and underscores',
+        };
       }
     }
 
     return { isValid: true };
   };
 
-  const validateByte = (data: CreateByteData): { isValid: boolean; errors: string[] } => {
+  const validateByte = (
+    data: CreateByteData
+  ): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
 
     const contentValidation = validateContent(data.content);
@@ -137,4 +148,3 @@ export function useCreateByte() {
     validateByte,
   };
 }
-

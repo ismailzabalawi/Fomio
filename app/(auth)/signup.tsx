@@ -1,46 +1,122 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Animated,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../../components/shared/theme-provider';
+import { useBffAuth } from '../../components/shared/bff-auth-provider';
+import { Button } from '../../components/ui/button';
+import {
+  UserPlus,
+  Globe,
+  Shield,
+  Coffee,
+  ArrowRight,
+  Sparkle,
+} from 'phosphor-react-native';
+import {
+  COLORS,
+  SPACING,
+  TYPOGRAPHY,
+  BORDER_RADIUS,
+  SHADOWS,
+} from '../../shared/theme-constants';
 
 export default function SignUpScreen() {
-  const { isDark } = useTheme();
+  const { isDark, isAmoled } = useTheme();
+  const { startLogin } = useBffAuth();
+  const { width } = Dimensions.get('window');
+
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  // Get theme colors from centralized system
   const colors = {
-    background: isDark ? '#18181b' : '#fff',
-    primary: isDark ? '#38bdf8' : '#0ea5e9',
-    text: isDark ? '#f4f4f5' : '#1e293b',
-    secondary: isDark ? '#a1a1aa' : '#64748b',
-    border: isDark ? '#334155' : '#0ea5e9',
-    inputBg: isDark ? '#27272a' : '#fff',
-    inputBorder: isDark ? '#334155' : '#d1d5db',
-    divider: isDark ? '#334155' : '#e2e8f0',
-    label: isDark ? '#f4f4f5' : '#1e293b',
-    disabled: isDark ? '#64748b' : '#64748b',
+    background: isAmoled
+      ? '#000000'
+      : isDark
+        ? COLORS.dark.background
+        : COLORS.light.background,
+    foreground: isAmoled
+      ? '#ffffff'
+      : isDark
+        ? COLORS.dark.foreground
+        : COLORS.light.foreground,
+    card: isAmoled ? '#000000' : isDark ? COLORS.dark.card : COLORS.light.card,
+    secondary: isAmoled
+      ? '#a1a1aa'
+      : isDark
+        ? COLORS.dark.secondary
+        : COLORS.light.secondary,
+    mutedForeground: isAmoled
+      ? '#71717a'
+      : isDark
+        ? COLORS.dark.mutedForeground
+        : COLORS.light.mutedForeground,
+    border: isAmoled
+      ? '#18181b'
+      : isDark
+        ? COLORS.dark.border
+        : COLORS.light.border,
+    primary: isAmoled
+      ? '#60a5fa'
+      : isDark
+        ? COLORS.dark.accent
+        : COLORS.light.accent,
+    surface: isAmoled
+      ? '#0a0a0a'
+      : isDark
+        ? COLORS.dark.muted
+        : COLORS.light.muted,
+    accent: isAmoled ? '#8b5cf6' : isDark ? '#8b5cf6' : '#a855f7',
+    gradient: isAmoled
+      ? ['#000000', '#1a1a1a']
+      : isDark
+        ? ['#18181b', '#27272a']
+        : ['#f8fafc', '#ffffff'],
   };
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  // Entrance animation
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const handleSignUp = async () => {
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await startLogin();
       router.replace('/(tabs)');
-    }, 1000);
+    } catch (error) {
+      console.error('Sign up failed:', error);
+      Alert.alert('Sign Up Error', 'Failed to sign up. Please try again.', [
+        { text: 'OK' },
+      ]);
+    }
   };
 
   const handleSignIn = () => {
@@ -52,106 +128,243 @@ export default function SignUpScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.divider }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      {/* Background Gradient Effect */}
+      <View
+        style={[
+          styles.backgroundGradient,
+          {
+            backgroundColor: colors.background,
+            opacity: isDark ? 0.1 : 0.05,
+          },
+        ]}
+      />
+
+      {/* Header */}
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
         <TouchableOpacity
           onPress={handleBack}
-          style={styles.backButton}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Back"
-          accessibilityHint="Go back to previous screen"
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={[styles.backButton, { backgroundColor: colors.surface }]}
         >
-          <Text style={[styles.backButtonText, { color: colors.primary }]}>←</Text>
+          <ArrowRight
+            size={20}
+            color={colors.foreground}
+            weight="bold"
+            style={{ transform: [{ rotate: '180deg' }] }}
+          />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Create Account</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.form}>
-          <Text style={[styles.label, { color: colors.label }]}>Full Name</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your full name"
-            placeholderTextColor={colors.secondary}
-            autoCapitalize="words"
-            autoCorrect={false}
+        <View style={styles.headerTitleContainer}>
+          <Text style={[styles.headerTitle, { color: colors.foreground }]}>
+            Join TechRebels
+          </Text>
+          <View
+            style={[styles.headerAccent, { backgroundColor: colors.accent }]}
           />
+        </View>
+        <View style={styles.headerSpacer} />
+      </Animated.View>
 
-          <Text style={[styles.label, { color: colors.label }]}>Email</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            placeholderTextColor={colors.secondary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-
-          <Text style={[styles.label, { color: colors.label }]}>Password</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            placeholderTextColor={colors.secondary}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-
-          <Text style={[styles.label, { color: colors.label }]}>Confirm Password</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Confirm your password"
-            placeholderTextColor={colors.secondary}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-
-          <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.disabledButton, { backgroundColor: colors.primary }]}
-            onPress={handleSignUp}
-            disabled={loading}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Create Account"
-            accessibilityHint="Create a new Fomio account"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      {/* Main Content Card */}
+      <Animated.View
+        style={[
+          styles.contentCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            shadowColor: colors.foreground,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+          },
+        ]}
+      >
+        {/* Welcome Section */}
+        <View style={styles.welcomeSection}>
+          <View
+            style={[styles.welcomeIcon, { backgroundColor: colors.accent }]}
           >
-            <Text style={[styles.primaryButtonText, { color: colors.background }]}>
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Text>
-          </TouchableOpacity>
+            <Sparkle size={32} color={colors.foreground} weight="fill" />
+          </View>
+          <Text style={[styles.welcomeTitle, { color: colors.foreground }]}>
+            Create Your Account
+          </Text>
+          <Text
+            style={[styles.welcomeSubtitle, { color: colors.mutedForeground }]}
+          >
+            Join thousands of tech enthusiasts, developers, and innovators in
+            meaningful discussions.
+          </Text>
+        </View>
 
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
-            <Text style={[styles.dividerText, { color: colors.secondary }]}>or</Text>
-            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
+        {/* Features Section */}
+        <View style={styles.featuresSection}>
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                shadowColor: colors.foreground,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.featureIcon,
+                {
+                  backgroundColor: colors.primary,
+                  shadowColor: colors.primary,
+                },
+              ]}
+            >
+              <Globe size={18} color={colors.foreground} weight="fill" />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.foreground }]}>
+                Global Network
+              </Text>
+              <Text
+                style={[styles.featureText, { color: colors.mutedForeground }]}
+              >
+                Connect with a worldwide tech community
+              </Text>
+            </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.secondaryButton]}
-            onPress={handleSignIn}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Already have an account? Sign In"
-            accessibilityHint="Go to sign in screen"
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                shadowColor: colors.foreground,
+              },
+            ]}
           >
-            <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>Already have an account? Sign In</Text>
-          </TouchableOpacity>
+            <View
+              style={[
+                styles.featureIcon,
+                {
+                  backgroundColor: colors.accent,
+                  shadowColor: colors.accent,
+                },
+              ]}
+            >
+              <Shield size={18} color={colors.foreground} weight="fill" />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.foreground }]}>
+                Privacy Focused
+              </Text>
+              <Text
+                style={[styles.featureText, { color: colors.mutedForeground }]}
+              >
+                No tracking, algorithms, or data mining
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                shadowColor: colors.foreground,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.featureIcon,
+                {
+                  backgroundColor: colors.primary,
+                  shadowColor: colors.primary,
+                },
+              ]}
+            >
+              <Coffee size={18} color={colors.foreground} weight="fill" />
+            </View>
+            <View style={styles.featureContent}>
+              <Text style={[styles.featureTitle, { color: colors.foreground }]}>
+                Knowledge Sharing
+              </Text>
+              <Text
+                style={[styles.featureText, { color: colors.mutedForeground }]}
+              >
+                Learn from experts and share your expertise
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actionSection}>
+          <Button
+            onPress={handleSignUp}
+            variant="primary"
+            size="lg"
+            fullWidth
+            icon={UserPlus}
+            style={styles.primaryButton}
+            accessibilityLabel="Create TechRebels account"
+            accessibilityHint="Opens the TechRebels sign up page in a secure web view"
+          >
+            Create Account
+          </Button>
+
+          <View style={styles.divider}>
+            <View
+              style={[styles.dividerLine, { backgroundColor: colors.border }]}
+            />
+            <Text
+              style={[styles.dividerText, { color: colors.mutedForeground }]}
+            >
+              or
+            </Text>
+            <View
+              style={[styles.dividerLine, { backgroundColor: colors.border }]}
+            />
+          </View>
+
+          <Button
+            onPress={handleSignIn}
+            variant="outline"
+            size="lg"
+            fullWidth
+            style={styles.secondaryButton}
+            accessibilityLabel="Sign in to existing TechRebels account"
+            accessibilityHint="Navigates to the sign in screen"
+          >
+            Sign In
+          </Button>
+        </View>
+      </Animated.View>
+
+      {/* Footer */}
+      <Animated.View
+        style={[
+          styles.footer,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
+          By creating an account, you agree to our Terms of Service and Privacy
+          Policy
+        </Text>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -159,82 +372,168 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: SPACING.lg,
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
+    paddingVertical: SPACING.lg,
+    marginBottom: SPACING.lg,
+    zIndex: 1,
   },
   backButton: {
-    padding: 8,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    ...SHADOWS.sm,
   },
-  backButtonText: {
-    fontSize: 24,
+  headerTitleContainer: {
+    alignItems: 'center',
+    position: 'relative',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: TYPOGRAPHY.fontSize.xl,
+    fontWeight: TYPOGRAPHY.fontWeight.bold,
+    letterSpacing: -0.3,
   },
-  placeholder: {
+  headerAccent: {
     width: 40,
+    height: 3,
+    borderRadius: BORDER_RADIUS.full,
+    marginTop: SPACING.xs,
   },
-  content: {
+  headerSpacer: {
+    width: 60,
+  },
+  contentCard: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  form: {
-    maxWidth: 400,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  input: {
+    borderRadius: BORDER_RADIUS.xl,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    marginBottom: 20,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    ...SHADOWS.lg,
+    zIndex: 1,
+  },
+  welcomeSection: {
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    paddingTop: SPACING.sm,
+  },
+  welcomeIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: BORDER_RADIUS.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.md,
+    ...SHADOWS.md,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  welcomeTitle: {
+    fontSize: TYPOGRAPHY.fontSize['2xl'],
+    fontWeight: TYPOGRAPHY.fontWeight.bold,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+    letterSpacing: -0.3,
+    lineHeight: TYPOGRAPHY.fontSize['2xl'] * 1.2,
+  },
+  welcomeSubtitle: {
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    textAlign: 'center',
+    lineHeight: TYPOGRAPHY.fontSize.sm * TYPOGRAPHY.lineHeight.normal,
+    maxWidth: 300,
+    opacity: 0.7,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
+    marginBottom: SPACING.md,
+  },
+  featuresSection: {
+    marginBottom: SPACING.lg,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    ...SHADOWS.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  featureIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.md,
+    ...SHADOWS.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  featureContent: {
+    flex: 1,
+  },
+  featureTitle: {
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    marginBottom: 3,
+    letterSpacing: -0.1,
+    lineHeight: TYPOGRAPHY.fontSize.sm * 1.1,
+  },
+  featureText: {
+    fontSize: TYPOGRAPHY.fontSize.xs,
+    lineHeight: TYPOGRAPHY.fontSize.xs * 1.3,
+    opacity: 0.8,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
+  },
+  actionSection: {
+    marginBottom: SPACING.sm,
   },
   primaryButton: {
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  disabledButton: {
-    opacity: 0.6,
+    marginBottom: SPACING.md,
+    ...SHADOWS.lg,
+    borderRadius: BORDER_RADIUS.xl,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: SPACING.md,
   },
   dividerLine: {
     flex: 1,
     height: 1,
+    opacity: 0.3,
   },
   dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
+    marginHorizontal: SPACING.lg,
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontWeight: TYPOGRAPHY.fontWeight.medium,
+    opacity: 0.6,
   },
   secondaryButton: {
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderWidth: 1.5,
+    ...SHADOWS.sm,
+    borderRadius: BORDER_RADIUS.xl,
   },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+  footer: {
+    alignItems: 'center',
+    paddingBottom: SPACING.lg,
+    zIndex: 1,
+  },
+  footerText: {
+    fontSize: TYPOGRAPHY.fontSize.xs,
+    textAlign: 'center',
+    lineHeight: TYPOGRAPHY.fontSize.xs * TYPOGRAPHY.lineHeight.relaxed,
+    maxWidth: 320,
+    opacity: 0.7,
   },
 });
-

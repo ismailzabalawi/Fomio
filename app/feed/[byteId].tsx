@@ -9,31 +9,45 @@ import { useTheme } from '../../components/shared/theme-provider';
 export default function ByteDetailScreen(): JSX.Element {
   const { byteId } = useLocalSearchParams<{ byteId: string }>();
   const { isDark, isAmoled } = useTheme();
-  
+
   console.log('ByteDetailScreen rendered with byteId:', byteId);
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
   };
-  
+
   // Mock data for the byte - in a real app, this would come from an API
   // based on the byteId parameter
   const mockByteData = {
     author: {
       name: 'Alex Chen',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      avatar:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     },
     teretTitle: 'React Native',
     title: 'Getting Started with React Native',
     content: [
-      { type: 'paragraph' as const, text: 'Just published my first React Native app! The development experience is amazing. The hot reload feature alone makes development so much faster.' },
+      {
+        type: 'paragraph' as const,
+        text: 'Just published my first React Native app! The development experience is amazing. The hot reload feature alone makes development so much faster.',
+      },
       { type: 'heading' as const, text: 'Key Learnings' },
-      { type: 'paragraph' as const, text: 'The hot reload feature is a game-changer. Being able to see changes instantly without rebuilding the entire app makes the development process incredibly smooth.' },
-      { type: 'paragraph' as const, text: 'Another great aspect is the cross-platform nature. Writing once and running on both iOS and Android is exactly what I was looking for.' },
+      {
+        type: 'paragraph' as const,
+        text: 'The hot reload feature is a game-changer. Being able to see changes instantly without rebuilding the entire app makes the development process incredibly smooth.',
+      },
+      {
+        type: 'paragraph' as const,
+        text: 'Another great aspect is the cross-platform nature. Writing once and running on both iOS and Android is exactly what I was looking for.',
+      },
       { type: 'heading' as const, text: 'Next Steps' },
-      { type: 'paragraph' as const, text: 'I\'m excited to explore more advanced features like native modules and performance optimization. The community around React Native is incredibly supportive.' },
+      {
+        type: 'paragraph' as const,
+        text: "I'm excited to explore more advanced features like native modules and performance optimization. The community around React Native is incredibly supportive.",
+      },
     ],
-    coverImage: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop',
+    coverImage:
+      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop',
     likes: 42,
     comments: 8,
     isBookmarked: false,
@@ -74,4 +88,4 @@ export default function ByteDetailScreen(): JSX.Element {
       />
     </SafeAreaView>
   );
-} 
+}

@@ -17,7 +17,7 @@ export interface InputProps {
   secureTextEntry?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-  autoComplete?: 
+  autoComplete?:
     | 'additional-name'
     | 'address-line1'
     | 'address-line2'
@@ -140,4 +140,3 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 });
-

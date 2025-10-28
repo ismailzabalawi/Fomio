@@ -51,18 +51,20 @@ jest.mock('expo-splash-screen', () => ({
 // Mock react-native-reanimated
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
-  
+
   // The mock for `call` immediately calls the callback which is incorrect
   // So we override it with a no-op
   Reanimated.default.call = () => {};
-  
+
   // Add missing methods that might be used
-  Reanimated.default.useSharedValue = (initialValue) => ({ value: initialValue });
+  Reanimated.default.useSharedValue = (initialValue) => ({
+    value: initialValue,
+  });
   Reanimated.default.useAnimatedStyle = () => ({});
   Reanimated.default.withTiming = (value) => value;
   Reanimated.default.withSpring = (value) => value;
   Reanimated.default.runOnJS = (fn) => fn;
-  
+
   return Reanimated;
 });
 
@@ -109,4 +111,3 @@ afterEach(() => {
   jest.useRealTimers();
   jest.clearAllMocks();
 });
-

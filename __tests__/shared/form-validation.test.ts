@@ -2,7 +2,10 @@
  * Unit tests for form validation utility
  */
 
-import { validationRules, formValidationManager } from '../../shared/form-validation';
+import {
+  validationRules,
+  formValidationManager,
+} from '../../shared/form-validation';
 
 describe('Form Validation', () => {
   describe('validationRules', () => {
@@ -198,7 +201,11 @@ describe('Form Validation', () => {
     describe('validateField', () => {
       it('should validate field with single rule', async () => {
         const rules = [validationRules.required()];
-        const result = await formValidationManager.validateField('test', 'value', rules);
+        const result = await formValidationManager.validateField(
+          'test',
+          'value',
+          rules
+        );
 
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -206,7 +213,11 @@ describe('Form Validation', () => {
 
       it('should return errors for invalid field', async () => {
         const rules = [validationRules.required()];
-        const result = await formValidationManager.validateField('test', '', rules);
+        const result = await formValidationManager.validateField(
+          'test',
+          '',
+          rules
+        );
 
         expect(result.isValid).toBe(false);
         expect(result.errors).toHaveLength(1);
@@ -219,7 +230,11 @@ describe('Form Validation', () => {
           validationRules.minLength(5),
           validationRules.email(),
         ];
-        const result = await formValidationManager.validateField('email', 'test@example.com', rules);
+        const result = await formValidationManager.validateField(
+          'email',
+          'test@example.com',
+          rules
+        );
 
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -231,7 +246,11 @@ describe('Form Validation', () => {
           validationRules.minLength(10),
           validationRules.email(),
         ];
-        const result = await formValidationManager.validateField('email', 'test', rules);
+        const result = await formValidationManager.validateField(
+          'email',
+          'test',
+          rules
+        );
 
         expect(result.isValid).toBe(false);
         expect(result.errors.length).toBeGreaterThan(1);
@@ -248,11 +267,17 @@ describe('Form Validation', () => {
 
         const fieldRules = {
           email: [validationRules.required(), validationRules.email()],
-          password: [validationRules.required(), validationRules.passwordStrength()],
+          password: [
+            validationRules.required(),
+            validationRules.passwordStrength(),
+          ],
           username: [validationRules.required(), validationRules.username()],
         };
 
-        const result = await formValidationManager.validateForm(formData, fieldRules);
+        const result = await formValidationManager.validateForm(
+          formData,
+          fieldRules
+        );
 
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -268,11 +293,17 @@ describe('Form Validation', () => {
 
         const fieldRules = {
           email: [validationRules.required(), validationRules.email()],
-          password: [validationRules.required(), validationRules.passwordStrength()],
+          password: [
+            validationRules.required(),
+            validationRules.passwordStrength(),
+          ],
           username: [validationRules.required(), validationRules.username()],
         };
 
-        const result = await formValidationManager.validateForm(formData, fieldRules);
+        const result = await formValidationManager.validateForm(
+          formData,
+          fieldRules
+        );
 
         expect(result.isValid).toBe(false);
         expect(result.errors.length).toBeGreaterThan(0);
@@ -283,4 +314,3 @@ describe('Form Validation', () => {
     });
   });
 });
-

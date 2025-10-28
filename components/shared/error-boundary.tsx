@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: any) {
     // Log the error
     logger.error('Error Boundary caught an error', error, errorInfo);
-    
+
     // Call custom error handler if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -62,7 +62,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 {this.state.error.toString()}
               </Text>
             )}
-            <TouchableOpacity style={styles.retryButton} onPress={this.handleRetry}>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={this.handleRetry}
+            >
               <Text style={styles.retryButtonText}>Try Again</Text>
             </TouchableOpacity>
           </View>
@@ -138,4 +141,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-

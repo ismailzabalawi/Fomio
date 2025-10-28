@@ -10,31 +10,31 @@ export const COLORS = {
     foreground: '#17131B',
     card: '#f8fafc',
     cardForeground: '#17131B',
-    
+
     // Secondary colors
     secondary: '#5C5D67',
     secondaryForeground: '#ffffff',
     muted: '#f1f5f9',
     mutedForeground: '#64748b',
-    
+
     // Accent colors
     accent: '#3b82f6',
     accentForeground: '#ffffff',
-    
+
     // Destructive colors
     destructive: '#ef4444',
     destructiveForeground: '#ffffff',
-    
+
     // Border and input colors
     border: '#e2e8f0',
     input: '#e2e8f0',
     ring: '#3b82f6',
-    
+
     // Status colors
     success: '#22c55e',
     warning: '#f59e0b',
     info: '#3b82f6',
-    
+
     // Social colors
     like: '#ef4444',
     bookmark: '#f59e0b',
@@ -46,31 +46,31 @@ export const COLORS = {
     foreground: '#f4f4f5',
     card: '#23232b',
     cardForeground: '#f4f4f5',
-    
+
     // Secondary colors
     secondary: '#a1a1aa',
     secondaryForeground: '#18181b',
     muted: '#27272a',
     mutedForeground: '#a1a1aa',
-    
+
     // Accent colors
     accent: '#60a5fa',
     accentForeground: '#18181b',
-    
+
     // Destructive colors
     destructive: '#f87171',
     destructiveForeground: '#18181b',
-    
+
     // Border and input colors
     border: '#3f3f46',
     input: '#3f3f46',
     ring: '#60a5fa',
-    
+
     // Status colors
     success: '#4ade80',
     warning: '#fbbf24',
     info: '#60a5fa',
-    
+
     // Social colors
     like: '#f87171',
     bookmark: '#fbbf24',
@@ -182,7 +182,7 @@ export const getThemeColors = (isDark: boolean) => {
  */
 export const createThemedStyles = (isDark: boolean) => {
   const colors = getThemeColors(isDark);
-  
+
   return {
     container: {
       backgroundColor: colors.background,
@@ -209,4 +209,3 @@ export const createThemedStyles = (isDark: boolean) => {
     },
   };
 };
-

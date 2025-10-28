@@ -11,8 +11,18 @@ interface ReactQueryTestProps {
 }
 
 export function ReactQueryTest({ colors }: ReactQueryTestProps) {
-  const { data: feedData, isLoading: feedLoading, error: feedError, refetch: refetchFeed } = useFeed();
-  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategories();
+  const {
+    data: feedData,
+    isLoading: feedLoading,
+    error: feedError,
+    refetch: refetchFeed,
+  } = useFeed();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories,
+  } = useCategories();
 
   // Determine the status based on the hooks
   const isLoading = feedLoading || categoriesLoading;
@@ -43,43 +53,46 @@ export function ReactQueryTest({ colors }: ReactQueryTestProps) {
       <Text style={[styles.title, { color: colors.primary }]}>
         React Query Test
       </Text>
-      
+
       <Text style={[styles.message, { color: colors.text }]}>
         React Query Hooks Test
       </Text>
-      
+
       <Text style={[styles.status, { color: getStatusColor() }]}>
         {getStatusMessage()}
       </Text>
-      
+
       <Text style={[styles.timestamp, { color: colors.secondary }]}>
         {new Date().toLocaleTimeString()}
       </Text>
-      
+
       {feedData && (
         <Text style={[styles.status, { color: colors.primary }]}>
           Feed: {feedData.topic_list.topics.length} topics
         </Text>
       )}
-      
+
       {categoriesData && (
         <Text style={[styles.status, { color: colors.primary }]}>
-          Categories: {categoriesData.category_list.categories.length} categories
+          Categories: {categoriesData.category_list.categories.length}{' '}
+          categories
         </Text>
       )}
-      
+
       {feedData && (
-        <Text style={[styles.status, { color: colors.secondary, fontSize: 12 }]}>
+        <Text
+          style={[styles.status, { color: colors.secondary, fontSize: 12 }]}
+        >
           Connected to: meta.techrebels.info
         </Text>
       )}
-      
+
       {hasError && (
         <Text style={[styles.status, { color: '#ef4444' }]}>
           Error: {feedError?.message || categoriesError?.message}
         </Text>
       )}
-      
+
       <TouchableOpacity
         style={[styles.refreshButton, { backgroundColor: colors.primary }]}
         onPress={() => {

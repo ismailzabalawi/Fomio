@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import { useTheme } from '../shared/theme-provider';
 import { Heart, ChatCircle, BookmarkSimple } from 'phosphor-react-native';
 import { CommentItem, Comment } from './CommentItem';
@@ -7,6 +16,7 @@ import { NewCommentInput } from './NewCommentInput';
 import { HeaderBar } from '../nav/HeaderBar';
 import { useTopic } from '../../hooks';
 import { useLocalSearchParams } from 'expo-router';
+import { useBffAuth } from '../shared/bff-auth-provider';
 
 export interface ByteBlogPageProps {
   author: {
@@ -44,27 +54,39 @@ export function ByteBlogPage({
   initialCommentsVisible = false,
 }: ByteBlogPageProps) {
   const { isDark, isAmoled } = useTheme();
-  const [isCommentsVisible, setIsCommentsVisible] = useState(initialCommentsVisible);
+  const { isAuthenticated } = useBffAuth();
+  const [isCommentsVisible, setIsCommentsVisible] = useState(
+    initialCommentsVisible
+  );
   const flatListRef = useRef<import('react-native').FlatList>(null);
-  
+
   // Get topic ID from route params and fetch real data
   const { byteId } = useLocalSearchParams<{ byteId: string }>();
   const topicId = parseInt(byteId || '1', 10);
-  const { data: topicData, isLoading, error } = useTopic(topicId);
-  
+  const { data: topicData, loading, error } = useTopic(topicId);
+
   // Use real topic data if available, fallback to props
-  const realTitle = topicData?.post_stream?.posts[0]?.topic_title || title;
-  const realAuthor = topicData?.post_stream?.posts[0] ? {
-    name: topicData.post_stream.posts[0].username,
-    avatar: `https://meta.techrebels.info${topicData.post_stream.posts[0].avatar_template.replace('{size}', '150')}`,
-  } : author;
-  const realContent = topicData?.post_stream?.posts[0]?.cooked ? [
-    { type: 'paragraph' as const, text: topicData.post_stream.posts[0].cooked.replace(/<[^>]*>/g, '') }
-  ] : content;
-  const realComments = topicData?.post_stream?.posts?.length ? topicData.post_stream.posts.length - 1 : comments;
+  const realTitle = topicData?.title || title;
+  const realAuthor = topicData?.posts?.[0]
+    ? {
+        name: topicData.posts[0].username,
+        avatar: `https://meta.techrebels.info${topicData.posts[0].avatar_template?.replace('{size}', '150') || ''}`,
+      }
+    : author;
+  const realContent = topicData?.posts?.[0]?.cooked
+    ? [
+        {
+          type: 'paragraph' as const,
+          text: topicData.posts[0].cooked.replace(/<[^>]*>/g, ''),
+        },
+      ]
+    : content;
+  const realComments = topicData?.posts?.length
+    ? topicData.posts.length - 1
+    : comments;
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#fff'),
-    card: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#fff',
+    card: isAmoled ? '#000000' : isDark ? '#23232b' : '#f8fafc',
     text: isDark ? '#f4f4f5' : '#17131B',
     secondary: isDark ? '#a1a1aa' : '#5C5D67',
     accent: isDark ? '#38bdf8' : '#0ea5e9',
@@ -78,14 +100,20 @@ export function ByteBlogPage({
   const mockComments: Comment[] = [
     {
       id: '1',
-      author: { name: 'Alice', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
+      author: {
+        name: 'Alice',
+        avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+      },
       content: 'This is a great Byte! Really enjoyed reading it.',
       createdAt: '2h ago',
       likes: 3,
     },
     {
       id: '2',
-      author: { name: 'Bob', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
+      author: {
+        name: 'Bob',
+        avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+      },
       content: 'Thanks for sharing your thoughts.',
       createdAt: '1h ago',
       likes: 1,
@@ -93,7 +121,10 @@ export function ByteBlogPage({
     },
     {
       id: '3',
-      author: { name: 'Charlie', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+      author: {
+        name: 'Charlie',
+        avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+      },
       content: 'I have a question about the second paragraph.',
       createdAt: '45m ago',
       likes: 0,
@@ -101,16 +132,16 @@ export function ByteBlogPage({
   ];
 
   // Group comments: parents and their direct replies
-  const parents = mockComments.filter(c => !c.parentId);
-  const replies = mockComments.filter(c => c.parentId);
+  const parents = mockComments.filter((c) => !c.parentId);
+  const replies = mockComments.filter((c) => c.parentId);
   function getReplies(parentId: string) {
-    return replies.filter(r => r.parentId === parentId);
+    return replies.filter((r) => r.parentId === parentId);
   }
 
   // Compose a flat list of items: parent, then its replies indented
-  const commentList = parents.flatMap(parent => [
+  const commentList = parents.flatMap((parent) => [
     { ...parent, isReply: false },
-    ...getReplies(parent.id).map(reply => ({ ...reply, isReply: true })),
+    ...getReplies(parent.id).map((reply) => ({ ...reply, isReply: true })),
   ]);
 
   // Scroll to comments on mount if initialCommentsVisible is true
@@ -124,10 +155,19 @@ export function ByteBlogPage({
   }, [initialCommentsVisible]);
 
   // Show loading state
-  if (isLoading) {
+  if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
-        <HeaderBar title="Loading..." showBackButton={true} showProfileButton={true} />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <HeaderBar
+          title="Loading..."
+          showBackButton={true}
+          showProfileButton={true}
+        />
         <View style={styles.loadingContent}>
           <ActivityIndicator size="large" color={colors.accent} />
           <Text style={[styles.loadingText, { color: colors.secondary }]}>
@@ -141,8 +181,14 @@ export function ByteBlogPage({
   // Show error state
   if (error) {
     return (
-      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
-        <HeaderBar title="Error" showBackButton={true} showProfileButton={true} />
+      <View
+        style={[styles.errorContainer, { backgroundColor: colors.background }]}
+      >
+        <HeaderBar
+          title="Error"
+          showBackButton={true}
+          showProfileButton={true}
+        />
         <View style={styles.errorContent}>
           <Text style={[styles.errorText, { color: '#ef4444' }]}>
             Failed to load topic
@@ -159,80 +205,180 @@ export function ByteBlogPage({
     <FlatList
       ref={flatListRef}
       data={isCommentsVisible ? commentList : []}
-      keyExtractor={item => item.id}
+      keyExtractor={(item) => item.id}
       ListHeaderComponent={
-        <View style={[styles.headerContainer, { backgroundColor: colors.background }]}> 
+        <View
+          style={[
+            styles.headerContainer,
+            { backgroundColor: colors.background },
+          ]}
+        >
           {/* HeaderBar */}
-          <HeaderBar 
-            title={realTitle} 
+          <HeaderBar
+            title={realTitle}
             showBackButton={true}
             showProfileButton={true}
           />
-          
+
           {/* Author & Teret Title */}
           <View style={styles.authorRow}>
-            <Image source={{ uri: realAuthor.avatar }} style={styles.avatar} accessibilityLabel={`${realAuthor.name}'s avatar`} />
+            <Image
+              source={{ uri: realAuthor.avatar }}
+              style={styles.avatar}
+              accessibilityLabel={`${realAuthor.name}'s avatar`}
+            />
             <View style={styles.authorInfo}>
-              <Text style={[styles.authorName, { color: colors.text }]}>{realAuthor.name}</Text>
-              <Text style={[styles.teret, { color: colors.topic }]}>{teretTitle}</Text>
+              <Text style={[styles.authorName, { color: colors.text }]}>
+                {realAuthor.name}
+              </Text>
+              <Text style={[styles.teret, { color: colors.topic }]}>
+                {teretTitle}
+              </Text>
             </View>
           </View>
           {/* Cover Image */}
           {coverImage && (
-            <Image source={{ uri: coverImage }} style={styles.coverImage} resizeMode="cover" accessibilityLabel="Cover image" />
+            <Image
+              source={{ uri: coverImage }}
+              style={styles.coverImage}
+              resizeMode="cover"
+              accessibilityLabel="Cover image"
+            />
           )}
           {/* Title */}
-          <Text style={[styles.title, { color: colors.heading }]}>{realTitle}</Text>
+          <Text style={[styles.title, { color: colors.heading }]}>
+            {realTitle}
+          </Text>
           {/* Content */}
           <View style={styles.contentBlock}>
             {realContent.map((block, idx) =>
               block.type === 'heading' ? (
-                <Text key={idx} style={[styles.heading, { color: colors.heading }]}>{block.text}</Text>
+                <Text
+                  key={idx}
+                  style={[styles.heading, { color: colors.heading }]}
+                >
+                  {block.text}
+                </Text>
               ) : (
-                <Text key={idx} style={[styles.paragraph, { color: colors.secondary }]}>{block.text}</Text>
+                <Text
+                  key={idx}
+                  style={[styles.paragraph, { color: colors.secondary }]}
+                >
+                  {block.text}
+                </Text>
               )
             )}
           </View>
           {/* Action Bar */}
-          <View style={[styles.actionBar, { borderTopColor: colors.divider }]}> 
+          <View style={[styles.actionBar, { borderTopColor: colors.divider }]}>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={onLike}
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(
+                    'Authentication Required',
+                    'Please sign in to like posts'
+                  );
+                  return;
+                }
+                onLike?.();
+              }}
               accessible
               accessibilityRole="button"
               accessibilityLabel="Like"
             >
-              <Heart size={24} weight={likes > 0 ? 'fill' : 'regular'} color={colors.action} />
-              <Text style={[styles.actionText, { color: colors.action }]}>{likes}</Text>
+              <Heart
+                size={24}
+                weight={likes > 0 ? 'fill' : 'regular'}
+                color={colors.action}
+              />
+              <Text style={[styles.actionText, { color: colors.action }]}>
+                {likes}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => setIsCommentsVisible(v => !v)}
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(
+                    'Authentication Required',
+                    'Please sign in to view comments'
+                  );
+                  return;
+                }
+                setIsCommentsVisible((v) => !v);
+              }}
               accessible
               accessibilityRole="button"
-              accessibilityLabel={isCommentsVisible ? 'Hide comments' : 'Show comments'}
-              accessibilityHint={isCommentsVisible ? 'Hides the comment section' : 'Shows the comment section'}
+              accessibilityLabel={
+                isCommentsVisible ? 'Hide comments' : 'Show comments'
+              }
+              accessibilityHint={
+                isCommentsVisible
+                  ? 'Hides the comment section'
+                  : 'Shows the comment section'
+              }
             >
-              <ChatCircle size={24} weight={isCommentsVisible ? 'fill' : 'regular'} color={colors.action} />
-              <Text style={[styles.actionText, { color: colors.action }]}>{realComments}</Text>
+              <ChatCircle
+                size={24}
+                weight={isCommentsVisible ? 'fill' : 'regular'}
+                color={colors.action}
+              />
+              <Text style={[styles.actionText, { color: colors.action }]}>
+                {realComments}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={onBookmark}
+              onPress={() => {
+                if (!isAuthenticated) {
+                  Alert.alert(
+                    'Authentication Required',
+                    'Please sign in to bookmark posts'
+                  );
+                  return;
+                }
+                onBookmark?.();
+              }}
               accessible
               accessibilityRole="button"
               accessibilityLabel="Bookmark"
             >
-              <BookmarkSimple size={24} weight={isBookmarked ? 'fill' : 'regular'} color={colors.action} />
+              <BookmarkSimple
+                size={24}
+                weight={isBookmarked ? 'fill' : 'regular'}
+                color={colors.action}
+              />
             </TouchableOpacity>
           </View>
         </View>
       }
-      renderItem={isCommentsVisible ? ({ item }) => (
-        <CommentItem comment={item} isReply={item.isReply} />
-      ) : undefined}
-      ListFooterComponent={isCommentsVisible ? <NewCommentInput onSend={() => {}} /> : null}
-      contentContainerStyle={{ paddingBottom: 32, backgroundColor: colors.background }}
+      renderItem={
+        isCommentsVisible
+          ? ({ item }) => <CommentItem comment={item} isReply={item.isReply} />
+          : undefined
+      }
+      ListFooterComponent={
+        isCommentsVisible ? (
+          <NewCommentInput
+            onSend={(comment) => {
+              if (!isAuthenticated) {
+                Alert.alert(
+                  'Authentication Required',
+                  'Please sign in to comment'
+                );
+                return;
+              }
+              // TODO: Implement comment posting
+              console.log('Posting comment:', comment);
+            }}
+          />
+        ) : null
+      }
+      contentContainerStyle={{
+        paddingBottom: 32,
+        backgroundColor: colors.background,
+      }}
       showsVerticalScrollIndicator={false}
     />
   );
@@ -349,4 +495,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#6b7280',
   },
-}); 
+});

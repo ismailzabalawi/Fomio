@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
   Image,
   Alert,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  ArrowLeft, 
-  Gear, 
-  PencilSimple, 
-  Heart, 
-  ChatCircle, 
-  Bookmark, 
-  Share, 
+import {
+  ArrowLeft,
+  Gear,
+  PencilSimple,
+  Heart,
+  ChatCircle,
+  Bookmark,
+  Share,
   Calendar,
   MapPin,
   Globe,
-  User,
+  User as UserIcon,
   Crown,
   Star,
   Trophy,
@@ -30,12 +30,13 @@ import {
   Eye,
   EyeSlash,
   Bell,
-  BellSlash
+  BellSlash,
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
-import { discourseApi, DiscourseUser } from '../../shared/discourseApi';
+import { User } from '../../api';
 import { router } from 'expo-router';
+import { useApolloProfile } from '../../hooks';
 
 interface ProfileStats {
   posts: number;
@@ -48,7 +49,13 @@ interface ProfileStats {
   timeRead: number;
 }
 
-function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
+function ProfileSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
     text: isDark ? '#9ca3af' : '#6b7280',
@@ -62,50 +69,62 @@ function ProfileSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-function StatCard({ icon, value, label, color }: { 
-  icon: React.ReactNode; 
-  value: string | number; 
-  label: string; 
-  color: string; 
+function StatCard({
+  icon,
+  value,
+  label,
+  color,
+}: {
+  icon: React.ReactNode;
+  value: string | number;
+  label: string;
+  color: string;
 }) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
   };
 
   return (
-    <View style={[styles.statCard, { 
-      backgroundColor: colors.background, 
-      borderColor: colors.border 
-    }]}>
+    <View
+      style={[
+        styles.statCard,
+        {
+          backgroundColor: colors.background,
+          borderColor: colors.border,
+        },
+      ]}
+    >
       <View style={[styles.statIcon, { backgroundColor: `${color}20` }]}>
         {icon}
       </View>
       <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: colors.secondary }]}>{label}</Text>
+      <Text style={[styles.statLabel, { color: colors.secondary }]}>
+        {label}
+      </Text>
     </View>
   );
 }
 
-function ActionButton({ 
-  icon, 
-  title, 
-  subtitle, 
-  onPress, 
-  color = '#3b82f6' 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  subtitle?: string; 
-  onPress: () => void; 
-  color?: string; 
+function ActionButton({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  color = '#3b82f6',
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  color?: string;
 }) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
@@ -113,10 +132,13 @@ function ActionButton({
 
   return (
     <TouchableOpacity
-      style={[styles.actionButton, { 
-        backgroundColor: colors.background, 
-        borderColor: colors.border 
-      }]}
+      style={[
+        styles.actionButton,
+        {
+          backgroundColor: colors.background,
+          borderColor: colors.border,
+        },
+      ]}
       onPress={onPress}
       accessible
       accessibilityRole="button"
@@ -127,7 +149,9 @@ function ActionButton({
           {icon}
         </View>
         <View style={styles.actionContent}>
-          <Text style={[styles.actionTitle, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.actionTitle, { color: colors.text }]}>
+            {title}
+          </Text>
           {subtitle && (
             <Text style={[styles.actionSubtitle, { color: colors.secondary }]}>
               {subtitle}
@@ -142,23 +166,18 @@ function ActionButton({
 
 export default function ProfileScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  const [user, setUser] = useState<DiscourseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    user,
+    stats: apolloStats,
+    loading,
+    error,
+    refresh,
+  } = useApolloProfile();
   const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState<ProfileStats>({
-    posts: 0,
-    topics: 0,
-    likes: 0,
-    followers: 0,
-    following: 0,
-    trustLevel: 0,
-    badges: 0,
-    timeRead: 0,
-  });
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
-    card: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
+    card: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
@@ -169,64 +188,21 @@ export default function ProfileScreen(): JSX.Element {
     error: isDark ? '#ef4444' : '#dc2626',
   };
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    setLoading(true);
-    try {
-      // Mock user data for now - replace with actual Discourse API call
-      const mockUser: DiscourseUser = {
-        id: 1,
-        username: 'alexchen',
-        name: 'Alex Chen',
-        email: 'alex@example.com',
-        avatar_template: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-        bio_raw: 'Mobile developer passionate about React Native and user experience. Building the future of social platforms.',
-        location: 'San Francisco, CA',
-        website: 'https://alexchen.dev',
-        date_of_birth: '1995-03-15',
-        trust_level: 3,
-        badge_count: 5,
-        post_count: 42,
-        topic_count: 8,
-        likes_given: 156,
-        likes_received: 89,
-        time_read: 86400,
-        days_visited: 45,
-        last_seen_at: '2024-01-15T10:30:00Z',
-        created_at: '2023-06-01T00:00:00Z',
-        can_edit: true,
-        can_edit_username: false,
-        can_edit_email: true,
-        can_edit_name: true,
-      };
-
-      setUser(mockUser);
-      
-      // Mock stats
-      setStats({
-        posts: mockUser.post_count,
-        topics: mockUser.topic_count,
-        likes: mockUser.likes_received,
-        followers: 23,
-        following: 15,
-        trustLevel: mockUser.trust_level,
-        badges: mockUser.badge_count,
-        timeRead: Math.floor(mockUser.time_read / 3600), // Convert to hours
-      });
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-      Alert.alert('Error', 'Failed to load profile data');
-    } finally {
-      setLoading(false);
-    }
+  // Transform Apollo stats to local format
+  const stats: ProfileStats = {
+    posts: apolloStats?.posts_count || 0,
+    topics: apolloStats?.topics_count || 0,
+    likes: apolloStats?.likes_received || 0,
+    followers: apolloStats?.followers_count || 0,
+    following: apolloStats?.following_count || 0,
+    trustLevel: user?.trust_level || 0,
+    badges: user?.badge_count || 0,
+    timeRead: Math.floor((user?.time_read || 0) / 3600), // Convert to hours
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadProfile();
+    await refresh();
     setRefreshing(false);
   };
 
@@ -242,57 +218,81 @@ export default function ProfileScreen(): JSX.Element {
     router.back();
   };
 
-  const getTrustLevelDisplay = (level: number) => {
+  const getTrustLevelDisplay = (level: number | undefined) => {
+    if (level === undefined || level === null) return 'Unknown';
     switch (level) {
-      case 0: return 'New User';
-      case 1: return 'Basic User';
-      case 2: return 'Regular User';
-      case 3: return 'Leader';
-      case 4: return 'Elder';
-      default: return 'Unknown';
+      case 0:
+        return 'New User';
+      case 1:
+        return 'Basic User';
+      case 2:
+        return 'Regular User';
+      case 3:
+        return 'Leader';
+      case 4:
+        return 'Elder';
+      default:
+        return 'Unknown';
     }
   };
 
-  const getTrustLevelColor = (level: number) => {
+  const getTrustLevelColor = (level: number | undefined) => {
+    if (level === undefined || level === null) return colors.secondary;
     switch (level) {
-      case 0: return colors.secondary;
-      case 1: return colors.primary;
-      case 2: return colors.success;
-      case 3: return colors.warning;
-      case 4: return colors.error;
-      default: return colors.secondary;
+      case 0:
+        return colors.secondary;
+      case 1:
+        return colors.primary;
+      case 2:
+        return colors.success;
+      case 3:
+        return colors.warning;
+      case 4:
+        return colors.error;
+      default:
+        return colors.secondary;
     }
   };
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <HeaderBar 
-          title="Profile" 
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <HeaderBar
+          title="Profile"
           showBackButton={true}
           showProfileButton={false}
           onBack={handleBack}
         />
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: colors.text }]}>Loading profile...</Text>
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Loading profile...
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!user) {
+  if (error || !user) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <HeaderBar 
-          title="Profile" 
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <HeaderBar
+          title="Profile"
           showBackButton={true}
           showProfileButton={false}
           onBack={handleBack}
         />
         <View style={styles.errorContainer}>
-          <Text style={[styles.errorText, { color: colors.text }]}>Failed to load profile</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
-            <Text style={[styles.retryText, { color: colors.primary }]}>Retry</Text>
+          <Text style={[styles.errorText, { color: colors.text }]}>
+            {error ? 'Failed to load profile' : 'No profile data available'}
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+            <Text style={[styles.retryText, { color: colors.primary }]}>
+              Retry
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -300,15 +300,17 @@ export default function ProfileScreen(): JSX.Element {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Profile" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Profile"
         showBackButton={true}
         showProfileButton={false}
         onBack={handleBack}
       />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -323,49 +325,49 @@ export default function ProfileScreen(): JSX.Element {
       >
         {/* Profile Header */}
         <View style={[styles.profileHeader, { backgroundColor: colors.card }]}>
-          <Image 
-            source={{ uri: user.avatar_template }} 
+          <Image
+            source={{
+              uri: user.avatar_template
+                ? `https://meta.techrebels.info${user.avatar_template.replace('{size}', '150')}`
+                : 'https://via.placeholder.com/150',
+            }}
             style={styles.avatar}
             accessible
-            accessibilityLabel={`${user.name}'s profile picture`}
+            accessibilityLabel={`${user.name || user.username}'s profile picture`}
           />
-          
+
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileName, { color: colors.text }]}>{user.name}</Text>
-            <Text style={[styles.profileUsername, { color: colors.secondary }]}>@{user.username}</Text>
-            
-            {user.bio_raw && (
-              <Text style={[styles.profileBio, { color: colors.text }]} numberOfLines={3}>
-                {user.bio_raw}
-              </Text>
-            )}
-            
+            <Text style={[styles.profileName, { color: colors.text }]}>
+              {user.name || user.username}
+            </Text>
+            <Text style={[styles.profileUsername, { color: colors.secondary }]}>
+              @{user.username}
+            </Text>
+
             <View style={styles.profileMeta}>
-              {user.location && (
-                <View style={styles.metaItem}>
-                  <MapPin size={16} color={colors.secondary} weight="regular" />
-                  <Text style={[styles.metaText, { color: colors.secondary }]}>{user.location}</Text>
-                </View>
-              )}
-              
-              {user.website && (
-                <View style={styles.metaItem}>
-                  <Globe size={16} color={colors.secondary} weight="regular" />
-                  <Text style={[styles.metaText, { color: colors.secondary }]}>{user.website}</Text>
-                </View>
-              )}
-              
               <View style={styles.metaItem}>
                 <Calendar size={16} color={colors.secondary} weight="regular" />
                 <Text style={[styles.metaText, { color: colors.secondary }]}>
-                  Joined {new Date(user.created_at).toLocaleDateString()}
+                  Joined{' '}
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : 'Unknown'}
                 </Text>
               </View>
             </View>
-            
+
             <View style={styles.trustLevel}>
-              <Crown size={16} color={getTrustLevelColor(user.trust_level)} weight="fill" />
-              <Text style={[styles.trustLevelText, { color: getTrustLevelColor(user.trust_level) }]}>
+              <Crown
+                size={16}
+                color={getTrustLevelColor(user.trust_level)}
+                weight="fill"
+              />
+              <Text
+                style={[
+                  styles.trustLevelText,
+                  { color: getTrustLevelColor(user.trust_level) },
+                ]}
+              >
                 {getTrustLevelDisplay(user.trust_level)}
               </Text>
             </View>
@@ -375,37 +377,39 @@ export default function ProfileScreen(): JSX.Element {
         {/* Stats Grid */}
         <ProfileSection title="Activity">
           <View style={styles.statsGrid}>
-            <StatCard 
-              icon={<ChatCircle size={20} color={colors.primary} weight="fill" />}
+            <StatCard
+              icon={
+                <ChatCircle size={20} color={colors.primary} weight="fill" />
+              }
               value={stats.posts}
               label="Posts"
               color={colors.primary}
             />
-            <StatCard 
+            <StatCard
               icon={<Hash size={20} color={colors.accent} weight="fill" />}
               value={stats.topics}
               label="Topics"
               color={colors.accent}
             />
-            <StatCard 
+            <StatCard
               icon={<Heart size={20} color={colors.error} weight="fill" />}
               value={stats.likes}
               label="Likes"
               color={colors.error}
             />
-            <StatCard 
+            <StatCard
               icon={<Users size={20} color={colors.success} weight="fill" />}
               value={stats.followers}
               label="Followers"
               color={colors.success}
             />
-            <StatCard 
+            <StatCard
               icon={<Trophy size={20} color={colors.warning} weight="fill" />}
               value={stats.badges}
               label="Badges"
               color={colors.warning}
             />
-            <StatCard 
+            <StatCard
               icon={<Star size={20} color={colors.primary} weight="fill" />}
               value={`${stats.timeRead}h`}
               label="Time Read"
@@ -417,13 +421,15 @@ export default function ProfileScreen(): JSX.Element {
         {/* Actions */}
         <ProfileSection title="Account">
           <ActionButton
-            icon={<PencilSimple size={24} color={colors.primary} weight="regular" />}
+            icon={
+              <PencilSimple size={24} color={colors.primary} weight="regular" />
+            }
             title="Edit Profile"
             subtitle="Update your information and avatar"
             onPress={handleEditProfile}
             color={colors.primary}
           />
-          
+
           <ActionButton
             icon={<Gear size={24} color={colors.accent} weight="regular" />}
             title="Settings"
@@ -431,7 +437,7 @@ export default function ProfileScreen(): JSX.Element {
             onPress={handleSettings}
             color={colors.accent}
           />
-          
+
           <ActionButton
             icon={<Bell size={24} color={colors.warning} weight="regular" />}
             title="Notification Preferences"
@@ -439,7 +445,7 @@ export default function ProfileScreen(): JSX.Element {
             onPress={() => console.log('Open notification preferences')}
             color={colors.warning}
           />
-          
+
           <ActionButton
             icon={<Eye size={24} color={colors.success} weight="regular" />}
             title="Privacy Settings"
@@ -451,36 +457,55 @@ export default function ProfileScreen(): JSX.Element {
 
         {/* Account Info */}
         <ProfileSection title="Account Information">
-          <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View
+            style={[
+              styles.infoCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Email</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{user.email}</Text>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>
+                Email
+              </Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {user.email}
+              </Text>
             </View>
-            
+
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Trust Level</Text>
-              <Text style={[styles.infoValue, { color: getTrustLevelColor(user.trust_level) }]}>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>
+                Trust Level
+              </Text>
+              <Text
+                style={[
+                  styles.infoValue,
+                  { color: getTrustLevelColor(user.trust_level) },
+                ]}
+              >
                 {getTrustLevelDisplay(user.trust_level)}
               </Text>
             </View>
-            
+
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Member Since</Text>
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>
+                Member Since
+              </Text>
               <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(user.created_at).toLocaleDateString()}
+                {user.created_at
+                  ? new Date(user.created_at).toLocaleDateString()
+                  : 'Unknown'}
               </Text>
             </View>
-            
+
             <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Last Seen</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>
-                {new Date(user.last_seen_at).toLocaleDateString()}
+              <Text style={[styles.infoLabel, { color: colors.secondary }]}>
+                Last Seen
               </Text>
-            </View>
-            
-            <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.secondary }]}>Days Visited</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{user.days_visited}</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>
+                {user.last_seen_at
+                  ? new Date(user.last_seen_at).toLocaleDateString()
+                  : 'Unknown'}
+              </Text>
             </View>
           </View>
         </ProfileSection>
@@ -683,4 +708,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-}); 
+});

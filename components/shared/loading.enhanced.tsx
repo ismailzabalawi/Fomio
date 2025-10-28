@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  ActivityIndicator, 
-  StyleSheet, 
-  ViewStyle, 
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  ViewStyle,
   Animated,
   Easing,
   Dimensions,
@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import { useTheme } from './theme-provider';
 import { ButtonEnhanced } from '../ui/button.enhanced';
-import { 
-  typography, 
-  spacing, 
-  borderRadius, 
-  animation, 
+import {
+  typography,
+  spacing,
+  borderRadius,
+  animation,
   getThemeColors,
   createTextStyle,
   createShadowStyle,
@@ -33,10 +33,10 @@ interface LoadingSpinnerProps {
 /**
  * Enhanced Loading Spinner with smooth animations
  */
-export function LoadingSpinnerEnhanced({ 
-  size = 'large', 
-  color, 
-  style 
+export function LoadingSpinnerEnhanced({
+  size = 'large',
+  color,
+  style,
 }: LoadingSpinnerProps) {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
@@ -60,9 +60,9 @@ interface LoadingOverlayProps {
 /**
  * Enhanced Full Screen Loading Overlay with fade animation
  */
-export function LoadingOverlayEnhanced({ 
-  message = 'Loading...', 
-  visible, 
+export function LoadingOverlayEnhanced({
+  message = 'Loading...',
+  visible,
   style,
   onCancel,
   cancelText = 'Cancel',
@@ -92,32 +92,35 @@ export function LoadingOverlayEnhanced({
   if (!visible) return null;
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.overlay, 
-        { 
-          backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.95)',
+        styles.overlay,
+        {
+          backgroundColor: isDark
+            ? 'rgba(0,0,0,0.8)'
+            : 'rgba(255,255,255,0.95)',
           opacity: fadeAnim,
-        }, 
-        style
+        },
+        style,
       ]}
     >
-      <View style={[
-        styles.overlayContent, 
-        { 
-          backgroundColor: colors.surface,
-          ...createShadowStyle('xl', isDark),
-        }
-      ]}>
-        <ActivityIndicator 
-          size="large" 
-          color={colors.primary} 
-          style={styles.overlaySpinner} 
+      <View
+        style={[
+          styles.overlayContent,
+          {
+            backgroundColor: colors.surface,
+            ...createShadowStyle('xl', isDark),
+          },
+        ]}
+      >
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={styles.overlaySpinner}
         />
-        <Text style={[
-          createTextStyle('body', colors.text),
-          styles.overlayText,
-        ]}>
+        <Text
+          style={[createTextStyle('body', colors.text), styles.overlayText]}
+        >
           {message}
         </Text>
         {onCancel && (
@@ -175,10 +178,12 @@ export function LoadingStateEnhanced({
         {loadingComponent || (
           <View style={styles.stateContainer}>
             <LoadingSpinnerEnhanced />
-            <Text style={[
-              createTextStyle('body', colors.textSecondary),
-              styles.stateText,
-            ]}>
+            <Text
+              style={[
+                createTextStyle('body', colors.textSecondary),
+                styles.stateText,
+              ]}
+            >
               Loading...
             </Text>
           </View>
@@ -192,16 +197,20 @@ export function LoadingStateEnhanced({
       <>
         {errorComponent || (
           <View style={styles.stateContainer}>
-            <Text style={[
-              createTextStyle('title', colors.error),
-              styles.errorTitle,
-            ]}>
+            <Text
+              style={[
+                createTextStyle('title', colors.error),
+                styles.errorTitle,
+              ]}
+            >
               Something went wrong
             </Text>
-            <Text style={[
-              createTextStyle('body', colors.textSecondary),
-              styles.errorMessage,
-            ]}>
+            <Text
+              style={[
+                createTextStyle('body', colors.textSecondary),
+                styles.errorMessage,
+              ]}
+            >
               {error}
             </Text>
             {onRetry && (
@@ -238,10 +247,10 @@ interface SkeletonProps {
 /**
  * Enhanced Skeleton with shimmer animation
  */
-export function SkeletonEnhanced({ 
-  width = '100%', 
-  height = 20, 
-  borderRadius = 4, 
+export function SkeletonEnhanced({
+  width = '100%',
+  height = 20,
+  borderRadius = 4,
   style,
   animated = true,
 }: SkeletonProps) {
@@ -267,9 +276,9 @@ export function SkeletonEnhanced({
           }),
         ])
       );
-      
+
       shimmerAnimation.start();
-      
+
       return () => shimmerAnimation.stop();
     }
   }, [animated, shimmerAnim]);
@@ -314,17 +323,17 @@ export function SkeletonEnhanced({
 export function UserSkeletonEnhanced() {
   return (
     <View style={styles.userSkeleton}>
-      <SkeletonEnhanced 
-        width={40} 
-        height={40} 
-        borderRadius={20} 
-        style={styles.userSkeletonAvatar} 
+      <SkeletonEnhanced
+        width={40}
+        height={40}
+        borderRadius={20}
+        style={styles.userSkeletonAvatar}
       />
       <View style={styles.userSkeletonContent}>
-        <SkeletonEnhanced 
-          width="60%" 
-          height={16} 
-          style={styles.userSkeletonName} 
+        <SkeletonEnhanced
+          width="60%"
+          height={16}
+          style={styles.userSkeletonName}
         />
         <SkeletonEnhanced width="40%" height={14} />
       </View>
@@ -339,10 +348,10 @@ export function PostSkeletonEnhanced() {
   return (
     <View style={styles.postSkeleton}>
       <UserSkeletonEnhanced />
-      <SkeletonEnhanced 
-        width="100%" 
-        height={60} 
-        style={styles.postSkeletonContent} 
+      <SkeletonEnhanced
+        width="100%"
+        height={60}
+        style={styles.postSkeletonContent}
       />
       <View style={styles.postSkeletonActions}>
         <SkeletonEnhanced width={60} height={16} />
@@ -370,9 +379,9 @@ export function PullToRefreshIndicator() {
         useNativeDriver: true,
       })
     );
-    
+
     rotateAnimation.start();
-    
+
     return () => rotateAnimation.stop();
   }, [rotateAnim]);
 
@@ -396,7 +405,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.lg,
   },
-  
+
   overlay: {
     position: 'absolute',
     top: 0,
@@ -407,7 +416,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
-  
+
   overlayContent: {
     padding: spacing.xl,
     borderRadius: borderRadius.xl,
@@ -415,89 +424,88 @@ const styles = StyleSheet.create({
     minWidth: 200,
     maxWidth: screenWidth * 0.8,
   },
-  
+
   overlaySpinner: {
     marginBottom: spacing.md,
   },
-  
+
   overlayText: {
     textAlign: 'center',
     marginBottom: spacing.md,
   },
-  
+
   cancelButton: {
     marginTop: spacing.sm,
   },
-  
+
   stateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xl,
   },
-  
+
   stateText: {
     marginTop: spacing.md,
     textAlign: 'center',
   },
-  
+
   errorTitle: {
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
-  
+
   errorMessage: {
     textAlign: 'center',
     marginBottom: spacing.lg,
     lineHeight: typography.lineHeight.relaxed * typography.fontSize.base,
   },
-  
+
   retryButton: {
     minWidth: 120,
   },
-  
+
   skeleton: {
     overflow: 'hidden',
   },
-  
+
   userSkeleton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.md,
   },
-  
+
   userSkeletonAvatar: {
     marginRight: spacing.sm,
   },
-  
+
   userSkeletonContent: {
     flex: 1,
   },
-  
+
   userSkeletonName: {
     marginBottom: spacing.sm,
   },
-  
+
   postSkeleton: {
     padding: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.05)',
   },
-  
+
   postSkeletonContent: {
     marginVertical: spacing.sm,
   },
-  
+
   postSkeletonActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: spacing.sm,
   },
-  
+
   pullToRefreshContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 50,
   },
 });
-

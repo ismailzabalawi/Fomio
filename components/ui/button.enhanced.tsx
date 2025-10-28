@@ -12,11 +12,11 @@ import {
   Pressable,
 } from 'react-native';
 import { useTheme } from '@/components/shared/theme-provider';
-import { 
-  typography, 
-  spacing, 
-  borderRadius, 
-  animation, 
+import {
+  typography,
+  spacing,
+  borderRadius,
+  animation,
   components,
   getThemeColors,
   createTextStyle,
@@ -40,7 +40,7 @@ export interface ButtonProps {
 
 /**
  * Enhanced Button Component
- * 
+ *
  * Features:
  * - Design system integration
  * - Micro-interactions with scale animation
@@ -68,7 +68,7 @@ export function ButtonEnhanced({
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  
+
   // Handle press with micro-interaction
   const handlePressIn = useCallback(() => {
     Animated.timing(scaleAnim, {
@@ -77,7 +77,7 @@ export function ButtonEnhanced({
       useNativeDriver: true,
     }).start();
   }, [scaleAnim]);
-  
+
   const handlePressOut = useCallback(() => {
     Animated.timing(scaleAnim, {
       toValue: 1,
@@ -85,7 +85,7 @@ export function ButtonEnhanced({
       useNativeDriver: true,
     }).start();
   }, [scaleAnim]);
-  
+
   const handlePress = useCallback(() => {
     if (!disabled && !loading && onPress) {
       // TODO: Add haptic feedback here when available
@@ -95,7 +95,7 @@ export function ButtonEnhanced({
       onPress();
     }
   }, [disabled, loading, onPress, hapticFeedback]);
-  
+
   // Get variant styles
   const getVariantStyles = () => {
     const baseStyles = {
@@ -121,10 +121,10 @@ export function ButtonEnhanced({
         borderWidth: 0,
       },
     };
-    
+
     return baseStyles[variant];
   };
-  
+
   // Get text color based on variant
   const getTextColor = () => {
     const textColors = {
@@ -134,10 +134,10 @@ export function ButtonEnhanced({
       ghost: colors.text,
       destructive: colors.textInverse,
     };
-    
+
     return textColors[variant];
   };
-  
+
   // Get size styles
   const getSizeStyles = () => {
     const sizeStyles = {
@@ -157,10 +157,10 @@ export function ButtonEnhanced({
         paddingVertical: components.button.padding.lg.vertical,
       },
     };
-    
+
     return sizeStyles[size];
   };
-  
+
   // Get text size based on button size
   const getTextSize = () => {
     const textSizes = {
@@ -168,10 +168,10 @@ export function ButtonEnhanced({
       md: typography.fontSize.base,
       lg: typography.fontSize.lg,
     };
-    
+
     return textSizes[size];
   };
-  
+
   // Dynamic styles
   const buttonStyle: StyleProp<ViewStyle> = [
     styles.base,
@@ -180,12 +180,14 @@ export function ButtonEnhanced({
     {
       borderRadius: components.button.borderRadius,
       opacity: disabled ? 0.6 : 1,
-      ...(variant === 'primary' && !disabled && createShadowStyle('sm', isDark)),
+      ...(variant === 'primary' &&
+        !disabled &&
+        createShadowStyle('sm', isDark)),
       ...(fullWidth && { width: '100%' }),
     },
     style,
   ];
-  
+
   const buttonTextStyle: StyleProp<TextStyle> = [
     createTextStyle('bodyMedium', getTextColor()),
     {
@@ -194,11 +196,12 @@ export function ButtonEnhanced({
     },
     textStyle,
   ];
-  
-  const spinnerColor = variant === 'primary' || variant === 'destructive' 
-    ? colors.textInverse 
-    : colors.primary;
-  
+
+  const spinnerColor =
+    variant === 'primary' || variant === 'destructive'
+      ? colors.textInverse
+      : colors.primary;
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
@@ -209,7 +212,7 @@ export function ButtonEnhanced({
         disabled={disabled || loading}
         accessible
         accessibilityRole="button"
-        accessibilityState={{ 
+        accessibilityState={{
           disabled: disabled || loading,
           busy: loading,
         }}
@@ -218,33 +221,29 @@ export function ButtonEnhanced({
         <View style={styles.content}>
           {/* Left Icon */}
           {icon && iconPosition === 'left' && !loading && (
-            <View style={[styles.icon, styles.iconLeft]}>
-              {icon}
-            </View>
+            <View style={[styles.icon, styles.iconLeft]}>{icon}</View>
           )}
-          
+
           {/* Loading Spinner */}
           {loading && (
             <ActivityIndicator
               size="small"
               color={spinnerColor}
               style={[
-                styles.spinner, 
-                ...(icon ? [styles.spinnerWithIcon] : [])
+                styles.spinner,
+                ...(icon ? [styles.spinnerWithIcon] : []),
               ]}
             />
           )}
-          
+
           {/* Button Text */}
           <Text style={buttonTextStyle} numberOfLines={1}>
             {children}
           </Text>
-          
+
           {/* Right Icon */}
           {icon && iconPosition === 'right' && !loading && (
-            <View style={[styles.icon, styles.iconRight]}>
-              {icon}
-            </View>
+            <View style={[styles.icon, styles.iconRight]}>{icon}</View>
           )}
         </View>
       </Pressable>
@@ -259,31 +258,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     minHeight: components.touchTarget.minSize,
   },
-  
+
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
   },
-  
+
   icon: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   iconLeft: {
     marginRight: spacing.sm,
   },
-  
+
   iconRight: {
     marginLeft: spacing.sm,
   },
-  
+
   spinner: {
     marginRight: spacing.sm,
   },
-  
+
   spinnerWithIcon: {
     marginRight: spacing.xs,
   },
@@ -291,4 +290,3 @@ const styles = StyleSheet.create({
 
 // Export with display name for debugging
 ButtonEnhanced.displayName = 'ButtonEnhanced';
-

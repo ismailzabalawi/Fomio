@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  Switch, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Switch,
   Alert,
   Linking,
   Platform,
-  Animated 
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Moon, 
-  Sun, 
-  Bell, 
-  Shield, 
-  User, 
-  Gear, 
-  Question, 
-  SignOut, 
+import {
+  Moon,
+  Sun,
+  Bell,
+  Shield,
+  User,
+  Gear,
+  Question,
+  SignOut,
   Trash,
   Download,
   WifiHigh,
@@ -33,10 +33,12 @@ import {
   Star,
   Bookmark,
   Notification,
-  Monitor
+  Monitor,
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
+import { useBffAuth } from '../../components/shared/bff-auth-provider';
+import { LogViewer } from '../../components/shared/log-viewer';
 
 interface SettingItemProps {
   title: string;
@@ -48,18 +50,18 @@ interface SettingItemProps {
   isDestructive?: boolean;
 }
 
-function SettingItem({ 
-  title, 
-  subtitle, 
-  icon, 
-  onPress, 
-  rightElement, 
+function SettingItem({
+  title,
+  subtitle,
+  icon,
+  onPress,
+  rightElement,
   showChevron = true,
-  isDestructive = false 
+  isDestructive = false,
 }: SettingItemProps) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
@@ -68,10 +70,13 @@ function SettingItem({
 
   return (
     <TouchableOpacity
-      style={[styles.settingItem, { 
-        backgroundColor: colors.background, 
-        borderBottomColor: colors.border 
-      }]}
+      style={[
+        styles.settingItem,
+        {
+          backgroundColor: colors.background,
+          borderBottomColor: colors.border,
+        },
+      ]}
       onPress={onPress}
       disabled={!onPress}
       accessible
@@ -80,14 +85,14 @@ function SettingItem({
       accessibilityHint={subtitle}
     >
       <View style={styles.settingLeft}>
-        <View style={styles.iconContainer}>
-          {icon}
-        </View>
+        <View style={styles.iconContainer}>{icon}</View>
         <View style={styles.settingText}>
-          <Text style={[
-            styles.settingTitle, 
-            { color: isDestructive ? colors.destructive : colors.text }
-          ]}>
+          <Text
+            style={[
+              styles.settingTitle,
+              { color: isDestructive ? colors.destructive : colors.text },
+            ]}
+          >
             {title}
           </Text>
           {subtitle && (
@@ -107,7 +112,13 @@ function SettingItem({
   );
 }
 
-function SettingSection({ title, children }: { title: string; children: React.ReactNode }) {
+function SettingSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
     text: isDark ? '#9ca3af' : '#6b7280',
@@ -116,27 +127,27 @@ function SettingSection({ title, children }: { title: string; children: React.Re
   return (
     <View style={styles.section}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
-      <View style={styles.sectionContent}>
-        {children}
-      </View>
+      <View style={styles.sectionContent}>{children}</View>
     </View>
   );
 }
 
 export default function SettingsScreen(): JSX.Element {
   const { isDark, isAmoled, theme, setTheme } = useTheme();
+  const { logout, isLoggingOut } = useBffAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
   const [autoSave, setAutoSave] = useState(true);
   const [showNSFW, setShowNSFW] = useState(false);
-  
+  const [showLogViewer, setShowLogViewer] = useState(false);
+
   // Animation for AMOLED toggle
   const slideAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
-    card: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
+    card: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
@@ -212,17 +223,10 @@ export default function SettingsScreen(): JSX.Element {
   }, []);
 
   const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => {
-          console.log('User signed out');
-          // Implement sign out logic
-        }},
-      ]
-    );
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: logout },
+    ]);
   };
 
   const handleDeleteAccount = () => {
@@ -231,10 +235,14 @@ export default function SettingsScreen(): JSX.Element {
       'This action cannot be undone. All your data will be permanently deleted.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => {
-          console.log('Account deletion requested');
-          // Implement account deletion logic
-        }},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            console.log('Account deletion requested');
+            // Implement account deletion logic
+          },
+        },
       ]
     );
   };
@@ -255,19 +263,23 @@ export default function SettingsScreen(): JSX.Element {
     if (Platform.OS === 'ios') {
       Linking.openURL('https://apps.apple.com/app/fomio');
     } else {
-      Linking.openURL('https://play.google.com/store/apps/details?id=com.fomio.app');
+      Linking.openURL(
+        'https://play.google.com/store/apps/details?id=com.fomio.app'
+      );
     }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Settings" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Settings"
         showBackButton={false}
         showProfileButton={false}
       />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -281,19 +293,27 @@ export default function SettingsScreen(): JSX.Element {
             onPress={toggleLightDark}
             rightElement={
               <View style={styles.themeToggle}>
-                <Sun size={16} color={colors.secondary} weight={isDark ? 'regular' : 'fill'} />
+                <Sun
+                  size={16}
+                  color={colors.secondary}
+                  weight={isDark ? 'regular' : 'fill'}
+                />
                 <Switch
                   value={isDark}
                   onValueChange={toggleLightDark}
                   trackColor={{ false: colors.border, true: colors.primary }}
                   thumbColor={isDark ? '#ffffff' : '#ffffff'}
                 />
-                <Moon size={16} color={colors.secondary} weight={isDark ? 'fill' : 'regular'} />
+                <Moon
+                  size={16}
+                  color={colors.secondary}
+                  weight={isDark ? 'fill' : 'regular'}
+                />
               </View>
             }
             showChevron={false}
           />
-          
+
           <Animated.View
             style={{
               opacity: opacityAnim,
@@ -314,7 +334,9 @@ export default function SettingsScreen(): JSX.Element {
           >
             <SettingItem
               title="AMOLED Mode"
-              subtitle={isAmoled ? 'True black background' : 'Standard dark background'}
+              subtitle={
+                isAmoled ? 'True black background' : 'Standard dark background'
+              }
               icon={<Monitor size={24} color={colors.primary} weight="fill" />}
               onPress={toggleDarkAmoled}
               rightElement={
@@ -346,11 +368,13 @@ export default function SettingsScreen(): JSX.Element {
             }
             showChevron={false}
           />
-          
+
           <SettingItem
             title="Notification Preferences"
             subtitle="Customize what you're notified about"
-            icon={<Notification size={24} color={colors.primary} weight="regular" />}
+            icon={
+              <Notification size={24} color={colors.primary} weight="regular" />
+            }
             onPress={() => console.log('Open notification preferences')}
           />
         </SettingSection>
@@ -371,14 +395,14 @@ export default function SettingsScreen(): JSX.Element {
             }
             showChevron={false}
           />
-          
+
           <SettingItem
             title="Privacy Settings"
             subtitle="Control who can see your activity"
             icon={<Shield size={24} color={colors.primary} weight="regular" />}
             onPress={() => console.log('Open privacy settings')}
           />
-          
+
           <SettingItem
             title="Blocked Users"
             subtitle="Manage your blocked users list"
@@ -392,7 +416,13 @@ export default function SettingsScreen(): JSX.Element {
           <SettingItem
             title="Offline Mode"
             subtitle="Browse without internet connection"
-            icon={offlineMode ? <WifiSlash size={24} color={colors.primary} weight="fill" /> : <WifiHigh size={24} color={colors.primary} weight="regular" />}
+            icon={
+              offlineMode ? (
+                <WifiSlash size={24} color={colors.primary} weight="fill" />
+              ) : (
+                <WifiHigh size={24} color={colors.primary} weight="regular" />
+              )
+            }
             rightElement={
               <Switch
                 value={offlineMode}
@@ -403,11 +433,13 @@ export default function SettingsScreen(): JSX.Element {
             }
             showChevron={false}
           />
-          
+
           <SettingItem
             title="Auto-save Drafts"
             subtitle="Automatically save your posts"
-            icon={<Bookmark size={24} color={colors.primary} weight="regular" />}
+            icon={
+              <Bookmark size={24} color={colors.primary} weight="regular" />
+            }
             rightElement={
               <Switch
                 value={autoSave}
@@ -418,16 +450,23 @@ export default function SettingsScreen(): JSX.Element {
             }
             showChevron={false}
           />
-          
+
           <SettingItem
             title="Clear Cache"
             subtitle="Free up storage space"
             icon={<Trash size={24} color={colors.primary} weight="regular" />}
             onPress={() => {
-              Alert.alert('Clear Cache', 'This will free up storage space. Continue?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Clear', onPress: () => console.log('Cache cleared') },
-              ]);
+              Alert.alert(
+                'Clear Cache',
+                'This will free up storage space. Continue?',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Clear',
+                    onPress: () => console.log('Cache cleared'),
+                  },
+                ]
+              );
             }}
           />
         </SettingSection>
@@ -437,24 +476,26 @@ export default function SettingsScreen(): JSX.Element {
           <SettingItem
             title="Contact Support"
             subtitle="Get help with your account"
-            icon={<Question size={24} color={colors.primary} weight="regular" />}
+            icon={
+              <Question size={24} color={colors.primary} weight="regular" />
+            }
             onPress={handleContactSupport}
           />
-          
+
           <SettingItem
             title="Rate Fomio"
             subtitle="Help us improve with your feedback"
             icon={<Star size={24} color={colors.primary} weight="regular" />}
             onPress={handleRateApp}
           />
-          
+
           <SettingItem
             title="Privacy Policy"
             subtitle="Read our privacy policy"
             icon={<Shield size={24} color={colors.primary} weight="regular" />}
             onPress={handlePrivacyPolicy}
           />
-          
+
           <SettingItem
             title="Terms of Service"
             subtitle="Read our terms of service"
@@ -463,20 +504,34 @@ export default function SettingsScreen(): JSX.Element {
           />
         </SettingSection>
 
+        {/* Debug & Development */}
+        <SettingSection title="Debug & Development">
+          <SettingItem
+            title="View App Logs"
+            subtitle="See detailed error logs and API calls"
+            icon={<Monitor size={24} color={colors.primary} weight="regular" />}
+            onPress={() => setShowLogViewer(true)}
+          />
+        </SettingSection>
+
         {/* Account Actions */}
         <SettingSection title="Account">
           <SettingItem
             title="Sign Out"
             subtitle="Sign out of your account"
-            icon={<SignOut size={24} color={colors.destructive} weight="regular" />}
+            icon={
+              <SignOut size={24} color={colors.destructive} weight="regular" />
+            }
             onPress={handleSignOut}
             isDestructive={true}
           />
-          
+
           <SettingItem
             title="Delete Account"
             subtitle="Permanently delete your account"
-            icon={<Trash size={24} color={colors.destructive} weight="regular" />}
+            icon={
+              <Trash size={24} color={colors.destructive} weight="regular" />
+            }
             onPress={handleDeleteAccount}
             isDestructive={true}
           />
@@ -492,6 +547,12 @@ export default function SettingsScreen(): JSX.Element {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Log Viewer Modal */}
+      <LogViewer
+        visible={showLogViewer}
+        onClose={() => setShowLogViewer(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -583,4 +644,4 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     textAlign: 'center',
   },
-}); 
+});

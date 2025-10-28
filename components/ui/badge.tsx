@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  StyleProp,
+} from 'react-native';
 import { useTheme } from '@/components/shared/theme-provider';
 
 export interface BadgeProps {
@@ -41,10 +48,14 @@ export function Badge({
 
   const getSizeStyle = () => {
     switch (size) {
-      case 'sm': return { paddingHorizontal: 6, paddingVertical: 2, minHeight: 20 };
-      case 'md': return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
-      case 'lg': return { paddingHorizontal: 12, paddingVertical: 6, minHeight: 32 };
-      default: return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
+      case 'sm':
+        return { paddingHorizontal: 6, paddingVertical: 2, minHeight: 20 };
+      case 'md':
+        return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
+      case 'lg':
+        return { paddingHorizontal: 12, paddingVertical: 6, minHeight: 32 };
+      default:
+        return { paddingHorizontal: 8, paddingVertical: 4, minHeight: 24 };
     }
   };
 
@@ -60,10 +71,14 @@ export function Badge({
 
   const getSizeTextStyle = () => {
     switch (size) {
-      case 'sm': return { fontSize: 11 };
-      case 'md': return { fontSize: 12 };
-      case 'lg': return { fontSize: 14 };
-      default: return { fontSize: 12 };
+      case 'sm':
+        return { fontSize: 11 };
+      case 'md':
+        return { fontSize: 12 };
+      case 'lg':
+        return { fontSize: 14 };
+      default:
+        return { fontSize: 12 };
     }
   };
 
@@ -100,4 +115,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-

@@ -12,7 +12,7 @@ export function NewCommentInput({ onSend }: NewCommentInputProps) {
   const { isDark, isAmoled } = useTheme();
   const [text, setText] = useState('');
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
+    background: isAmoled ? '#000000' : isDark ? '#23232b' : '#f8fafc',
     text: isDark ? '#f4f4f5' : '#17131B',
     placeholder: isDark ? '#a1a1aa' : '#5C5D67',
     accent: isDark ? '#38bdf8' : '#0ea5e9',
@@ -25,7 +25,12 @@ export function NewCommentInput({ onSend }: NewCommentInputProps) {
     }
   }
   return (
-    <View style={[styles.inputRow, { backgroundColor: colors.background, borderColor: colors.border }]}> 
+    <View
+      style={[
+        styles.inputRow,
+        { backgroundColor: colors.background, borderColor: colors.border },
+      ]}
+    >
       <TextInput
         style={[styles.input, { color: colors.text }]}
         placeholder="Add a comment..."
@@ -73,4 +78,4 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: 8,
   },
-}); 
+});

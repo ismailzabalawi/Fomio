@@ -63,7 +63,9 @@ export interface CardTitleProps {
 export function CardTitle({ children, style }: CardTitleProps) {
   const { isDark } = useTheme();
   return (
-    <Text style={[styles.title, { color: isDark ? '#f9fafb' : '#111827' }, style]}>
+    <Text
+      style={[styles.title, { color: isDark ? '#f9fafb' : '#111827' }, style]}
+    >
       {children}
     </Text>
   );
@@ -77,7 +79,13 @@ export interface CardDescriptionProps {
 export function CardDescription({ children, style }: CardDescriptionProps) {
   const { isDark } = useTheme();
   return (
-    <Text style={[styles.description, { color: isDark ? '#d1d5db' : '#6b7280' }, style]}>
+    <Text
+      style={[
+        styles.description,
+        { color: isDark ? '#d1d5db' : '#6b7280' },
+        style,
+      ]}
+    >
       {children}
     </Text>
   );
@@ -133,4 +141,3 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 });
-

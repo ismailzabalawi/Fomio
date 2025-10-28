@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../../components/shared/theme-provider';
@@ -9,17 +15,20 @@ const { width } = Dimensions.get('window');
 const onboardingSteps = [
   {
     title: 'Welcome to Fomio',
-    description: 'Share your thoughts, connect with others, and discover amazing content.',
+    description:
+      'Share your thoughts, connect with others, and discover amazing content.',
     emoji: '🚀',
   },
   {
     title: 'Create Bytes',
-    description: 'Share bite-sized content with the community. Express yourself in creative ways.',
+    description:
+      'Share bite-sized content with the community. Express yourself in creative ways.',
     emoji: '💭',
   },
   {
     title: 'Connect & Engage',
-    description: 'Follow creators, like posts, and engage with content you love.',
+    description:
+      'Follow creators, like posts, and engage with content you love.',
     emoji: '❤️',
   },
 ];
@@ -50,7 +59,9 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleSkip}
@@ -61,15 +72,21 @@ export default function OnboardingScreen() {
           accessibilityHint="Skip onboarding and go to sign up"
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Text style={[styles.skipButtonText, { color: colors.secondary }]}>Skip</Text>
+          <Text style={[styles.skipButtonText, { color: colors.secondary }]}>
+            Skip
+          </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.stepContainer}>
           <Text style={styles.emoji}>{onboardingSteps[currentStep].emoji}</Text>
-          <Text style={[styles.title, { color: colors.text }]}>{onboardingSteps[currentStep].title}</Text>
-          <Text style={[styles.description, { color: colors.secondary }]}>{onboardingSteps[currentStep].description}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {onboardingSteps[currentStep].title}
+          </Text>
+          <Text style={[styles.description, { color: colors.secondary }]}>
+            {onboardingSteps[currentStep].description}
+          </Text>
         </View>
 
         <View style={styles.indicators}>
@@ -79,7 +96,9 @@ export default function OnboardingScreen() {
               style={[
                 styles.indicator,
                 { backgroundColor: colors.indicator },
-                index === currentStep && { backgroundColor: colors.activeIndicator },
+                index === currentStep && {
+                  backgroundColor: colors.activeIndicator,
+                },
               ]}
             />
           ))}
@@ -92,12 +111,20 @@ export default function OnboardingScreen() {
           onPress={handleNext}
           accessible
           accessibilityRole="button"
-          accessibilityLabel={currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
-          accessibilityHint={currentStep === onboardingSteps.length - 1 ? 'Finish onboarding and go to sign up' : 'Go to next onboarding step'}
+          accessibilityLabel={
+            currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'
+          }
+          accessibilityHint={
+            currentStep === onboardingSteps.length - 1
+              ? 'Finish onboarding and go to sign up'
+              : 'Go to next onboarding step'
+          }
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Text style={[styles.nextButtonText, { color: colors.buttonText }]}>
-            {currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
+            {currentStep === onboardingSteps.length - 1
+              ? 'Get Started'
+              : 'Next'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -171,4 +198,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

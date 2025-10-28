@@ -24,24 +24,40 @@ interface CommentSectionProps {
   onSend?: (text: string, parentId?: string) => void;
 }
 
-export function CommentSection({ comments, onLike, onReply, onSend }: CommentSectionProps) {
+export function CommentSection({
+  comments,
+  onLike,
+  onReply,
+  onSend,
+}: CommentSectionProps) {
   const { isDark } = useTheme();
   // Group comments: parents and their direct replies
-  const parents = comments.filter(c => !c.parentId);
-  const replies = comments.filter(c => c.parentId);
+  const parents = comments.filter((c) => !c.parentId);
+  const replies = comments.filter((c) => c.parentId);
   function getReplies(parentId: string) {
-    return replies.filter(r => r.parentId === parentId);
+    return replies.filter((r) => r.parentId === parentId);
   }
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#18181b' : '#fff' }]}> 
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? '#18181b' : '#fff' },
+      ]}
+    >
       <FlatList
         data={parents}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View>
             <CommentItem comment={item} onLike={onLike} onReply={onReply} />
-            {getReplies(item.id).map(reply => (
-              <CommentItem key={reply.id} comment={reply} onLike={onLike} onReply={onReply} isReply />
+            {getReplies(item.id).map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                onLike={onLike}
+                onReply={onReply}
+                isReply
+              />
             ))}
           </View>
         )}
@@ -58,4 +74,4 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingHorizontal: 0,
   },
-}); 
+});

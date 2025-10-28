@@ -2,9 +2,7 @@
   "buildSuccess": false,
   "bundleSize": null,
   "buildTime": null,
-  "optimizations": [
-    "Dependency analysis completed: 26 prod deps"
-  ],
+  "optimizations": ["Dependency analysis completed: 26 prod deps"],
   "warnings": [],
   "errors": [
     {

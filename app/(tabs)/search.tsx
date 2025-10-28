@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { 
-  MagnifyingGlass, 
+import {
+  MagnifyingGlass,
   Coffee,
   Sparkle,
   Heart,
-  Rocket
+  Rocket,
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
@@ -22,16 +22,16 @@ export default function SearchScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
   const router = useRouter();
   const [randomCard, setRandomCard] = useState<number>(0);
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
-    card: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
+    card: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
     primary: isDark ? '#3b82f6' : '#0ea5e9',
     accent: isDark ? '#8b5cf6' : '#a855f7',
-    input: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    input: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
   };
 
   // Generate new random card every time the screen comes into focus
@@ -46,21 +46,32 @@ export default function SearchScreen(): JSX.Element {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Discover" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Discover"
         showBackButton={false}
         showProfileButton={true}
       />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Search Bar - Disabled State */}
-        <View style={[styles.searchContainer, { backgroundColor: colors.input, opacity: 0.6 }]}>
-          <MagnifyingGlass size={20} color={colors.secondary} weight="regular" />
+        <View
+          style={[
+            styles.searchContainer,
+            { backgroundColor: colors.input, opacity: 0.6 },
+          ]}
+        >
+          <MagnifyingGlass
+            size={20}
+            color={colors.secondary}
+            weight="regular"
+          />
           <Text style={[styles.searchInput, { color: colors.secondary }]}>
             Search coming soon... 🚀
           </Text>
@@ -70,7 +81,9 @@ export default function SearchScreen(): JSX.Element {
         <View style={styles.mainContent}>
           {/* Icon and Title */}
           <View style={styles.iconContainer}>
-            <View style={[styles.iconCircle, { backgroundColor: colors.accent }]}>
+            <View
+              style={[styles.iconCircle, { backgroundColor: colors.accent }]}
+            >
               <Sparkle size={48} color="#ffffff" weight="fill" />
             </View>
           </View>
@@ -78,7 +91,7 @@ export default function SearchScreen(): JSX.Element {
           <Text style={[styles.mainTitle, { color: colors.text }]}>
             Search & Discover
           </Text>
-          
+
           <Text style={[styles.subtitle, { color: colors.secondary }]}>
             Coming Soon™ (probably)
           </Text>
@@ -86,35 +99,54 @@ export default function SearchScreen(): JSX.Element {
           {/* Fun Messages */}
           <View style={styles.messageContainer}>
             {randomCard === 0 && (
-              <View style={[styles.messageCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View
+                style={[
+                  styles.messageCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
                 <Coffee size={24} color={colors.accent} weight="regular" />
                 <Text style={[styles.messageText, { color: colors.text }]}>
-                  "Search is 'coming soon.' In tech-speak, that means: we'll ship it when it stops being broken. Could be 3 months. Could be 6. Definitely not now."
+                  "Search is 'coming soon.' In tech-speak, that means: we'll
+                  ship it when it stops being broken. Could be 3 months. Could
+                  be 6. Definitely not now."
                 </Text>
               </View>
             )}
 
             {randomCard === 1 && (
-              <View style={[styles.messageCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View
+                style={[
+                  styles.messageCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
                 <Heart size={24} color={colors.accent} weight="regular" />
                 <Text style={[styles.messageText, { color: colors.text }]}>
-                  "Our developers are 'working hard' (read: scrolling Reels and calling it research)"
+                  "Our developers are 'working hard' (read: scrolling Reels and
+                  calling it research)"
                 </Text>
               </View>
             )}
 
             {randomCard === 2 && (
-              <View style={[styles.messageCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View
+                style={[
+                  styles.messageCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
                 <Rocket size={24} color={colors.accent} weight="regular" />
                 <Text style={[styles.messageText, { color: colors.text }]}>
-                  "Meanwhile, the feed actually works. Revolutionary concept, we know"
+                  "Meanwhile, the feed actually works. Revolutionary concept, we
+                  know"
                 </Text>
               </View>
             )}
           </View>
 
           {/* Call to Action */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.ctaButton, { backgroundColor: colors.primary }]}
             onPress={handleExploreFeed}
             accessible
@@ -126,7 +158,8 @@ export default function SearchScreen(): JSX.Element {
 
           {/* Footer Note */}
           <Text style={[styles.footerNote, { color: colors.secondary }]}>
-            Search functionality will be available in a future update (we promise, maybe)
+            Search functionality will be available in a future update (we
+            promise, maybe)
           </Text>
         </View>
       </ScrollView>
@@ -226,4 +259,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
-}); 
+});

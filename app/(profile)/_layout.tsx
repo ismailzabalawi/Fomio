@@ -3,9 +3,9 @@ import { useTheme } from '../../components/shared/theme-provider';
 
 export default function ProfileLayout() {
   const { isDark, isAmoled } = useTheme();
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
   };
 
   return (
@@ -20,4 +20,4 @@ export default function ProfileLayout() {
       <Stack.Screen name="settings" />
     </Stack>
   );
-} 
+}

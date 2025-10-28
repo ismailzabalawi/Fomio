@@ -18,9 +18,11 @@ const mockFeedData: Byte[] = [
       id: '2',
       name: 'John Doe',
       username: '@johndoe',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      avatar:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     },
-    content: 'Just discovered this amazing new coffee shop downtown! The atmosphere is perfect for working and the coffee is incredible. ☕️',
+    content:
+      'Just discovered this amazing new coffee shop downtown! The atmosphere is perfect for working and the coffee is incredible. ☕️',
     teretId: 'coffee',
     teretName: 'Coffee Lovers',
     tags: ['coffee', 'lifestyle'],
@@ -36,9 +38,11 @@ const mockFeedData: Byte[] = [
       id: '3',
       name: 'Sarah Wilson',
       username: '@sarahw',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      avatar:
+        'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     },
-    content: 'Working on a new React Native project and loving the developer experience with Expo Router. The file-based routing is so intuitive! 🚀',
+    content:
+      'Working on a new React Native project and loving the developer experience with Expo Router. The file-based routing is so intuitive! 🚀',
     teretId: 'react-native',
     teretName: 'React Native',
     tags: ['tech', 'react-native'],
@@ -54,9 +58,11 @@ const mockFeedData: Byte[] = [
       id: '4',
       name: 'Mike Chen',
       username: '@mikechen',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      avatar:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     },
-    content: 'Beautiful sunset from my evening walk. Sometimes the simple moments are the most meaningful. 🌅',
+    content:
+      'Beautiful sunset from my evening walk. Sometimes the simple moments are the most meaningful. 🌅',
     teretId: 'nature',
     teretName: 'Nature & Outdoors',
     tags: ['nature', 'photography'],
@@ -85,13 +91,13 @@ export function useFeed() {
 
   const loadFeed = async () => {
     try {
-      setFeedState(prev => ({ ...prev, isLoading: true, error: null }));
-      
+      setFeedState((prev) => ({ ...prev, isLoading: true, error: null }));
+
       // TODO: Implement actual API call
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setFeedState(prev => ({
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setFeedState((prev) => ({
         ...prev,
         bytes: mockFeedData,
         isLoading: false,
@@ -99,7 +105,7 @@ export function useFeed() {
       }));
     } catch (error) {
       console.error('Load feed error:', error);
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
         isLoading: false,
         error: 'Failed to load feed',
@@ -109,13 +115,13 @@ export function useFeed() {
 
   const refreshFeed = async () => {
     try {
-      setFeedState(prev => ({ ...prev, isRefreshing: true, error: null }));
-      
+      setFeedState((prev) => ({ ...prev, isRefreshing: true, error: null }));
+
       // TODO: Implement actual API call
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setFeedState(prev => ({
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setFeedState((prev) => ({
         ...prev,
         bytes: mockFeedData,
         isRefreshing: false,
@@ -123,7 +129,7 @@ export function useFeed() {
       }));
     } catch (error) {
       console.error('Refresh feed error:', error);
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
         isRefreshing: false,
         error: 'Failed to refresh feed',
@@ -135,18 +141,18 @@ export function useFeed() {
     if (!feedState.hasMore || feedState.isLoading) return;
 
     try {
-      setFeedState(prev => ({ ...prev, isLoading: true }));
-      
+      setFeedState((prev) => ({ ...prev, isLoading: true }));
+
       // TODO: Implement actual API call for pagination
       // For now, just mark as no more data
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
         isLoading: false,
         hasMore: false,
       }));
     } catch (error) {
       console.error('Load more bytes error:', error);
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
         isLoading: false,
         error: 'Failed to load more bytes',
@@ -158,10 +164,10 @@ export function useFeed() {
     if (!user) return;
 
     try {
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
-        bytes: prev.bytes.map(byte => 
-          byte.id === byteId 
+        bytes: prev.bytes.map((byte) =>
+          byte.id === byteId
             ? {
                 ...byte,
                 isLiked: !byte.isLiked,
@@ -176,10 +182,10 @@ export function useFeed() {
     } catch (error) {
       console.error('Toggle like error:', error);
       // Revert the optimistic update
-      setFeedState(prev => ({
+      setFeedState((prev) => ({
         ...prev,
-        bytes: prev.bytes.map(byte => 
-          byte.id === byteId 
+        bytes: prev.bytes.map((byte) =>
+          byte.id === byteId
             ? {
                 ...byte,
                 isLiked: !byte.isLiked,
@@ -192,14 +198,14 @@ export function useFeed() {
   };
 
   const addByte = (newByte: Byte) => {
-    setFeedState(prev => ({
+    setFeedState((prev) => ({
       ...prev,
       bytes: [newByte, ...prev.bytes],
     }));
   };
 
   const getByteById = (byteId: string): Byte | undefined => {
-    return feedState.bytes.find(byte => byte.id === byteId);
+    return feedState.bytes.find((byte) => byte.id === byteId);
   };
 
   return {
@@ -212,4 +218,3 @@ export function useFeed() {
     getByteById,
   };
 }
-

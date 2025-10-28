@@ -31,9 +31,7 @@
     "Consider encrypting sensitive data before storing",
     "Consider adding input sanitization for XSS protection"
   ],
-  "warnings": [
-    "Dependency vulnerabilities detected - run npm audit fix"
-  ],
+  "warnings": ["Dependency vulnerabilities detected - run npm audit fix"],
   "score": 19,
   "timestamp": "2025-07-17T23:14:08.815Z"
 }

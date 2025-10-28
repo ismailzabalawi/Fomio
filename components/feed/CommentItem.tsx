@@ -23,24 +23,45 @@ interface CommentItemProps {
   onReply?: (id: string) => void;
 }
 
-export function CommentItem({ comment, isReply, onLike, onReply }: CommentItemProps) {
+export function CommentItem({
+  comment,
+  isReply,
+  onLike,
+  onReply,
+}: CommentItemProps) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#23232b' : '#f8fafc'),
+    background: isAmoled ? '#000000' : isDark ? '#23232b' : '#f8fafc',
     text: isDark ? '#f4f4f5' : '#17131B',
     secondary: isDark ? '#a1a1aa' : '#5C5D67',
     action: isDark ? '#a1a1aa' : '#17131B',
     divider: isDark ? '#23232b' : '#e2e8f0',
   };
   return (
-    <View style={[styles.row, { borderBottomColor: colors.divider }, isReply && styles.replyRow]}> 
-      <Image source={{ uri: comment.author.avatar }} style={styles.avatar} accessibilityLabel={`${comment.author.name}'s avatar`} />
+    <View
+      style={[
+        styles.row,
+        { borderBottomColor: colors.divider },
+        isReply && styles.replyRow,
+      ]}
+    >
+      <Image
+        source={{ uri: comment.author.avatar }}
+        style={styles.avatar}
+        accessibilityLabel={`${comment.author.name}'s avatar`}
+      />
       <View style={styles.contentBlock}>
         <View style={styles.headerRow}>
-          <Text style={[styles.author, { color: colors.text }]}>{comment.author.name}</Text>
-          <Text style={[styles.time, { color: colors.secondary }]}>{comment.createdAt}</Text>
+          <Text style={[styles.author, { color: colors.text }]}>
+            {comment.author.name}
+          </Text>
+          <Text style={[styles.time, { color: colors.secondary }]}>
+            {comment.createdAt}
+          </Text>
         </View>
-        <Text style={[styles.text, { color: colors.text }]}>{comment.content}</Text>
+        <Text style={[styles.text, { color: colors.text }]}>
+          {comment.content}
+        </Text>
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.actionBtn}
@@ -49,8 +70,14 @@ export function CommentItem({ comment, isReply, onLike, onReply }: CommentItemPr
             accessibilityRole="button"
             accessibilityLabel="Like comment"
           >
-            <Heart size={18} weight={comment.likes > 0 ? 'fill' : 'regular'} color={colors.action} />
-            <Text style={[styles.actionText, { color: colors.action }]}>{comment.likes}</Text>
+            <Heart
+              size={18}
+              weight={comment.likes > 0 ? 'fill' : 'regular'}
+              color={colors.action}
+            />
+            <Text style={[styles.actionText, { color: colors.action }]}>
+              {comment.likes}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionBtn}
@@ -60,7 +87,9 @@ export function CommentItem({ comment, isReply, onLike, onReply }: CommentItemPr
             accessibilityLabel="Reply to comment"
           >
             <ChatCircle size={18} weight="regular" color={colors.action} />
-            <Text style={[styles.actionText, { color: colors.action }]}>Reply</Text>
+            <Text style={[styles.actionText, { color: colors.action }]}>
+              Reply
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -125,4 +154,4 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontWeight: '500',
   },
-}); 
+});

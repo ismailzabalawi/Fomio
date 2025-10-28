@@ -1,37 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
   FlatList,
   Image,
   RefreshControl,
-  Alert
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Bell, 
-  BellSlash, 
-  Check, 
-  Trash, 
-  Heart, 
-  ChatCircle, 
-  Share, 
+import {
+  Bell,
+  BellSlash,
+  Check,
+  Trash,
+  Heart,
+  ChatCircle,
+  Share,
   UserPlus,
   At,
   Star,
   Bookmark,
   ArrowRight,
-  Clock
+  Clock,
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
+import { useApolloNotifications } from '../../hooks';
 
 interface Notification {
   id: string;
-  type: 'like' | 'reply' | 'mention' | 'follow' | 'bookmark' | 'quote' | 'system';
+  type:
+    | 'like'
+    | 'reply'
+    | 'mention'
+    | 'follow'
+    | 'bookmark'
+    | 'quote'
+    | 'system';
   title: string;
   message: string;
   timestamp: string;
@@ -48,26 +56,118 @@ interface Notification {
   };
 }
 
+// Helper function to convert Apollo notification type to UI type
+function getNotificationType(
+  notificationType: number
+): 'like' | 'reply' | 'mention' | 'follow' | 'bookmark' | 'quote' | 'system' {
+  // Discourse notification types: 1=mentioned, 2=replied, 3=quoted, 4=edited, 5=liked, 6=private_message, etc.
+  switch (notificationType) {
+    case 1:
+      return 'mention';
+    case 2:
+      return 'reply';
+    case 3:
+      return 'quote';
+    case 5:
+      return 'like';
+    case 6:
+      return 'bookmark';
+    default:
+      return 'system';
+  }
+}
+
+// Helper function to format notification title and message
+function formatNotification(
+  apolloNotification: import('../../hooks/useApolloNotifications').Notification
+): Notification {
+  const type = getNotificationType(apolloNotification.notification_type);
+  const data = apolloNotification.data;
+
+  let title = 'New notification';
+  let message = '';
+
+  switch (type) {
+    case 'like':
+      title = `${data?.display_username || data?.username || 'Someone'} liked your post`;
+      message = data?.topic_title || 'Your post received a like';
+      break;
+    case 'reply':
+      title = `${data?.display_username || data?.username || 'Someone'} replied to your post`;
+      message = data?.topic_title || 'Your post received a reply';
+      break;
+    case 'mention':
+      title = `You were mentioned`;
+      message = data?.topic_title || 'You were mentioned in a post';
+      break;
+    case 'quote':
+      title = `${data?.display_username || data?.username || 'Someone'} quoted your post`;
+      message = data?.topic_title || 'Your post was quoted';
+      break;
+    case 'bookmark':
+      title = `Your post was bookmarked`;
+      message = data?.topic_title || 'Your post was bookmarked';
+      break;
+    default:
+      title = 'New notification';
+      message = data?.message || 'You have a new notification';
+  }
+
+  return {
+    id: apolloNotification.id.toString(),
+    type,
+    title,
+    message,
+    timestamp: formatTimestamp(apolloNotification.created_at),
+    isRead: apolloNotification.read,
+    isActionable: true,
+    data: {
+      postId: apolloNotification.post_number?.toString(),
+      topicId: apolloNotification.topic_id?.toString(),
+      username: data?.display_username || data?.username,
+      avatar: data?.avatar_template
+        ? `https://meta.techrebels.info${data.avatar_template.replace('{size}', '150')}`
+        : undefined,
+    },
+  };
+}
+
+// Helper function to format timestamp
+function formatTimestamp(timestamp: string): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
 interface NotificationSection {
   title: string;
   data: Notification[];
 }
 
-function NotificationItem({ 
-  notification, 
-  onPress, 
-  onMarkRead, 
-  onDelete 
-}: { 
-  notification: Notification; 
-  onPress: () => void; 
-  onMarkRead: () => void; 
-  onDelete: () => void; 
+function NotificationItem({
+  notification,
+  onPress,
+  onMarkRead,
+  onDelete,
+}: {
+  notification: Notification;
+  onPress: () => void;
+  onMarkRead: () => void;
+  onDelete: () => void;
 }) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
-    unreadBackground: isAmoled ? '#0a0a0a' : (isDark ? '#374151' : '#f8fafc'),
+    background: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
+    unreadBackground: isAmoled ? '#0a0a0a' : isDark ? '#374151' : '#f8fafc',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
@@ -123,10 +223,12 @@ function NotificationItem({
     <TouchableOpacity
       style={[
         styles.notificationItem,
-        { 
-          backgroundColor: notification.isRead ? colors.background : colors.unreadBackground,
-          borderColor: colors.border 
-        }
+        {
+          backgroundColor: notification.isRead
+            ? colors.background
+            : colors.unreadBackground,
+          borderColor: colors.border,
+        },
       ]}
       onPress={onPress}
       accessible
@@ -134,32 +236,42 @@ function NotificationItem({
       accessibilityLabel={`${notification.title} notification`}
     >
       <View style={styles.notificationHeader}>
-        <View style={styles.notificationIcon}>
-          {getNotificationIcon()}
-        </View>
+        <View style={styles.notificationIcon}>{getNotificationIcon()}</View>
         <View style={styles.notificationContent}>
           <Text style={[styles.notificationTitle, { color: colors.text }]}>
             {notification.title}
           </Text>
-          <Text style={[styles.notificationMessage, { color: colors.secondary }]} numberOfLines={2}>
+          <Text
+            style={[styles.notificationMessage, { color: colors.secondary }]}
+            numberOfLines={2}
+          >
             {notification.message}
           </Text>
           <View style={styles.notificationMeta}>
-            <Text style={[styles.notificationTime, { color: colors.secondary }]}>
+            <Text
+              style={[styles.notificationTime, { color: colors.secondary }]}
+            >
               {notification.timestamp}
             </Text>
             {notification.data?.hubName && (
-              <Text style={[styles.notificationContext, { color: colors.accent }]}>
+              <Text
+                style={[styles.notificationContext, { color: colors.accent }]}
+              >
                 in {notification.data.hubName}
               </Text>
             )}
           </View>
         </View>
         {!notification.isRead && (
-          <View style={[styles.unreadIndicator, { backgroundColor: getNotificationColor() }]} />
+          <View
+            style={[
+              styles.unreadIndicator,
+              { backgroundColor: getNotificationColor() },
+            ]}
+          />
         )}
       </View>
-      
+
       {notification.isActionable && (
         <View style={styles.notificationActions}>
           <TouchableOpacity
@@ -170,9 +282,11 @@ function NotificationItem({
             accessibilityLabel="Mark as read"
           >
             <Check size={16} color={colors.success} weight="regular" />
-            <Text style={[styles.actionText, { color: colors.success }]}>Mark Read</Text>
+            <Text style={[styles.actionText, { color: colors.success }]}>
+              Mark Read
+            </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: colors.border }]}
             onPress={onDelete}
@@ -181,7 +295,9 @@ function NotificationItem({
             accessibilityLabel="Delete notification"
           >
             <Trash size={16} color={colors.error} weight="regular" />
-            <Text style={[styles.actionText, { color: colors.error }]}>Delete</Text>
+            <Text style={[styles.actionText, { color: colors.error }]}>
+              Delete
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -189,7 +305,13 @@ function NotificationItem({
   );
 }
 
-function NotificationSection({ title, children }: { title: string; children: React.ReactNode }) {
+function NotificationSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   const { isDark, isAmoled } = useTheme();
   const colors = {
     text: isDark ? '#9ca3af' : '#6b7280',
@@ -205,136 +327,34 @@ function NotificationSection({ title, children }: { title: string; children: Rea
 
 export default function NotificationsScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    notifications: apolloNotifications,
+    unreadCount,
+    loading,
+    error,
+    refresh,
+  } = useApolloNotifications();
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#18181b' : '#ffffff'),
-    card: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
+    background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
+    card: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
     text: isDark ? '#f9fafb' : '#111827',
     secondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : '#e5e7eb',
+    backdrop: isAmoled ? '#0a0a0a' : isDark ? '#374151' : '#f8fafc',
     primary: isDark ? '#3b82f6' : '#0ea5e9',
     error: isDark ? '#ef4444' : '#dc2626',
   };
 
-  // Mock notifications data
-  const mockNotifications: Notification[] = [
-    {
-      id: '1',
-      type: 'like',
-      title: 'Alex Chen liked your post',
-      message: 'Alex Chen liked your post "Getting Started with React Native" in #react-native',
-      timestamp: '2m ago',
-      isRead: false,
-      isActionable: true,
-      data: {
-        postId: '123',
-        userId: 'alex-chen',
-        username: 'Alex Chen',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-        hubName: 'Technology',
-        teretName: 'react-native',
-      },
-    },
-    {
-      id: '2',
-      type: 'reply',
-      title: 'Sarah Kim replied to your post',
-      message: 'Sarah Kim replied to your post "UI/UX Design Tips" in #ui-design',
-      timestamp: '15m ago',
-      isRead: false,
-      isActionable: true,
-      data: {
-        postId: '124',
-        userId: 'sarah-kim',
-        username: 'Sarah Kim',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-        hubName: 'Design',
-        teretName: 'ui-design',
-      },
-    },
-    {
-      id: '3',
-      type: 'mention',
-      title: 'You were mentioned in a post',
-      message: 'Mike Johnson mentioned you in "Best practices for mobile development"',
-      timestamp: '1h ago',
-      isRead: true,
-      isActionable: true,
-      data: {
-        postId: '125',
-        userId: 'mike-johnson',
-        username: 'Mike Johnson',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-        hubName: 'Technology',
-        teretName: 'mobile-dev',
-      },
-    },
-    {
-      id: '4',
-      type: 'follow',
-      title: 'New follower',
-      message: 'Emma Wilson started following you',
-      timestamp: '2h ago',
-      isRead: true,
-      isActionable: true,
-      data: {
-        userId: 'emma-wilson',
-        username: 'Emma Wilson',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      },
-    },
-    {
-      id: '5',
-      type: 'bookmark',
-      title: 'Your post was bookmarked',
-      message: 'David Lee bookmarked your post "Advanced TypeScript Patterns"',
-      timestamp: '3h ago',
-      isRead: true,
-      isActionable: true,
-      data: {
-        postId: '126',
-        userId: 'david-lee',
-        username: 'David Lee',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-        hubName: 'Technology',
-        teretName: 'typescript',
-      },
-    },
-    {
-      id: '6',
-      type: 'system',
-      title: 'Welcome to Fomio!',
-      message: 'Your account has been successfully created. Start exploring hubs and terets!',
-      timestamp: '1d ago',
-      isRead: true,
-      isActionable: false,
-    },
-  ];
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setNotifications(mockNotifications);
-    } catch (error) {
-      console.error('Failed to load notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Transform Apollo notifications to UI format
+  const notifications: Notification[] =
+    apolloNotifications.filter(Boolean).map(formatNotification);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadNotifications();
+    await refresh();
     setRefreshing(false);
   };
 
@@ -351,13 +371,8 @@ export default function NotificationsScreen(): JSX.Element {
   };
 
   const handleMarkRead = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === notificationId 
-          ? { ...notification, isRead: true }
-          : notification
-      )
-    );
+    // TODO: Implement mark as read mutation when available
+    console.log('Mark as read:', notificationId);
   };
 
   const handleDelete = (notificationId: string) => {
@@ -366,35 +381,29 @@ export default function NotificationsScreen(): JSX.Element {
       'Are you sure you want to delete this notification?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          style: 'destructive', 
+        {
+          text: 'Delete',
+          style: 'destructive',
           onPress: () => {
-            setNotifications(prev => 
-              prev.filter(notification => notification.id !== notificationId)
-            );
-          }
+            // TODO: Implement delete mutation when available
+            console.log('Delete notification:', notificationId);
+          },
         },
       ]
     );
   };
 
   const handleMarkAllRead = () => {
-    Alert.alert(
-      'Mark All as Read',
-      'Mark all notifications as read?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Mark Read', 
-          onPress: () => {
-            setNotifications(prev => 
-              prev.map(notification => ({ ...notification, isRead: true }))
-            );
-          }
+    Alert.alert('Mark All as Read', 'Mark all notifications as read?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Mark Read',
+        onPress: () => {
+          // TODO: Implement mark all as read mutation when available
+          console.log('Mark all as read');
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleClearAll = () => {
@@ -403,47 +412,59 @@ export default function NotificationsScreen(): JSX.Element {
       'Are you sure you want to clear all notifications? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Clear All', 
-          style: 'destructive', 
+        {
+          text: 'Clear All',
+          style: 'destructive',
           onPress: () => {
-            setNotifications([]);
-          }
+            // TODO: Implement clear all mutation when available
+            console.log('Clear all notifications');
+          },
         },
       ]
     );
   };
 
-  const filteredNotifications = notifications.filter(notification => {
+  const filteredNotifications = notifications.filter((notification) => {
     if (filter === 'unread') return !notification.isRead;
     if (filter === 'read') return notification.isRead;
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  const renderFilterButton = (filterType: 'all' | 'unread' | 'read', label: string, count?: number) => (
+  const renderFilterButton = (
+    filterType: 'all' | 'unread' | 'read',
+    label: string,
+    count?: number
+  ) => (
     <TouchableOpacity
       style={[
         styles.filterButton,
-        { 
-          backgroundColor: filter === filterType ? colors.primary : 'transparent',
-          borderColor: colors.border 
-        }
+        {
+          backgroundColor:
+            filter === filterType ? colors.primary : 'transparent',
+          borderColor: colors.border,
+        },
       ]}
       onPress={() => setFilter(filterType)}
       accessible
       accessibilityRole="button"
       accessibilityLabel={`${label} filter`}
     >
-      <Text style={[
-        styles.filterButtonText,
-        { color: filter === filterType ? '#ffffff' : colors.text }
-      ]}>
+      <Text
+        style={[
+          styles.filterButtonText,
+          { color: filter === filterType ? '#ffffff' : colors.text },
+        ]}
+      >
         {label}
         {count !== undefined && count > 0 && (
-          <Text style={[styles.filterCount, { color: filter === filterType ? '#ffffff' : colors.primary }]}>
-            {' '}({count})
+          <Text
+            style={[
+              styles.filterCount,
+              { color: filter === filterType ? '#ffffff' : colors.primary },
+            ]}
+          >
+            {' '}
+            ({count})
           </Text>
         )}
       </Text>
@@ -454,30 +475,41 @@ export default function NotificationsScreen(): JSX.Element {
     <View style={styles.emptyState}>
       <BellSlash size={64} color={colors.secondary} weight="regular" />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        {filter === 'all' ? 'No notifications yet' : 
-         filter === 'unread' ? 'No unread notifications' : 'No read notifications'}
+        {filter === 'all'
+          ? 'No notifications yet'
+          : filter === 'unread'
+            ? 'No unread notifications'
+            : 'No read notifications'}
       </Text>
       <Text style={[styles.emptyMessage, { color: colors.secondary }]}>
-        {filter === 'all' ? 'When you receive notifications, they\'ll appear here' :
-         filter === 'unread' ? 'All caught up! No unread notifications' : 'No read notifications to show'}
+        {filter === 'all'
+          ? "When you receive notifications, they'll appear here"
+          : filter === 'unread'
+            ? 'All caught up! No unread notifications'
+            : 'No read notifications to show'}
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <HeaderBar 
-        title="Notifications" 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <HeaderBar
+        title="Notifications"
         showBackButton={false}
         showProfileButton={true}
       />
-      
+
       {/* Header Actions */}
       {(unreadCount > 0 || notifications.length > 0) && (
         <View style={styles.headerActions}>
           {unreadCount > 0 && (
             <TouchableOpacity
-              style={styles.headerAction}
+              style={[
+                styles.headerAction,
+                { backgroundColor: colors.backdrop },
+              ]}
               onPress={handleMarkAllRead}
               accessible
               accessibilityRole="button"
@@ -488,7 +520,10 @@ export default function NotificationsScreen(): JSX.Element {
           )}
           {notifications.length > 0 && (
             <TouchableOpacity
-              style={styles.headerAction}
+              style={[
+                styles.headerAction,
+                { backgroundColor: colors.backdrop },
+              ]}
               onPress={handleClearAll}
               accessible
               accessibilityRole="button"
@@ -499,39 +534,68 @@ export default function NotificationsScreen(): JSX.Element {
           )}
         </View>
       )}
-      
+
+      {/* Loading State */}
+      {loading && !refreshing && (
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Loading notifications...
+          </Text>
+        </View>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: colors.text }]}>
+            Failed to load notifications
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+            <Text style={[styles.retryText, { color: colors.primary }]}>
+              Retry
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Filter Tabs */}
       <View style={styles.filterContainer}>
         {renderFilterButton('all', 'All', notifications.length)}
         {renderFilterButton('unread', 'Unread', unreadCount)}
-        {renderFilterButton('read', 'Read', notifications.filter(n => n.isRead).length)}
+        {renderFilterButton(
+          'read',
+          'Read',
+          notifications.filter((n) => n.isRead).length
+        )}
       </View>
 
       {/* Notifications List */}
-      <FlatList
-        data={filteredNotifications}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <NotificationItem
-            notification={item}
-            onPress={() => handleNotificationPress(item)}
-            onMarkRead={() => handleMarkRead(item.id)}
-            onDelete={() => handleDelete(item.id)}
-          />
-        )}
-        contentContainerStyle={styles.notificationsList}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        ListEmptyComponent={renderEmptyState}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+      {!loading && !error && (
+        <FlatList
+          data={filteredNotifications}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <NotificationItem
+              notification={item}
+              onPress={() => handleNotificationPress(item)}
+              onMarkRead={() => handleMarkRead(item.id)}
+              onDelete={() => handleDelete(item.id)}
+            />
+          )}
+          contentContainerStyle={styles.notificationsList}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          ListEmptyComponent={renderEmptyState}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -551,7 +615,40 @@ const styles = StyleSheet.create({
   headerAction: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  retryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+  },
+  retryText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#3b82f6',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -679,4 +776,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-}); 
+});

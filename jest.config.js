@@ -1,12 +1,7 @@
 module.exports = {
   preset: 'jest-expo',
-  setupFilesAfterEnv: [
-    '<rootDir>/jest.setup.js',
-  ],
-  testMatch: [
-    '**/__tests__/**/*.(ts|tsx|js)',
-    '**/*.(test|spec).(ts|tsx|js)',
-  ],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testMatch: ['**/__tests__/**/*.(ts|tsx|js)', '**/*.(test|spec).(ts|tsx|js)'],
   collectCoverageFrom: [
     'shared/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
@@ -32,4 +27,3 @@ module.exports = {
   ],
   testEnvironment: 'node',
 };
-

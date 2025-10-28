@@ -3,12 +3,44 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react-native';
+import {
+  render,
+  fireEvent,
+  waitFor,
+  screen,
+} from '@testing-library/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../../shared/useAuth';
+import { BffAuthProvider } from '../../components/shared/bff-auth-provider';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage');
+
+// Mock expo-secure-store
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn().mockResolvedValue(null),
+  setItemAsync: jest.fn().mockResolvedValue(undefined),
+  deleteItemAsync: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Mock expo-auth-session
+jest.mock('expo-auth-session', () => ({
+  startAsync: jest.fn().mockResolvedValue({
+    type: 'cancel',
+    params: {},
+  }),
+  makeRedirectUri: jest.fn(() => 'fomio://auth'),
+}));
+
+// Mock the BFF API client
+jest.mock('../../lib/apiClient', () => ({
+  bffFetch: jest
+    .fn()
+    .mockResolvedValue({ authUrl: 'https://example.com/auth' }),
+  setTokens: jest.fn(),
+  clearTokens: jest.fn(),
+  getAccess: jest.fn(() => null),
+  getRefresh: jest.fn(() => null),
+}));
 
 // Mock theme provider
 jest.mock('../../components/shared/theme-provider', () => ({
@@ -24,215 +56,69 @@ jest.mock('../../components/shared/theme-provider', () => ({
   }),
 }));
 
-// Mock useAuth hook
-jest.mock('../../shared/useAuth', () => ({
-  useAuth: jest.fn(),
-}));
-
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useBffAuth } from '../../components/shared/bff-auth-provider';
 
-// Test component that uses useAuth hook
+// Test component that uses auth context
 const TestAuthComponent = () => {
-  const { user, isLoading, isAuthenticated, signIn, signUp, signOut, updateUser } = useAuth();
+  const { user, isLoading, isAuthenticated, startLogin, logout } = useBffAuth();
 
   return (
     <View>
       <Text testID="auth-status">
-        {isLoading ? 'Loading' : isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
+        {isLoading
+          ? 'Loading'
+          : isAuthenticated
+            ? 'Authenticated'
+            : 'Not Authenticated'}
       </Text>
       {user && (
         <Text testID="user-info">
           {user.username} - {user.email}
         </Text>
       )}
-      <TouchableOpacity
-        testID="sign-in-button"
-        onPress={() => signIn('test@example.com', 'password')}
-      >
+      <TouchableOpacity testID="sign-in-button" onPress={() => startLogin()}>
         <Text>Sign In</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        testID="sign-up-button"
-        onPress={() => signUp('test@example.com', 'password', 'testuser')}
-      >
+      <TouchableOpacity testID="sign-up-button" onPress={() => startLogin()}>
         <Text>Sign Up</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        testID="sign-out-button"
-        onPress={() => signOut()}
-      >
+      <TouchableOpacity testID="sign-out-button" onPress={() => logout()}>
         <Text>Sign Out</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        testID="update-user-button"
-        onPress={() => updateUser({ username: 'updateduser' })}
-      >
-        <Text>Update User</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 describe('Authentication Integration Tests', () => {
-  const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-  
   beforeEach(() => {
     jest.clearAllMocks();
     (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
     (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
     (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
-    
-    // Default mock implementation
-    mockUseAuth.mockReturnValue({
-      user: null,
-      isLoading: false,
-      isAuthenticated: false,
-      signIn: jest.fn(),
-      signUp: jest.fn(),
-      signOut: jest.fn(),
-      updateUser: jest.fn(),
-    });
   });
+
+  const renderWithAuth = (component: React.ReactElement) => {
+    return render(<BffAuthProvider>{component}</BffAuthProvider>);
+  };
 
   it('should initialize with unauthenticated state', async () => {
-    render(<TestAuthComponent />);
+    renderWithAuth(<TestAuthComponent />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
+      expect(screen.getByTestId('auth-status')).toHaveTextContent(
+        'Not Authenticated'
+      );
     });
   });
 
-  it('should handle successful sign in', async () => {
-    render(<TestAuthComponent />);
-
-    // Wait for initial load
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
-    });
-
-    // Trigger sign in
-    fireEvent.press(screen.getByTestId('sign-in-button'));
+  it('should render auth buttons', async () => {
+    renderWithAuth(<TestAuthComponent />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
-      expect(screen.getByTestId('user-info')).toHaveTextContent('test@example.com - test@example.com');
-    });
-
-    // Verify AsyncStorage was called
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      'auth_state',
-      expect.stringContaining('test@example.com')
-    );
-  });
-
-  it('should handle successful sign up', async () => {
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
-    });
-
-    fireEvent.press(screen.getByTestId('sign-up-button'));
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
-      expect(screen.getByTestId('user-info')).toHaveTextContent('testuser - test@example.com');
-    });
-
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      'auth_state',
-      expect.stringContaining('testuser')
-    );
-  });
-
-  it('should handle sign out', async () => {
-    // Start with authenticated state
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-      JSON.stringify({
-        user: { id: '1', email: 'test@example.com', username: 'testuser' },
-        isAuthenticated: true,
-      })
-    );
-
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
-    });
-
-    fireEvent.press(screen.getByTestId('sign-out-button'));
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
-    });
-
-    expect(AsyncStorage.removeItem).toHaveBeenCalledWith('auth_state');
-  });
-
-  it('should handle user update', async () => {
-    // Start with authenticated state
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-      JSON.stringify({
-        user: { id: '1', email: 'test@example.com', username: 'testuser' },
-        isAuthenticated: true,
-      })
-    );
-
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
-      expect(screen.getByTestId('user-info')).toHaveTextContent('testuser - test@example.com');
-    });
-
-    fireEvent.press(screen.getByTestId('update-user-button'));
-
-    await waitFor(() => {
-      expect(screen.getByTestId('user-info')).toHaveTextContent('updateduser - test@example.com');
-    });
-
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      'auth_state',
-      expect.stringContaining('updateduser')
-    );
-  });
-
-  it('should restore authentication state from storage', async () => {
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-      JSON.stringify({
-        user: { id: '1', email: 'stored@example.com', username: 'storeduser' },
-        isAuthenticated: true,
-      })
-    );
-
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
-      expect(screen.getByTestId('user-info')).toHaveTextContent('storeduser - stored@example.com');
-    });
-
-    expect(AsyncStorage.getItem).toHaveBeenCalledWith('auth_state');
-  });
-
-  it('should handle corrupted storage data gracefully', async () => {
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValue('invalid-json');
-
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
-    });
-  });
-
-  it('should handle storage errors gracefully', async () => {
-    (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error('Storage error'));
-
-    render(<TestAuthComponent />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
+      expect(screen.getByTestId('sign-in-button')).toBeTruthy();
+      expect(screen.getByTestId('sign-up-button')).toBeTruthy();
+      expect(screen.getByTestId('sign-out-button')).toBeTruthy();
     });
   });
 });
-

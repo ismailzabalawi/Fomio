@@ -61,7 +61,10 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const signIn = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       // TODO: Implement actual API call
       // For now, simulate a successful login
@@ -70,7 +73,8 @@ export function useAuth() {
         name: 'John Doe',
         username: '@johndoe',
         email,
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        avatar:
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
         bio: 'Coffee enthusiast ☕️ | Tech lover 💻 | Always exploring new places 🌍',
         followers: 1234,
         following: 567,
@@ -93,7 +97,11 @@ export function useAuth() {
     }
   };
 
-  const signUp = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const signUp = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       // TODO: Implement actual API call
       // For now, simulate a successful signup
@@ -144,11 +152,14 @@ export function useAuth() {
     try {
       const updatedUser = { ...authState.user, ...updates };
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         user: updatedUser,
       }));
-      logger.userAction('update-profile', { userId: updatedUser.id, updates: Object.keys(updates) });
+      logger.userAction('update-profile', {
+        userId: updatedUser.id,
+        updates: Object.keys(updates),
+      });
     } catch (error) {
       logger.error('Update user error', error);
     }
@@ -162,4 +173,3 @@ export function useAuth() {
     updateUser,
   };
 }
-

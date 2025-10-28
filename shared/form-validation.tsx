@@ -7,14 +7,22 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { useTheme } from '../components/shared/theme-provider';
 import { logger } from './logger';
-import { 
-  spacing, 
+import {
+  spacing,
   getThemeColors,
   createTextStyle,
   animation,
 } from './design-system';
 
-const { width: screenWidth } = Dimensions.get('window');
+// Get screen width safely (for test environment compatibility)
+const getScreenWidth = () => {
+  try {
+    return Dimensions.get('window').width;
+  } catch {
+    return 375; // Default width for tests
+  }
+};
+const screenWidth = getScreenWidth();
 
 // =============================================================================
 // VALIDATION TYPES AND INTERFACES
@@ -23,7 +31,10 @@ const { width: screenWidth } = Dimensions.get('window');
 export interface ValidationRule {
   name: string;
   message: string;
-  validator: (value: any, formData?: Record<string, any>) => boolean | Promise<boolean>;
+  validator: (
+    value: any,
+    formData?: Record<string, any>
+  ) => boolean | Promise<boolean>;
   severity?: 'error' | 'warning' | 'info';
   debounceMs?: number;
 }
@@ -81,7 +92,7 @@ export const validationRules = {
       return value != null && value !== '';
     },
   }),
-  
+
   // Email validation
   email: (message = 'Please enter a valid email address'): ValidationRule => ({
     name: 'email',
@@ -92,7 +103,7 @@ export const validationRules = {
       return emailRegex.test(value);
     },
   }),
-  
+
   // Minimum length validation
   minLength: (min: number, message?: string): ValidationRule => ({
     name: 'minLength',
@@ -102,7 +113,7 @@ export const validationRules = {
       return value.length >= min;
     },
   }),
-  
+
   // Maximum length validation
   maxLength: (max: number, message?: string): ValidationRule => ({
     name: 'maxLength',
@@ -112,7 +123,7 @@ export const validationRules = {
       return value.length <= max;
     },
   }),
-  
+
   // Pattern validation
   pattern: (regex: RegExp, message = 'Invalid format'): ValidationRule => ({
     name: 'pattern',
@@ -122,9 +133,11 @@ export const validationRules = {
       return regex.test(value);
     },
   }),
-  
+
   // Password strength validation
-  passwordStrength: (message = 'Password must contain at least 8 characters, including uppercase, lowercase, and numbers'): ValidationRule => ({
+  passwordStrength: (
+    message = 'Password must contain at least 8 characters, including uppercase, lowercase, and numbers'
+  ): ValidationRule => ({
     name: 'passwordStrength',
     message,
     validator: (value) => {
@@ -136,9 +149,12 @@ export const validationRules = {
       return hasUpper && hasLower && hasNumber && hasMinLength;
     },
   }),
-  
+
   // Confirm password validation
-  confirmPassword: (passwordField: string, message = 'Passwords do not match'): ValidationRule => ({
+  confirmPassword: (
+    passwordField: string,
+    message = 'Passwords do not match'
+  ): ValidationRule => ({
     name: 'confirmPassword',
     message,
     validator: (value, formData) => {
@@ -146,9 +162,11 @@ export const validationRules = {
       return value === formData[passwordField];
     },
   }),
-  
+
   // Username validation
-  username: (message = 'Username must be 3-20 characters and contain only letters, numbers, and underscores'): ValidationRule => ({
+  username: (
+    message = 'Username must be 3-20 characters and contain only letters, numbers, and underscores'
+  ): ValidationRule => ({
     name: 'username',
     message,
     validator: (value) => {
@@ -157,7 +175,7 @@ export const validationRules = {
       return usernameRegex.test(value);
     },
   }),
-  
+
   // URL validation
   url: (message = 'Please enter a valid URL'): ValidationRule => ({
     name: 'url',
@@ -165,17 +183,21 @@ export const validationRules = {
     validator: (value) => {
       if (!value) return true; // Allow empty if not required
       try {
-        new URL(value);
-        return true;
+        const url = new URL(value);
+        // Only allow http and https protocols
+        return url.protocol === 'http:' || url.protocol === 'https:';
       } catch {
         return false;
       }
     },
   }),
-  
+
   // Custom async validation
   custom: (
-    validator: (value: any, formData?: Record<string, any>) => boolean | Promise<boolean>,
+    validator: (
+      value: any,
+      formData?: Record<string, any>
+    ) => boolean | Promise<boolean>,
     message = 'Invalid value',
     debounceMs = 500
   ): ValidationRule => ({
@@ -192,7 +214,7 @@ export const validationRules = {
 
 class FormValidationManager {
   private validationTimeouts: Map<string, NodeJS.Timeout> = new Map();
-  
+
   // Validate single field
   async validateField(
     fieldName: string,
@@ -204,20 +226,20 @@ class FormValidationManager {
     const warnings: ValidationError[] = [];
     const infos: ValidationError[] = [];
     let isValidating = false;
-    
+
     for (const rule of rules) {
       try {
         // Handle debounced validation
         if (rule.debounceMs && rule.debounceMs > 0) {
           isValidating = true;
-          
+
           // Clear existing timeout
           const timeoutKey = `${fieldName}_${rule.name}`;
           const existingTimeout = this.validationTimeouts.get(timeoutKey);
           if (existingTimeout) {
             clearTimeout(existingTimeout);
           }
-          
+
           // Set new timeout
           const timeout = setTimeout(async () => {
             const result = await rule.validator(value, formData);
@@ -227,7 +249,7 @@ class FormValidationManager {
                 message: rule.message,
                 severity: rule.severity || 'error',
               };
-              
+
               // Add to appropriate array based on severity
               switch (error.severity) {
                 case 'warning':
@@ -242,7 +264,7 @@ class FormValidationManager {
             }
             this.validationTimeouts.delete(timeoutKey);
           }, rule.debounceMs);
-          
+
           this.validationTimeouts.set(timeoutKey, timeout);
         } else {
           // Immediate validation
@@ -253,7 +275,7 @@ class FormValidationManager {
               message: rule.message,
               severity: rule.severity || 'error',
             };
-            
+
             // Add to appropriate array based on severity
             switch (error.severity) {
               case 'warning':
@@ -268,7 +290,10 @@ class FormValidationManager {
           }
         }
       } catch (error) {
-        logger.error(`Validation error for field ${fieldName}, rule ${rule.name}:`, error);
+        logger.error(
+          `Validation error for field ${fieldName}, rule ${rule.name}:`,
+          error
+        );
         errors.push({
           rule: rule.name,
           message: 'Validation failed',
@@ -276,7 +301,7 @@ class FormValidationManager {
         });
       }
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -287,7 +312,7 @@ class FormValidationManager {
       hasBeenBlurred: false,
     };
   }
-  
+
   // Validate entire form
   async validateForm(
     formData: Record<string, any>,
@@ -298,7 +323,7 @@ class FormValidationManager {
     const allWarnings: ValidationError[] = [];
     const allInfos: ValidationError[] = [];
     let isValidating = false;
-    
+
     for (const [fieldName, rules] of Object.entries(fieldRules)) {
       const fieldValidation = await this.validateField(
         fieldName,
@@ -306,17 +331,17 @@ class FormValidationManager {
         rules,
         formData
       );
-      
+
       fields[fieldName] = fieldValidation;
       allErrors.push(...fieldValidation.errors);
       allWarnings.push(...fieldValidation.warnings);
       allInfos.push(...fieldValidation.infos);
-      
+
       if (fieldValidation.isValidating) {
         isValidating = true;
       }
     }
-    
+
     return {
       isValid: allErrors.length === 0,
       isValidating,
@@ -326,10 +351,10 @@ class FormValidationManager {
       infos: allInfos,
     };
   }
-  
+
   // Clear validation timeouts
   clearTimeouts() {
-    this.validationTimeouts.forEach(timeout => clearTimeout(timeout));
+    this.validationTimeouts.forEach((timeout) => clearTimeout(timeout));
     this.validationTimeouts.clear();
   }
 }
@@ -345,7 +370,7 @@ class ToastManager {
   private toasts: ToastNotification[] = [];
   private listeners: ((toasts: ToastNotification[]) => void)[] = [];
   private idCounter = 0;
-  
+
   // Show toast notification
   show(toast: Omit<ToastNotification, 'id'>): string {
     const id = `toast_${++this.idCounter}`;
@@ -354,38 +379,38 @@ class ToastManager {
       id,
       duration: toast.duration ?? (toast.type === 'error' ? 5000 : 3000),
     };
-    
+
     this.toasts.push(newToast);
     this.notifyListeners();
-    
+
     // Auto-dismiss if not persistent
     if (!newToast.persistent && newToast.duration && newToast.duration > 0) {
       setTimeout(() => {
         this.dismiss(id);
       }, newToast.duration);
     }
-    
+
     logger.info(`Toast shown: ${newToast.type} - ${newToast.title}`);
     return id;
   }
-  
+
   // Dismiss toast
   dismiss(id: string) {
-    this.toasts = this.toasts.filter(toast => toast.id !== id);
+    this.toasts = this.toasts.filter((toast) => toast.id !== id);
     this.notifyListeners();
   }
-  
+
   // Dismiss all toasts
   dismissAll() {
     this.toasts = [];
     this.notifyListeners();
   }
-  
+
   // Add listener
   addListener(listener: (toasts: ToastNotification[]) => void) {
     this.listeners.push(listener);
     listener(this.toasts); // Immediate call with current state
-    
+
     return () => {
       const index = this.listeners.indexOf(listener);
       if (index > -1) {
@@ -393,10 +418,10 @@ class ToastManager {
       }
     };
   }
-  
+
   // Notify listeners
   private notifyListeners() {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener([...this.toasts]);
       } catch (error) {
@@ -404,7 +429,7 @@ class ToastManager {
       }
     });
   }
-  
+
   // Get current toasts
   getToasts(): ToastNotification[] {
     return [...this.toasts];
@@ -434,55 +459,65 @@ export function useFormValidation(
   });
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   const [blurredFields, setBlurredFields] = useState<Set<string>>(new Set());
-  
+
   // Validate form whenever data changes
   useEffect(() => {
     const validateForm = async () => {
-      const newValidation = await formValidationManager.validateForm(formData, fieldRules);
-      
+      const newValidation = await formValidationManager.validateForm(
+        formData,
+        fieldRules
+      );
+
       // Update touched and blurred states
-      Object.keys(newValidation.fields).forEach(fieldName => {
-        newValidation.fields[fieldName].hasBeenTouched = touchedFields.has(fieldName);
-        newValidation.fields[fieldName].hasBeenBlurred = blurredFields.has(fieldName);
+      Object.keys(newValidation.fields).forEach((fieldName) => {
+        newValidation.fields[fieldName].hasBeenTouched =
+          touchedFields.has(fieldName);
+        newValidation.fields[fieldName].hasBeenBlurred =
+          blurredFields.has(fieldName);
       });
-      
+
       setValidation(newValidation);
     };
-    
+
     validateForm();
   }, [formData, fieldRules, touchedFields, blurredFields]);
-  
+
   // Update field value
   const updateField = useCallback((fieldName: string, value: any) => {
-    setFormData(prev => ({ ...prev, [fieldName]: value }));
-    setTouchedFields(prev => new Set(prev).add(fieldName));
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    setTouchedFields((prev) => new Set(prev).add(fieldName));
   }, []);
-  
+
   // Mark field as blurred
   const blurField = useCallback((fieldName: string) => {
-    setBlurredFields(prev => new Set(prev).add(fieldName));
+    setBlurredFields((prev) => new Set(prev).add(fieldName));
   }, []);
-  
+
   // Reset form
   const reset = useCallback((newData: Record<string, any> = {}) => {
     setFormData(newData);
     setTouchedFields(new Set());
     setBlurredFields(new Set());
   }, []);
-  
+
   // Get field validation state
-  const getFieldValidation = useCallback((fieldName: string): FieldValidation => {
-    return validation.fields[fieldName] || {
-      isValid: true,
-      errors: [],
-      warnings: [],
-      infos: [],
-      isValidating: false,
-      hasBeenTouched: false,
-      hasBeenBlurred: false,
-    };
-  }, [validation.fields]);
-  
+  const getFieldValidation = useCallback(
+    (fieldName: string): FieldValidation => {
+      return (
+        validation.fields[fieldName] || {
+          isValid: true,
+          errors: [],
+          warnings: [],
+          infos: [],
+          isValidating: false,
+          hasBeenTouched: false,
+          hasBeenBlurred: false,
+        }
+      );
+    },
+    [validation.fields]
+  );
+
   return {
     formData,
     validation,
@@ -498,41 +533,53 @@ export function useFormValidation(
 // Hook for toast notifications
 export function useToast() {
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
-  
+
   useEffect(() => {
     const unsubscribe = toastManager.addListener(setToasts);
     return unsubscribe;
   }, []);
-  
+
   const showToast = useCallback((toast: Omit<ToastNotification, 'id'>) => {
     return toastManager.show(toast);
   }, []);
-  
+
   const dismissToast = useCallback((id: string) => {
     toastManager.dismiss(id);
   }, []);
-  
+
   const dismissAllToasts = useCallback(() => {
     toastManager.dismissAll();
   }, []);
-  
+
   // Convenience methods
-  const showSuccess = useCallback((title: string, message?: string, action?: ToastNotification['action']) => {
-    return showToast({ type: 'success', title, message, action });
-  }, [showToast]);
-  
-  const showError = useCallback((title: string, message?: string, action?: ToastNotification['action']) => {
-    return showToast({ type: 'error', title, message, action });
-  }, [showToast]);
-  
-  const showWarning = useCallback((title: string, message?: string, action?: ToastNotification['action']) => {
-    return showToast({ type: 'warning', title, message, action });
-  }, [showToast]);
-  
-  const showInfo = useCallback((title: string, message?: string, action?: ToastNotification['action']) => {
-    return showToast({ type: 'info', title, message, action });
-  }, [showToast]);
-  
+  const showSuccess = useCallback(
+    (title: string, message?: string, action?: ToastNotification['action']) => {
+      return showToast({ type: 'success', title, message, action });
+    },
+    [showToast]
+  );
+
+  const showError = useCallback(
+    (title: string, message?: string, action?: ToastNotification['action']) => {
+      return showToast({ type: 'error', title, message, action });
+    },
+    [showToast]
+  );
+
+  const showWarning = useCallback(
+    (title: string, message?: string, action?: ToastNotification['action']) => {
+      return showToast({ type: 'warning', title, message, action });
+    },
+    [showToast]
+  );
+
+  const showInfo = useCallback(
+    (title: string, message?: string, action?: ToastNotification['action']) => {
+      return showToast({ type: 'info', title, message, action });
+    },
+    [showToast]
+  );
+
   return {
     toasts,
     showToast,
@@ -555,35 +602,40 @@ interface FieldValidationDisplayProps {
   showOnlyOnBlur?: boolean;
 }
 
-export function FieldValidationDisplay({ 
-  validation, 
-  showOnlyOnBlur = false 
+export function FieldValidationDisplay({
+  validation,
+  showOnlyOnBlur = false,
 }: FieldValidationDisplayProps) {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
-  
+
   // Don't show validation messages until field has been blurred (if configured)
   if (showOnlyOnBlur && !validation.hasBeenBlurred) {
     return null;
   }
-  
-  const hasMessages = validation.errors.length > 0 || validation.warnings.length > 0 || validation.infos.length > 0;
-  
+
+  const hasMessages =
+    validation.errors.length > 0 ||
+    validation.warnings.length > 0 ||
+    validation.infos.length > 0;
+
   if (!hasMessages && !validation.isValidating) {
     return null;
   }
-  
+
   return (
     <View style={styles.validationContainer}>
       {validation.isValidating && (
-        <Text style={[
-          createTextStyle('caption', colors.textSecondary),
-          styles.validationMessage,
-        ]}>
+        <Text
+          style={[
+            createTextStyle('caption', colors.textSecondary),
+            styles.validationMessage,
+          ]}
+        >
           Validating...
         </Text>
       )}
-      
+
       {validation.errors.map((error, index) => (
         <Text
           key={`error-${index}`}
@@ -596,7 +648,7 @@ export function FieldValidationDisplay({
           {error.message}
         </Text>
       ))}
-      
+
       {validation.warnings.map((warning, index) => (
         <Text
           key={`warning-${index}`}
@@ -608,7 +660,7 @@ export function FieldValidationDisplay({
           {warning.message}
         </Text>
       ))}
-      
+
       {validation.infos.map((info, index) => (
         <Text
           key={`info-${index}`}
@@ -630,12 +682,15 @@ interface ToastNotificationProps {
   onDismiss: (id: string) => void;
 }
 
-export function ToastNotificationComponent({ toast, onDismiss }: ToastNotificationProps) {
+export function ToastNotificationComponent({
+  toast,
+  onDismiss,
+}: ToastNotificationProps) {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const slideAnim = useRef(new Animated.Value(-100)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
-  
+
   useEffect(() => {
     // Slide in animation
     Animated.parallel([
@@ -651,7 +706,7 @@ export function ToastNotificationComponent({ toast, onDismiss }: ToastNotificati
       }),
     ]).start();
   }, [slideAnim, opacityAnim]);
-  
+
   const handleDismiss = () => {
     Animated.parallel([
       Animated.timing(slideAnim, {
@@ -668,7 +723,7 @@ export function ToastNotificationComponent({ toast, onDismiss }: ToastNotificati
       onDismiss(toast.id);
     });
   };
-  
+
   const getToastColors = () => {
     switch (toast.type) {
       case 'success':
@@ -683,9 +738,9 @@ export function ToastNotificationComponent({ toast, onDismiss }: ToastNotificati
         return { background: colors.surface, text: colors.text };
     }
   };
-  
+
   const toastColors = getToastColors();
-  
+
   return (
     <Animated.View
       style={[
@@ -699,38 +754,44 @@ export function ToastNotificationComponent({ toast, onDismiss }: ToastNotificati
     >
       <View style={styles.toastContent}>
         <View style={styles.toastText}>
-          <Text style={[
-            createTextStyle('headline', toastColors.text),
-            styles.toastTitle,
-          ]}>
+          <Text
+            style={[
+              createTextStyle('headline', toastColors.text),
+              styles.toastTitle,
+            ]}
+          >
             {toast.title}
           </Text>
           {toast.message && (
-            <Text style={[
-              createTextStyle('body', toastColors.text),
-              styles.toastMessage,
-            ]}>
+            <Text
+              style={[
+                createTextStyle('body', toastColors.text),
+                styles.toastMessage,
+              ]}
+            >
               {toast.message}
             </Text>
           )}
         </View>
-        
+
         {toast.action && (
           <TouchableOpacity
             style={styles.toastAction}
             onPress={toast.action.onPress}
             accessibilityLabel={toast.action.label}
           >
-            <Text style={[
-              createTextStyle('label', toastColors.text),
-              styles.toastActionText,
-            ]}>
+            <Text
+              style={[
+                createTextStyle('label', toastColors.text),
+                styles.toastActionText,
+              ]}
+            >
               {toast.action.label}
             </Text>
           </TouchableOpacity>
         )}
       </View>
-      
+
       {!toast.persistent && (
         <TouchableOpacity
           style={styles.toastDismiss}
@@ -754,12 +815,12 @@ const styles = StyleSheet.create({
   validationContainer: {
     marginTop: spacing.xs,
   },
-  
+
   validationMessage: {
     marginBottom: spacing.xs,
     lineHeight: 16,
   },
-  
+
   toast: {
     position: 'absolute',
     top: 50,
@@ -774,26 +835,26 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 1000,
   },
-  
+
   toastContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  
+
   toastText: {
     flex: 1,
   },
-  
+
   toastTitle: {
     fontWeight: '600',
   },
-  
+
   toastMessage: {
     marginTop: spacing.xs,
     opacity: 0.9,
   },
-  
+
   toastAction: {
     marginLeft: spacing.md,
     paddingHorizontal: spacing.sm,
@@ -801,11 +862,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  
+
   toastActionText: {
     fontWeight: '600',
   },
-  
+
   toastDismiss: {
     position: 'absolute',
     top: spacing.xs,
@@ -815,7 +876,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   toastDismissText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -824,4 +885,3 @@ const styles = StyleSheet.create({
 
 // TouchableOpacity import
 import { TouchableOpacity } from 'react-native';
-

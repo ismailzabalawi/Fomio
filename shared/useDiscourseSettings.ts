@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
+import { bffFetch } from '../lib/apiClient';
 
 export function useDiscourseSettings() {
-  const [settings, setSettings] = useState<{ minTitle: number; minPost: number }>({ minTitle: 15, minPost: 20 });
+  const [settings, setSettings] = useState<{
+    minTitle: number;
+    minPost: number;
+  }>({ minTitle: 15, minPost: 20 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const res = await fetch('https://meta.techrebels.info/site.json');
-        const data = await res.json();
+        // Use BFF endpoint instead of direct Discourse call
+        const data = await bffFetch('/site/settings') as any;
         setSettings({
-          minTitle: data.site_settings.min_topic_title_length,
-          minPost: data.site_settings.min_post_length,
+          minTitle: data.min_topic_title_length || 15,
+          minPost: data.min_post_length || 20,
         });
       } catch (e) {
         // fallback to defaults
+        console.warn('Failed to fetch site settings, using defaults:', e);
       } finally {
         setLoading(false);
       }
@@ -23,4 +28,4 @@ export function useDiscourseSettings() {
   }, []);
 
   return { ...settings, loading };
-} 
+}

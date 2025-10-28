@@ -1,15 +1,20 @@
 import React from 'react';
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../components/shared/theme-provider';
-import { ReactQueryTest } from '../components/shared/react-query-test';
 
 interface WelcomeScreenProps {}
 
 export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
   const { isDark } = useTheme();
-  
+
   const colors = {
     background: isDark ? '#18181b' : '#ffffff',
     primary: isDark ? '#38bdf8' : '#0ea5e9',
@@ -32,29 +37,36 @@ export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.primary }]}>Welcome to Fomio</Text>
+          <Text style={[styles.title, { color: colors.primary }]}>
+            Welcome to Fomio
+          </Text>
           <Text style={[styles.subtitle, { color: colors.secondary }]}>
-            Share your thoughts, connect with others, and discover amazing content.
+            Share your thoughts, connect with others, and discover amazing
+            content.
           </Text>
         </View>
 
         <View style={styles.content}>
           <View style={styles.hero}>
-            <Text style={[styles.heroTitle, { color: colors.text }]}>Fomio</Text>
+            <Text style={[styles.heroTitle, { color: colors.text }]}>
+              Fomio
+            </Text>
             <Text style={[styles.heroSubtitle, { color: colors.secondary }]}>
               Your social platform for sharing and connecting
             </Text>
           </View>
 
-          {/* React Query Test Component */}
-          <ReactQueryTest colors={colors} />
-
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={[styles.primaryButton, { backgroundColor: colors.primary }]}
+              style={[
+                styles.primaryButton,
+                { backgroundColor: colors.primary },
+              ]}
               onPress={handleGetStarted}
               accessible
               accessibilityRole="button"
@@ -62,11 +74,13 @@ export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
               accessibilityHint="Begin onboarding for Fomio"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.primaryButtonText, { color: colors.buttonText }]}>
+              <Text
+                style={[styles.primaryButtonText, { color: colors.buttonText }]}
+              >
                 Get Started
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.secondaryButton, { borderColor: colors.primary }]}
               onPress={handleSignIn}
@@ -76,11 +90,13 @@ export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
               accessibilityHint="Sign in to your Fomio account"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.secondaryButtonText, { color: colors.primary }]}>
+              <Text
+                style={[styles.secondaryButtonText, { color: colors.primary }]}
+              >
                 Sign In
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={styles.ghostButton}
               onPress={handleExplore}
@@ -90,7 +106,9 @@ export default function WelcomeScreen({}: WelcomeScreenProps): JSX.Element {
               accessibilityHint="Browse Fomio without signing in"
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={[styles.ghostButtonText, { color: colors.secondary }]}>
+              <Text
+                style={[styles.ghostButtonText, { color: colors.secondary }]}
+              >
                 Explore Without Account
               </Text>
             </TouchableOpacity>
@@ -182,4 +200,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, ViewStyle, TouchableOpacity, DimensionValue } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  ViewStyle,
+  TouchableOpacity,
+  DimensionValue,
+} from 'react-native';
 import { useTheme } from './theme-provider';
 
 interface LoadingSpinnerProps {
@@ -11,7 +19,11 @@ interface LoadingSpinnerProps {
 /**
  * Simple loading spinner
  */
-export function LoadingSpinner({ size = 'large', color, style }: LoadingSpinnerProps) {
+export function LoadingSpinner({
+  size = 'large',
+  color,
+  style,
+}: LoadingSpinnerProps) {
   const { isDark } = useTheme();
   const spinnerColor = color || (isDark ? '#f9fafb' : '#374151');
 
@@ -31,16 +43,42 @@ interface LoadingOverlayProps {
 /**
  * Full screen loading overlay
  */
-export function LoadingOverlay({ message = 'Loading...', visible, style }: LoadingOverlayProps) {
+export function LoadingOverlay({
+  message = 'Loading...',
+  visible,
+  style,
+}: LoadingOverlayProps) {
   const { isDark } = useTheme();
 
   if (!visible) return null;
 
   return (
-    <View style={[styles.overlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.9)' }, style]}>
-      <View style={[styles.overlayContent, { backgroundColor: isDark ? '#374151' : '#ffffff' }]}>
-        <ActivityIndicator size="large" color="#0ea5e9" style={styles.overlaySpinner} />
-        <Text style={[styles.overlayText, { color: isDark ? '#f9fafb' : '#374151' }]}>
+    <View
+      style={[
+        styles.overlay,
+        {
+          backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.9)',
+        },
+        style,
+      ]}
+    >
+      <View
+        style={[
+          styles.overlayContent,
+          { backgroundColor: isDark ? '#374151' : '#ffffff' },
+        ]}
+      >
+        <ActivityIndicator
+          size="large"
+          color="#0ea5e9"
+          style={styles.overlaySpinner}
+        />
+        <Text
+          style={[
+            styles.overlayText,
+            { color: isDark ? '#f9fafb' : '#374151' },
+          ]}
+        >
           {message}
         </Text>
       </View>
@@ -76,7 +114,12 @@ export function LoadingState({
         {loadingComponent || (
           <View style={styles.stateContainer}>
             <LoadingSpinner />
-            <Text style={[styles.stateText, { color: isDark ? '#f9fafb' : '#374151' }]}>
+            <Text
+              style={[
+                styles.stateText,
+                { color: isDark ? '#f9fafb' : '#374151' },
+              ]}
+            >
               Loading...
             </Text>
           </View>
@@ -90,10 +133,20 @@ export function LoadingState({
       <>
         {errorComponent || (
           <View style={styles.stateContainer}>
-            <Text style={[styles.errorTitle, { color: isDark ? '#fca5a5' : '#ef4444' }]}>
+            <Text
+              style={[
+                styles.errorTitle,
+                { color: isDark ? '#fca5a5' : '#ef4444' },
+              ]}
+            >
               Something went wrong
             </Text>
-            <Text style={[styles.errorMessage, { color: isDark ? '#d1d5db' : '#6b7280' }]}>
+            <Text
+              style={[
+                styles.errorMessage,
+                { color: isDark ? '#d1d5db' : '#6b7280' },
+              ]}
+            >
               {error}
             </Text>
             {onRetry && (
@@ -120,7 +173,12 @@ interface SkeletonProps {
 /**
  * Skeleton loading placeholder
  */
-export function Skeleton({ width = '100%', height = 20, borderRadius = 4, style }: SkeletonProps) {
+export function Skeleton({
+  width = '100%',
+  height = 20,
+  borderRadius = 4,
+  style,
+}: SkeletonProps) {
   const { isDark } = useTheme();
 
   return (
@@ -145,7 +203,12 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 4, style 
 export function UserSkeleton() {
   return (
     <View style={styles.userSkeleton}>
-      <Skeleton width={40} height={40} borderRadius={20} style={styles.userSkeletonAvatar} />
+      <Skeleton
+        width={40}
+        height={40}
+        borderRadius={20}
+        style={styles.userSkeletonAvatar}
+      />
       <View style={styles.userSkeletonContent}>
         <Skeleton width="60%" height={16} style={styles.userSkeletonName} />
         <Skeleton width="40%" height={14} />
@@ -267,4 +330,3 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
 });
-

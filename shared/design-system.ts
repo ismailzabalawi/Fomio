@@ -52,37 +52,37 @@ export const typography = {
       fontWeight: '700',
       lineHeight: 40,
     } as TextStyle,
-    
+
     headline: {
       fontSize: 24,
       fontWeight: '600',
       lineHeight: 32,
     } as TextStyle,
-    
+
     title: {
       fontSize: 20,
       fontWeight: '600',
       lineHeight: 28,
     } as TextStyle,
-    
+
     body: {
       fontSize: 16,
       fontWeight: '400',
       lineHeight: 24,
     } as TextStyle,
-    
+
     bodyMedium: {
       fontSize: 16,
       fontWeight: '500',
       lineHeight: 24,
     } as TextStyle,
-    
+
     caption: {
       fontSize: 14,
       fontWeight: '400',
       lineHeight: 20,
     } as TextStyle,
-    
+
     label: {
       fontSize: 12,
       fontWeight: '500',
@@ -206,22 +206,22 @@ export const lightTheme = {
   primaryVariant: colors.primary[700],
   secondary: colors.accent[500],
   accent: colors.accent[600],
-  
+
   // Text Colors
   text: colors.gray[900],
   textSecondary: colors.gray[600],
   textTertiary: colors.gray[500],
   textInverse: '#ffffff',
-  
+
   // Border Colors
   border: colors.gray[200],
   borderFocus: colors.primary[500],
-  
+
   // State Colors
   success: colors.success[600],
   warning: colors.warning[500],
   error: colors.error[500],
-  
+
   // Interactive Colors
   interactive: colors.primary[600],
   interactiveHover: colors.primary[700],
@@ -236,22 +236,22 @@ export const darkTheme = {
   primaryVariant: colors.primary[300],
   secondary: colors.accent[400],
   accent: colors.accent[400],
-  
+
   // Text Colors
   text: colors.gray[50],
   textSecondary: colors.gray[300],
   textTertiary: colors.gray[400],
   textInverse: colors.gray[900],
-  
+
   // Border Colors
   border: colors.gray[600],
   borderFocus: colors.primary[400],
-  
+
   // State Colors
   success: colors.success[400],
   warning: colors.warning[400],
   error: colors.error[400],
-  
+
   // Interactive Colors
   interactive: colors.primary[400],
   interactiveHover: colors.primary[300],
@@ -270,7 +270,7 @@ export const elevation = {
     shadowRadius: 0,
     elevation: 0,
   },
-  
+
   sm: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
@@ -278,7 +278,7 @@ export const elevation = {
     shadowRadius: 2,
     elevation: 1,
   },
-  
+
   md: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
@@ -286,7 +286,7 @@ export const elevation = {
     shadowRadius: 4,
     elevation: 2,
   },
-  
+
   lg: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -294,7 +294,7 @@ export const elevation = {
     shadowRadius: 8,
     elevation: 4,
   },
-  
+
   xl: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
@@ -329,7 +329,7 @@ export const animation = {
     slow: 350,
     slower: 500,
   },
-  
+
   easing: {
     linear: 'linear',
     ease: 'ease',
@@ -359,20 +359,20 @@ export const components = {
     },
     borderRadius: borderRadius.md,
   },
-  
+
   input: {
     height: 44,
     padding: { horizontal: 12, vertical: 8 },
     borderRadius: borderRadius.md,
     borderWidth: 1,
   },
-  
+
   card: {
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     elevation: elevation.sm,
   },
-  
+
   avatar: {
     size: {
       xs: 24,
@@ -382,7 +382,7 @@ export const components = {
       xl: 80,
     },
   },
-  
+
   touchTarget: {
     minSize: 44, // WCAG AA minimum touch target
   },
@@ -392,7 +392,8 @@ export const components = {
 // UTILITY FUNCTIONS
 // =============================================================================
 
-export const getThemeColors = (isDark: boolean) => isDark ? darkTheme : lightTheme;
+export const getThemeColors = (isDark: boolean) =>
+  isDark ? darkTheme : lightTheme;
 
 export const createTextStyle = (
   variant: keyof typeof typography.styles,
@@ -421,13 +422,13 @@ export const createShadowStyle = (
 
 export const accessibility = {
   minTouchTarget: 44,
-  
+
   // WCAG AA contrast ratios
   contrast: {
     normal: 4.5,
     large: 3,
   },
-  
+
   // Screen reader labels
   labels: {
     like: 'Like this post',
@@ -442,4 +443,3 @@ export const accessibility = {
     menu: 'Open menu',
   },
 };
-

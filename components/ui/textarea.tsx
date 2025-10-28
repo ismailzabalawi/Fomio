@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
-  
+
   // Variant styles
   outlineContainer: {
     borderWidth: 1,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#ffffff',
   },
-  
+
   // Size styles
   smContainer: {
     minHeight: 80,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   lgContainer: {
     minHeight: 120,
   },
-  
+
   // Input styles
   input: {
     flex: 1,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     textAlignVertical: 'top',
   },
-  
+
   // Size input styles
   smInput: {
     fontSize: 14,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  
+
   // Disabled styles
   disabledContainer: {
     backgroundColor: '#f9fafb',
@@ -137,4 +137,3 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
   },
 });
-

@@ -53,7 +53,10 @@ export function ThemeProvider({
     loadTheme();
   }, [storageKey]);
 
-  const isDark = theme === 'dark' || theme === 'amoled' || (theme === 'system' && systemTheme === 'dark');
+  const isDark =
+    theme === 'dark' ||
+    theme === 'amoled' ||
+    (theme === 'system' && systemTheme === 'dark');
   const isAmoled = theme === 'amoled';
 
   const value = {
@@ -96,4 +99,3 @@ export const useTheme = () => {
 
   return context;
 };
-

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Switch as RNSwitch,
-  View,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { Switch as RNSwitch, View, StyleSheet, ViewStyle } from 'react-native';
 
 export interface SwitchProps {
   checked?: boolean;
@@ -58,7 +53,7 @@ const styles = StyleSheet.create({
   switch: {
     // Base switch styles
   },
-  
+
   // Size styles
   smContainer: {
     // Small container styles
@@ -69,7 +64,7 @@ const styles = StyleSheet.create({
   lgContainer: {
     // Large container styles
   },
-  
+
   smSwitch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
@@ -80,4 +75,3 @@ const styles = StyleSheet.create({
     transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
   },
 });
-

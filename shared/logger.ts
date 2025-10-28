@@ -18,10 +18,19 @@ interface LogEntry {
 }
 
 class Logger {
-  private isDevelopment = __DEV__;
-  private minLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
+  private get isDevelopment() {
+    return __DEV__;
+  }
 
-  private formatMessage(level: LogLevel, message: string, context?: any): string {
+  private get minLevel() {
+    return this.isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
+  }
+
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    context?: any
+  ): string {
     const timestamp = new Date().toISOString();
     const levelName = LogLevel[level];
     const contextStr = context ? ` | Context: ${JSON.stringify(context)}` : '';
@@ -48,11 +57,17 @@ class Logger {
 
   error(message: string, error?: Error | any, context?: any): void {
     if (this.minLevel <= LogLevel.ERROR) {
-      const errorInfo = error instanceof Error 
-        ? { name: error.name, message: error.message, stack: error.stack }
-        : error;
-      
-      console.error(this.formatMessage(LogLevel.ERROR, message, { error: errorInfo, ...context }));
+      const errorInfo =
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : error;
+
+      console.error(
+        this.formatMessage(LogLevel.ERROR, message, {
+          error: errorInfo,
+          ...context,
+        })
+      );
     }
   }
 
@@ -74,7 +89,7 @@ class Logger {
   api(method: string, url: string, status?: number, duration?: number): void {
     const message = `API ${method} ${url}`;
     const context = { status, duration };
-    
+
     if (status && status >= 400) {
       this.error(message, undefined, context);
     } else {
@@ -109,7 +124,7 @@ export async function withLogging<T>(
 ): Promise<T> {
   const startTime = Date.now();
   logger.debug(`Starting ${operationName}`, context);
-  
+
   try {
     const result = await operation();
     const duration = Date.now() - startTime;
@@ -121,4 +136,3 @@ export async function withLogging<T>(
     throw error;
   }
 }
-

@@ -16,10 +16,21 @@ export interface ButtonProps {
   onPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link'
+    | 'primary';
+  size?: 'default' | 'sm' | 'md' | 'lg' | 'icon';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  icon?: React.ComponentType<any>;
+  fullWidth?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export function Button({
@@ -31,12 +42,22 @@ export function Button({
   size = 'default',
   style,
   textStyle,
+  icon: IconComponent,
+  fullWidth = false,
+  accessibilityLabel,
+  accessibilityHint,
 }: ButtonProps) {
   const { isDark } = useTheme();
 
   const getVariantStyle = () => {
     const baseStyles = {
       default: {
+        backgroundColor: '#0ea5e9',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minHeight: 44,
+      },
+      primary: {
         backgroundColor: '#0ea5e9',
         paddingVertical: 12,
         paddingHorizontal: 16,
@@ -80,16 +101,23 @@ export function Button({
 
   const getSizeStyle = () => {
     switch (size) {
-      case 'sm': return styles.smButton;
-      case 'lg': return styles.lgButton;
-      case 'icon': return styles.iconButton;
-      default: return {};
+      case 'sm':
+        return styles.smButton;
+      case 'md':
+        return styles.mdButton;
+      case 'lg':
+        return styles.lgButton;
+      case 'icon':
+        return styles.iconButton;
+      default:
+        return {};
     }
   };
 
   const getVariantTextStyle = () => {
     const baseTextStyles = {
       default: { color: '#ffffff' },
+      primary: { color: '#ffffff' },
       destructive: { color: '#ffffff' },
       outline: { color: isDark ? '#f9fafb' : '#374151' },
       secondary: { color: isDark ? '#f9fafb' : '#374151' },
@@ -101,10 +129,16 @@ export function Button({
 
   const getSizeTextStyle = () => {
     switch (size) {
-      case 'sm': return styles.smText;
-      case 'lg': return styles.lgText;
-      case 'icon': return styles.iconText;
-      default: return {};
+      case 'sm':
+        return styles.smText;
+      case 'md':
+        return styles.mdText;
+      case 'lg':
+        return styles.lgText;
+      case 'icon':
+        return styles.iconText;
+      default:
+        return {};
     }
   };
 
@@ -112,6 +146,7 @@ export function Button({
     styles.base,
     getVariantStyle(),
     getSizeStyle(),
+    fullWidth && styles.fullWidth,
     disabled && styles.disabled,
     style,
   ];
@@ -132,15 +167,24 @@ export function Button({
       disabled={disabled || loading}
       activeOpacity={0.7}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
     >
       <View style={styles.content}>
         {loading && (
           <ActivityIndicator
             testID="button-loading-indicator"
             size="small"
-            color={variant === 'default' ? '#ffffff' : '#0ea5e9'}
+            color={
+              variant === 'default' || variant === 'primary'
+                ? '#ffffff'
+                : '#0ea5e9'
+            }
             style={styles.spinner}
           />
+        )}
+        {IconComponent && !loading && (
+          <IconComponent size={16} style={styles.icon} />
         )}
         <Text style={textStyleCombined}>{children}</Text>
       </View>
@@ -163,12 +207,17 @@ const styles = StyleSheet.create({
   spinner: {
     marginRight: 8,
   },
-  
+
   // Size styles
   smButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
     minHeight: 36,
+  },
+  mdButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    minHeight: 40,
   },
   lgButton: {
     paddingVertical: 16,
@@ -181,17 +230,23 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
-  
+  fullWidth: {
+    width: '100%',
+  },
+
   // Text styles
   baseText: {
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
   },
-  
+
   // Size text styles
   smText: {
     fontSize: 14,
+  },
+  mdText: {
+    fontSize: 15,
   },
   lgText: {
     fontSize: 18,
@@ -199,7 +254,10 @@ const styles = StyleSheet.create({
   iconText: {
     fontSize: 16,
   },
-  
+  icon: {
+    marginRight: 8,
+  },
+
   // Disabled styles
   disabled: {
     opacity: 0.5,
@@ -208,4 +266,3 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-

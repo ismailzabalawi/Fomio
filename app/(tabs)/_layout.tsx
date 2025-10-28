@@ -1,6 +1,12 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { House, MagnifyingGlass, Plus, Bell, GearSix } from 'phosphor-react-native';
+import {
+  House,
+  MagnifyingGlass,
+  Plus,
+  Bell,
+  GearSix,
+} from 'phosphor-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../components/shared/theme-provider';
 import { View, StyleSheet } from 'react-native';
@@ -8,15 +14,19 @@ import { View, StyleSheet } from 'react-native';
 export default function TabLayout(): JSX.Element {
   const insets = useSafeAreaInsets();
   const { isDark, isAmoled } = useTheme();
-  
+
   const colors = {
-    background: isAmoled ? '#000000' : (isDark ? '#1f2937' : '#ffffff'),
-    border: isAmoled ? '#000000' : (isDark ? '#374151' : '#e2e8f0'),
+    background: isAmoled ? '#000000' : isDark ? '#1f2937' : '#ffffff',
+    border: isAmoled ? '#000000' : isDark ? '#374151' : '#e2e8f0',
     primary: isDark ? '#38bdf8' : '#0ea5e9',
     primaryGradient: isDark ? '#0ea5e9' : '#0284c7',
-    shadow: isAmoled ? 'rgba(14, 165, 233, 0.15)' : (isDark ? 'rgba(14, 165, 233, 0.25)' : 'rgba(14, 165, 233, 0.2)'),
+    shadow: isAmoled
+      ? 'rgba(14, 165, 233, 0.15)'
+      : isDark
+        ? 'rgba(14, 165, 233, 0.25)'
+        : 'rgba(14, 165, 233, 0.2)',
   };
-  
+
   return (
     <Tabs
       screenOptions={{
@@ -33,14 +43,14 @@ export default function TabLayout(): JSX.Element {
           paddingRight: Math.max(insets.right, 12),
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: isAmoled ? 0 : (isDark ? 0.3 : 0.06),
+          shadowOpacity: isAmoled ? 0 : isDark ? 0.3 : 0.06,
           shadowRadius: 8,
           elevation: 8,
         },
-        tabBarLabelStyle: { 
-          fontSize: 12, 
-          fontWeight: '600', 
-          marginBottom: 2 
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginBottom: 2,
         },
         headerShown: false,
       }}
@@ -50,10 +60,10 @@ export default function TabLayout(): JSX.Element {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size, focused }) => (
-            <House 
-              color={color} 
-              size={focused ? size + 2 : size} 
-              weight={focused ? 'fill' : 'regular'} 
+            <House
+              color={color}
+              size={focused ? size + 2 : size}
+              weight={focused ? 'fill' : 'regular'}
             />
           ),
         }}
@@ -63,10 +73,10 @@ export default function TabLayout(): JSX.Element {
         options={{
           title: 'Search',
           tabBarIcon: ({ color, size, focused }) => (
-            <MagnifyingGlass 
-              color={color} 
-              size={focused ? size + 2 : size} 
-              weight="bold" 
+            <MagnifyingGlass
+              color={color}
+              size={focused ? size + 2 : size}
+              weight="bold"
             />
           ),
         }}
@@ -76,20 +86,20 @@ export default function TabLayout(): JSX.Element {
         options={{
           title: '',
           tabBarIcon: ({ focused }) => (
-            <View style={[
-              styles.composeButton,
-              {
-                backgroundColor: focused ? colors.primaryGradient : colors.primary,
-                shadowColor: colors.primary,
-                shadowOpacity: focused ? 0.4 : 0.2,
-                transform: [{ scale: focused ? 1.1 : 1 }],
-              }
-            ]}>
-              <Plus
-                color="#ffffff"
-                size={focused ? 28 : 24}
-                weight="bold"
-              />
+            <View
+              style={[
+                styles.composeButton,
+                {
+                  backgroundColor: focused
+                    ? colors.primaryGradient
+                    : colors.primary,
+                  shadowColor: colors.primary,
+                  shadowOpacity: focused ? 0.4 : 0.2,
+                  transform: [{ scale: focused ? 1.1 : 1 }],
+                },
+              ]}
+            >
+              <Plus color="#ffffff" size={focused ? 28 : 24} weight="bold" />
             </View>
           ),
           tabBarLabel: '',
@@ -100,10 +110,10 @@ export default function TabLayout(): JSX.Element {
         options={{
           title: 'Notifications',
           tabBarIcon: ({ color, size, focused }) => (
-            <Bell 
-              color={color} 
-              size={focused ? size + 2 : size} 
-              weight="bold" 
+            <Bell
+              color={color}
+              size={focused ? size + 2 : size}
+              weight="bold"
             />
           ),
         }}
@@ -113,10 +123,10 @@ export default function TabLayout(): JSX.Element {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size, focused }) => (
-            <GearSix 
-              color={color} 
-              size={focused ? size + 2 : size} 
-              weight="bold" 
+            <GearSix
+              color={color}
+              size={focused ? size + 2 : size}
+              weight="bold"
             />
           ),
         }}
