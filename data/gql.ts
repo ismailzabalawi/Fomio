@@ -353,7 +353,7 @@ function transformGraphQLUser(user: any): User {
 }
 
 export const gqlClient = (
-  apollo: ApolloClient<NormalizedCacheObject>
+  apollo: ApolloClient
 ): DataClient => ({
   async getFeed(params: FeedParams = {}): Promise<FeedItem[]> {
     try {
@@ -366,7 +366,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      const topics = data.feed?.edges || [];
+      const topics = (data as any).feed?.edges || [];
       logger.info('GraphQL Feed loaded', { topicCount: topics.length });
 
       return topics.map(transformGraphQLTopic);
@@ -405,7 +405,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      return transformGraphQLPost(data.post);
+      return transformGraphQLPost((data as any).post);
     } catch (error) {
       logger.error('Failed to load post via GraphQL', error);
       throw error;
@@ -420,7 +420,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      const posts = data.topicPosts || [];
+      const posts = (data as any).topicPosts || [];
       return posts.map(transformGraphQLPost);
     } catch (error) {
       logger.error('Failed to load topic posts via GraphQL', error);
@@ -436,11 +436,11 @@ export const gqlClient = (
       });
 
       logger.info('Post created via GraphQL', {
-        topicId: data.createPost.topicId,
-        postId: data.createPost.postId,
+        topicId: (data as any).createPost.topicId,
+        postId: (data as any).createPost.postId,
       });
 
-      return data.createPost;
+      return (data as any).createPost;
     } catch (error) {
       logger.error('Failed to create post via GraphQL', error);
       throw error;
@@ -455,7 +455,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      return transformGraphQLTopic(data.topic);
+      return transformGraphQLTopic((data as any).topic);
     } catch (error) {
       logger.error('Failed to load topic via GraphQL', error);
       throw error;
@@ -469,7 +469,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      const categories = data.categories || [];
+      const categories = (data as any).categories || [];
       return categories.map(transformGraphQLCategory);
     } catch (error) {
       logger.error('Failed to load categories via GraphQL', error);
@@ -497,7 +497,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      return transformGraphQLCategory(data.category);
+      return transformGraphQLCategory((data as any).category);
     } catch (error) {
       logger.error('Failed to load category via GraphQL', error);
       throw error;
@@ -511,11 +511,11 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      if (!data.me) {
+      if (!(data as any).me) {
         return null;
       }
 
-      return transformGraphQLUser(data.me);
+      return transformGraphQLUser((data as any).me);
     } catch (error) {
       logger.error('Failed to get current user via GraphQL', error);
       return null;
@@ -553,7 +553,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      return transformGraphQLUser(data.user);
+      return transformGraphQLUser((data as any).user);
     } catch (error) {
       logger.error('Failed to get user via GraphQL', error);
       throw error;
@@ -572,7 +572,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      return data.search || [];
+      return (data as any).search || [];
     } catch (error) {
       logger.error('Failed to search via GraphQL', error);
       throw error;
@@ -586,7 +586,7 @@ export const gqlClient = (
         variables: { postId },
       });
 
-      return data.likePost;
+      return (data as any).likePost;
     } catch (error) {
       logger.error('Failed to like post via GraphQL', error);
       return false;
@@ -600,7 +600,7 @@ export const gqlClient = (
         variables: { postId },
       });
 
-      return data.unlikePost;
+      return (data as any).unlikePost;
     } catch (error) {
       logger.error('Failed to unlike post via GraphQL', error);
       return false;
@@ -614,7 +614,7 @@ export const gqlClient = (
         variables: { topicId },
       });
 
-      return data.bookmarkTopic;
+      return (data as any).bookmarkTopic;
     } catch (error) {
       logger.error('Failed to bookmark topic via GraphQL', error);
       return false;
@@ -628,7 +628,7 @@ export const gqlClient = (
         variables: { topicId },
       });
 
-      return data.unbookmarkTopic;
+      return (data as any).unbookmarkTopic;
     } catch (error) {
       logger.error('Failed to unbookmark topic via GraphQL', error);
       return false;
@@ -642,7 +642,7 @@ export const gqlClient = (
         fetchPolicy: 'cache-first',
       });
 
-      const notifications = data.notifications || [];
+      const notifications = (data as any).notifications || [];
       return notifications.map((notif: any) => ({
         id: notif.id.toString(),
         type: notif.type,
@@ -663,7 +663,7 @@ export const gqlClient = (
         variables: { id },
       });
 
-      return data.markNotificationRead;
+      return (data as any).markNotificationRead;
     } catch (error) {
       logger.error('Failed to mark notification as read via GraphQL', error);
       return false;
@@ -676,7 +676,7 @@ export const gqlClient = (
         mutation: MARK_ALL_NOTIFICATIONS_READ_MUTATION,
       });
 
-      return data.markAllNotificationsRead;
+      return (data as any).markAllNotificationsRead;
     } catch (error) {
       logger.error(
         'Failed to mark all notifications as read via GraphQL',
@@ -697,7 +697,7 @@ export const gqlClient = (
         fetchPolicy: 'network-only',
       });
 
-      return data.health === true;
+      return (data as any).health === true;
     } catch (error) {
       logger.warn('GraphQL API health check failed', error);
       return false;

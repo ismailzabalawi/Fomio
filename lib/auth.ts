@@ -1,4 +1,5 @@
 import * as AuthSession from 'expo-auth-session';
+import { AuthRequest, ResponseType } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { bffApiClient } from './apiClient';
 import { Tokens } from './secureStore';
@@ -133,10 +134,17 @@ export class AuthService {
         throw new Error('No auth URL received from server');
       }
 
+      // Create auth request
+      const authRequest = new AuthRequest({
+        clientId: 'fomio-mobile',
+        redirectUri: 'fomio://auth',
+        scopes: ['read', 'write'],
+        responseType: ResponseType.Code,
+      });
+
       // Start auth session
-      const result = await AuthSession.startAsync({
-        authUrl: response.authUrl,
-        returnUrl: 'fomio://auth',
+      const result = await authRequest.promptAsync({
+        authorizationEndpoint: response.authUrl,
       });
 
       if (result.type === 'success' && result.url) {
