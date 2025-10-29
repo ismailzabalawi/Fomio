@@ -53,7 +53,7 @@ export function ApolloTest(): JSX.Element {
         </View>
       )}
 
-      {data && (
+      {!!data && (
         <View style={styles.successContainer}>
           <Text style={[styles.successText, { color: '#10b981' }]}>
             ✓ Apollo Connected Successfully

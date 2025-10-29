@@ -7,12 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {
-  useLatestTopics,
-  useCategories,
-  useSiteInfo,
-  useApolloCache,
-} from '../hooks/useApolloDiscourse';
+import { useBffFeed, useBffCategories } from '../hooks';
 import { useColorScheme } from './useColorScheme';
 
 export function TestApolloConnection() {
@@ -23,23 +18,16 @@ export function TestApolloConnection() {
   // Test queries
   const {
     data: topicsData,
-    loading: topicsLoading,
+    isLoading: topicsLoading,
     error: topicsError,
-  } = useLatestTopics();
+    refetch: refetchLatestTopics,
+  } = useBffFeed();
   const {
     data: categoriesData,
-    loading: categoriesLoading,
+    isLoading: categoriesLoading,
     error: categoriesError,
-  } = useCategories();
-  const {
-    data: siteData,
-    loading: siteLoading,
-    error: siteError,
-  } = useSiteInfo();
-
-  // Cache management functions
-  const { refetchLatestTopics, refetchCategories, refetchSiteInfo } =
-    useApolloCache();
+    refetch: refetchCategories,
+  } = useBffCategories();
 
   const colors = {
     background: isDark ? '#1a1a1a' : '#ffffff',
@@ -71,9 +59,9 @@ export function TestApolloConnection() {
       addTestResult('🔄 Latest topics query is loading...');
     } else if (topicsError) {
       addTestResult(`❌ Latest topics query error: ${topicsError.message}`);
-    } else if (topicsData?.latestTopics) {
+    } else if (topicsData) {
       addTestResult(
-        `✅ Latest topics query successful - Found ${topicsData.latestTopics.length} topics`
+        `✅ Latest topics query successful - Found ${topicsData.topics.length} topics`
       );
     }
 
@@ -81,19 +69,9 @@ export function TestApolloConnection() {
       addTestResult('🔄 Categories query is loading...');
     } else if (categoriesError) {
       addTestResult(`❌ Categories query error: ${categoriesError.message}`);
-    } else if (categoriesData?.categories) {
+    } else if (categoriesData) {
       addTestResult(
         `✅ Categories query successful - Found ${categoriesData.categories.length} categories`
-      );
-    }
-
-    if (siteLoading) {
-      addTestResult('🔄 Site info query is loading...');
-    } else if (siteError) {
-      addTestResult(`❌ Site info query error: ${siteError.message}`);
-    } else if (siteData?.siteInfo) {
-      addTestResult(
-        `✅ Site info query successful - Site: ${siteData.siteInfo.title}`
       );
     }
 
@@ -113,18 +91,14 @@ export function TestApolloConnection() {
   };
 
   const showConnectionStatus = () => {
-    const hasTopics =
-      topicsData?.latestTopics && topicsData.latestTopics.length > 0;
-    const hasCategories =
-      categoriesData?.categories && categoriesData.categories.length > 0;
-    const hasSiteInfo = siteData?.siteInfo;
+    const hasTopics = topicsData && topicsData.topics.length > 0;
+    const hasCategories = categoriesData && categoriesData.categories.length > 0;
 
-    if (hasTopics && hasCategories && hasSiteInfo) {
+    if (hasTopics && hasCategories) {
       Alert.alert(
         'Connection Status',
-        '✅ Apollo Rest Link is working perfectly!\n\n' +
-          `📱 Connected to: ${siteData.siteInfo.title}\n` +
-          `📚 Found ${topicsData.latestTopics.length} topics\n` +
+        '✅ BFF API is working perfectly!\n\n' +
+          `📚 Found ${topicsData.topics.length} topics\n` +
           `🏷️ Found ${categoriesData.categories.length} categories`,
         [{ text: 'Excellent!' }]
       );
@@ -144,10 +118,10 @@ export function TestApolloConnection() {
     >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>
-          Apollo Rest Link Test
+          BFF API Test
         </Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Testing connection to Discourse via Apollo Rest Link
+          Testing connection to Discourse via BFF API
         </Text>
       </View>
 
@@ -221,9 +195,9 @@ export function TestApolloConnection() {
             <Text style={[styles.dataText, { color: colors.error }]}>
               Error: {topicsError.message}
             </Text>
-          ) : topicsData?.latestTopics ? (
+          ) : topicsData ? (
             <Text style={[styles.dataText, { color: colors.textSecondary }]}>
-              {topicsData.latestTopics.length} topics loaded
+              {topicsData.topics.length} topics loaded
             </Text>
           ) : (
             <Text style={[styles.dataText, { color: colors.textSecondary }]}>
@@ -249,7 +223,7 @@ export function TestApolloConnection() {
             <Text style={[styles.dataText, { color: colors.error }]}>
               Error: {categoriesError.message}
             </Text>
-          ) : categoriesData?.categories ? (
+          ) : categoriesData ? (
             <Text style={[styles.dataText, { color: colors.textSecondary }]}>
               {categoriesData.categories.length} categories loaded
             </Text>
@@ -260,33 +234,6 @@ export function TestApolloConnection() {
           )}
         </View>
 
-        <View
-          style={[
-            styles.dataCard,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-        >
-          <Text style={[styles.dataTitle, { color: colors.text }]}>
-            Site Info
-          </Text>
-          {siteLoading ? (
-            <Text style={[styles.dataText, { color: colors.textSecondary }]}>
-              Loading...
-            </Text>
-          ) : siteError ? (
-            <Text style={[styles.dataText, { color: colors.error }]}>
-              Error: {siteError.message}
-            </Text>
-          ) : siteData?.siteInfo ? (
-            <Text style={[styles.dataText, { color: colors.textSecondary }]}>
-              {siteData.siteInfo.title}
-            </Text>
-          ) : (
-            <Text style={[styles.dataText, { color: colors.textSecondary }]}>
-              No data
-            </Text>
-          )}
-        </View>
       </View>
     </ScrollView>
   );

@@ -12,10 +12,10 @@ interface ReactQueryTestProps {
 
 export function ReactQueryTest({ colors }: ReactQueryTestProps) {
   const {
-    data: feedData,
-    isLoading: feedLoading,
+    topics: feedData,
+    loading: feedLoading,
     error: feedError,
-    refetch: refetchFeed,
+    refresh: refetchFeed,
   } = useFeed();
   const {
     data: categoriesData,
@@ -33,7 +33,7 @@ export function ReactQueryTest({ colors }: ReactQueryTestProps) {
     if (isLoading) return 'Loading... ⏳';
     if (hasError) return 'API Error - Check Configuration';
     if (feedData && categoriesData) {
-      return `Connected! ${feedData.topic_list.topics.length} topics, ${categoriesData.category_list.categories.length} categories`;
+      return `Connected! ${feedData.length} topics, ${categoriesData.categories.length} categories`;
     }
     if (isDemo) {
       return 'Demo Mode - Configure Discourse API';
@@ -68,14 +68,13 @@ export function ReactQueryTest({ colors }: ReactQueryTestProps) {
 
       {feedData && (
         <Text style={[styles.status, { color: colors.primary }]}>
-          Feed: {feedData.topic_list.topics.length} topics
+          Feed: {feedData.length} topics
         </Text>
       )}
 
       {categoriesData && (
         <Text style={[styles.status, { color: colors.primary }]}>
-          Categories: {categoriesData.category_list.categories.length}{' '}
-          categories
+          Categories: {categoriesData.categories.length} categories
         </Text>
       )}
 

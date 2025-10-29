@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useLatestTopics, useCategories } from '../hooks/useApolloDiscourse';
+import { useBffFeed, useBffCategories } from '../hooks';
 
 export const DebugApollo: React.FC = () => {
   const {
     data: topicsData,
-    loading: topicsLoading,
+    isLoading: topicsLoading,
     error: topicsError,
-  } = useLatestTopics();
+  } = useBffFeed();
   const {
     data: categoriesData,
-    loading: categoriesLoading,
+    isLoading: categoriesLoading,
     error: categoriesError,
-  } = useCategories();
+  } = useBffCategories();
 
   return (
     <View style={styles.container}>
@@ -23,7 +23,7 @@ export const DebugApollo: React.FC = () => {
         <Text>Loading: {topicsLoading ? 'Yes' : 'No'}</Text>
         <Text>Error: {topicsError ? topicsError.message : 'None'}</Text>
         <Text>
-          Data: {topicsData ? JSON.stringify(topicsData, null, 2) : 'No data'}
+          Data: {topicsData ? JSON.stringify(topicsData.topics, null, 2) : 'No data'}
         </Text>
       </View>
 
@@ -33,7 +33,7 @@ export const DebugApollo: React.FC = () => {
         <Text>Error: {categoriesError ? categoriesError.message : 'None'}</Text>
         <Text>
           Data:{' '}
-          {categoriesData ? JSON.stringify(categoriesData, null, 2) : 'No data'}
+          {categoriesData ? JSON.stringify(categoriesData.categories, null, 2) : 'No data'}
         </Text>
       </View>
     </View>

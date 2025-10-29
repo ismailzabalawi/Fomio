@@ -15,4 +15,9 @@ export { useApolloCreatePost } from './useApolloCreatePost';
 export { useApolloTopic } from './useApolloTopic';
 export { useApolloProfile } from './useApolloProfile';
 export { useApolloNotifications } from './useApolloNotifications';
+
+// BFF hooks
+export { useBffFeed } from './useBffFeed';
+export { useBffCategories } from './useBffCategories';
+export { useBffTopic } from './useBffTopic';
 // Removed useDiscourse and useApolloDiscourse - replaced with BFF integration

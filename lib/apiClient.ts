@@ -92,7 +92,7 @@ class BffApiClient {
         }
 
         await saveTokens({
-          access: this.accessToken,
+          access: this.accessToken || '',
           refresh: this.refreshToken || '',
         });
 

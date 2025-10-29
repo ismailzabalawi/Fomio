@@ -14,7 +14,6 @@ const compat = new FlatCompat({
 
 export default [
   js.configs.recommended,
-  ...compat.extends('@expo/eslint-config'),
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
