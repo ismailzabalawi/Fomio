@@ -37,8 +37,9 @@ import {
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
-import { useBffAuth } from '../../components/shared/bff-auth-provider';
 import { LogViewer } from '../../components/shared/log-viewer';
+import { useAuth } from '../../lib/auth';
+import { router } from 'expo-router';
 
 interface SettingItemProps {
   title: string;
@@ -134,7 +135,7 @@ function SettingSection({
 
 export default function SettingsScreen(): JSX.Element {
   const { isDark, isAmoled, theme, setTheme } = useTheme();
-  const { logout, isLoggingOut } = useBffAuth();
+  const { signOut } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
   const [autoSave, setAutoSave] = useState(true);
@@ -225,8 +226,30 @@ export default function SettingsScreen(): JSX.Element {
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: logout },
+      { text: 'Sign Out', style: 'destructive', onPress: signOut },
     ]);
+  };
+
+  const handleRevokeKey = () => {
+    Alert.alert(
+      'Revoke User API Key',
+      'This will revoke your API key and sign you out. You will need to sign in again to use the app.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Revoke',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              Alert.alert('Success', 'API key revoked successfully.');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to revoke API key. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleDeleteAccount = () => {
@@ -516,6 +539,16 @@ export default function SettingsScreen(): JSX.Element {
 
         {/* Account Actions */}
         <SettingSection title="Account">
+          <SettingItem
+            title="Revoke User API Key"
+            subtitle="Revoke your API key and sign out"
+            icon={
+              <Shield size={24} color={colors.destructive} weight="regular" />
+            }
+            onPress={handleRevokeKey}
+            isDestructive={true}
+          />
+
           <SettingItem
             title="Sign Out"
             subtitle="Sign out of your account"

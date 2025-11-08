@@ -5,9 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { useAuth } from '../../lib/auth';
+import { searchTopics, DiscourseSearchResponse } from '../../lib/discourse';
 import {
   MagnifyingGlass,
   Coffee,
@@ -21,7 +26,26 @@ import { HeaderBar } from '../../components/nav/HeaderBar';
 export default function SearchScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
   const router = useRouter();
+  const { authed } = useAuth();
+  const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<DiscourseSearchResponse | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
   const [randomCard, setRandomCard] = useState<number>(0);
+
+  const handleSearch = async () => {
+    if (!query.trim() || !authed) return;
+    
+    setIsSearching(true);
+    try {
+      const results = await searchTopics(query.trim());
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults(null);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const colors = {
     background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
@@ -60,11 +84,11 @@ export default function SearchScreen(): JSX.Element {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Search Bar - Disabled State */}
+        {/* Search Bar */}
         <View
           style={[
             styles.searchContainer,
-            { backgroundColor: colors.input, opacity: 0.6 },
+            { backgroundColor: colors.input, borderColor: colors.border },
           ]}
         >
           <MagnifyingGlass
@@ -72,10 +96,73 @@ export default function SearchScreen(): JSX.Element {
             color={colors.secondary}
             weight="regular"
           />
-          <Text style={[styles.searchInput, { color: colors.secondary }]}>
-            Search coming soon... 🚀
-          </Text>
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search topics..."
+            placeholderTextColor={colors.secondary}
+            value={query}
+            onChangeText={setQuery}
+            onSubmitEditing={handleSearch}
+            editable={authed}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {isSearching && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
         </View>
+
+        {/* Search Results */}
+        {authed && searchResults && (
+          <View style={styles.resultsContainer}>
+            <Text style={[styles.resultsTitle, { color: colors.text }]}>
+              {searchResults.posts?.length || 0} results
+            </Text>
+            <FlatList
+              data={searchResults.posts || []}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.resultItem,
+                    { backgroundColor: colors.card, borderColor: colors.border },
+                  ]}
+                  onPress={() => router.push(`/feed/${item.topic_id}`)}
+                >
+                  <Text style={[styles.resultTitle, { color: colors.text }]}>
+                    {item.topic_title || `Topic #${item.topic_id}`}
+                  </Text>
+                  <Text
+                    style={[styles.resultExcerpt, { color: colors.secondary }]}
+                    numberOfLines={2}
+                  >
+                    {item.blurb?.replace(/<[^>]*>/g, '') || 'No excerpt'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={
+                <Text style={[styles.emptyText, { color: colors.secondary }]}>
+                  No results found
+                </Text>
+              }
+            />
+          </View>
+        )}
+
+        {/* Not Authenticated State */}
+        {!authed && (
+          <View style={styles.notAuthedContainer}>
+            <Text style={[styles.notAuthedText, { color: colors.secondary }]}>
+              Please sign in to search
+            </Text>
+            <TouchableOpacity
+              style={[styles.signInButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push('/(auth)/signin')}
+            >
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Main Content */}
         <View style={styles.mainContent}>
@@ -192,7 +279,61 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    fontStyle: 'italic',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  resultsContainer: {
+    flex: 1,
+    marginTop: 16,
+    paddingHorizontal: 16,
+  },
+  resultsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  resultItem: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  resultTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  resultExcerpt: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 32,
+    fontSize: 16,
+  },
+  notAuthedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  notAuthedText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  signInButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  signInButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   mainContent: {
     alignItems: 'center',

@@ -6,27 +6,30 @@ import {
   Pressable,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/components/shared/theme-provider';
-import { useCreatePost } from '@/hooks/useCreatePost';
 import { HeaderBar } from '@/components/nav/HeaderBar';
 import { FieldError } from '@/components/shared/FieldError';
+import { useAuth } from '@/lib/auth';
+import { createTopic } from '@/lib/discourse';
 
 export default function CreatePostScreen() {
   const router = useRouter();
   const { isDark, isAmoled } = useTheme();
+  const { authed } = useAuth();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const isValid = useMemo(
     () => title.trim().length >= 3 && body.trim().length >= 3,
     [title, body]
   );
-
-  const { createPost, loading, error } = useCreatePost();
 
   // Validation errors
   const titleError = title.trim().length > 0 && title.trim().length < 3 
@@ -38,12 +41,15 @@ export default function CreatePostScreen() {
     : undefined;
 
   async function onSubmit() {
-    if (!isValid || loading) return;
+    if (!isValid || loading || !authed) return;
+
+    setLoading(true);
+    setError(null);
 
     try {
-      await createPost({
+      await createTopic({
         title: title.trim(),
-        content: body.trim(),
+        raw: body.trim(),
       });
 
       // Haptic feedback for success
@@ -58,7 +64,10 @@ export default function CreatePostScreen() {
     } catch (e: unknown) {
       // Haptic feedback for error
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      // Error will be displayed inline via the error state
+      const err = e instanceof Error ? e : new Error('Failed to create post');
+      setError(err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -80,6 +89,20 @@ export default function CreatePostScreen() {
         showBackButton={true}
         showProfileButton={false}
       />
+
+      {!authed && (
+        <View style={[styles.authPrompt, { backgroundColor: colors.primary }]}>
+          <Text style={styles.authPromptText}>
+            Please sign in to create posts
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/signin')}
+            style={styles.authPromptButton}
+          >
+            <Text style={styles.authPromptButtonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={[styles.content, { backgroundColor: colors.background }]}>
         <Text style={[styles.label, { color: colors.text }]}>Title</Text>
@@ -136,13 +159,13 @@ export default function CreatePostScreen() {
 
           <Pressable
             onPress={onSubmit}
-            disabled={!isValid || loading}
+            disabled={!isValid || loading || !authed}
             style={[
               styles.submitButton,
               {
                 backgroundColor:
-                  isValid && !loading ? colors.primary : colors.border,
-                opacity: isValid && !loading ? 1 : 0.6,
+                  isValid && !loading && authed ? colors.primary : colors.border,
+                opacity: isValid && !loading && authed ? 1 : 0.6,
               },
             ]}
           >
@@ -210,6 +233,31 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  authPrompt: {
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  authPromptText: {
+    color: '#ffffff',
+    fontSize: 14,
+    flex: 1,
+  },
+  authPromptButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 8,
+  },
+  authPromptButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
     fontWeight: '600',
   },
 });

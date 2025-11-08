@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../../components/shared/theme-provider';
-import { useAuthContext } from '../../components/shared/auth-provider';
+import { useAuth } from '../../lib/auth';
 import { SignIn, ArrowLeft } from 'phosphor-react-native';
 import {
   COLORS,
@@ -22,7 +22,7 @@ import {
 
 export default function SignInScreen() {
   const { isDark, isAmoled } = useTheme();
-  const { handleWebViewAuth } = useAuthContext();
+  const { connect } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const colors = {
@@ -64,17 +64,8 @@ export default function SignInScreen() {
 
     try {
       setIsLoading(true);
-
-      // For now, we'll simulate WebView auth with mock data
-      // In a real implementation, this would open a WebView
-      const mockCookies = {
-        authToken: 'mock_auth_token',
-        sessionCookie: 'mock_session_cookie',
-        csrfToken: 'mock_csrf_token',
-      };
-
-      await handleWebViewAuth(mockCookies);
-      router.replace('/(tabs)');
+      await connect();
+      // Navigation is handled by connect()
     } catch (error: any) {
       console.error('Sign in failed:', error);
       setIsLoading(false);
@@ -82,13 +73,10 @@ export default function SignInScreen() {
       // Provide more helpful error messages
       let errorMessage = 'Failed to sign in. Please try again.';
 
-      if (error?.status === 400) {
-        errorMessage =
-          'Invalid request. Please check your server configuration.';
-      } else if (error?.status === 401) {
-        errorMessage = 'Authentication failed. Please try again.';
-      } else if (error?.status === 500) {
-        errorMessage = 'Server error. Please try again later.';
+      if (error?.message?.includes('Missing redirect')) {
+        errorMessage = 'Missing redirect in Discourse settings. Please contact support.';
+      } else if (error?.message?.includes('Insufficient scopes')) {
+        errorMessage = 'Insufficient scopes. Please re-authenticate.';
       } else if (error?.message) {
         errorMessage = error.message;
       }
@@ -172,7 +160,7 @@ export default function SignInScreen() {
                   <SignIn size={20} color="#ffffff" weight="bold" />
                 </View>
                 <Text style={styles.primaryButtonText}>
-                  Sign In to TechRebels
+                  Connect to Forum
                 </Text>
               </View>
             )}

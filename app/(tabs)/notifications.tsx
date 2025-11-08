@@ -28,7 +28,9 @@ import {
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
-import { useApolloNotifications } from '../../hooks';
+import { useAuth } from '../../lib/auth';
+import { getNotifications, DiscourseNotificationsResponse } from '../../lib/discourse';
+import { useEffect, useState } from 'react';
 
 interface Notification {
   id: string;
@@ -327,15 +329,42 @@ function NotificationSection({
 
 export default function NotificationsScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  const {
-    notifications: apolloNotifications,
-    unreadCount,
-    loading,
-    error,
-    refresh,
-  } = useApolloNotifications();
+  const { authed } = useAuth();
+  const [notificationsData, setNotificationsData] = useState<DiscourseNotificationsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+
+  const loadNotifications = async () => {
+    if (!authed) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getNotifications();
+      setNotificationsData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to load notifications'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authed) {
+      loadNotifications();
+    }
+  }, [authed]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await loadNotifications();
+    setRefreshing(false);
+  };
+
+  const apolloNotifications = notificationsData?.notifications || [];
+  const unreadCount = apolloNotifications.filter(n => !n.read).length;
 
   const colors = {
     background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
@@ -348,7 +377,7 @@ export default function NotificationsScreen(): JSX.Element {
     error: isDark ? '#ef4444' : '#dc2626',
   };
 
-  // Transform Apollo notifications to UI format
+  // Transform Discourse notifications to UI format
   const notifications: Notification[] =
     apolloNotifications.filter(Boolean).map(formatNotification);
 
@@ -500,6 +529,20 @@ export default function NotificationsScreen(): JSX.Element {
         showBackButton={false}
         showProfileButton={true}
       />
+
+      {!authed && (
+        <View style={styles.notAuthedContainer}>
+          <Text style={[styles.notAuthedText, { color: colors.text }]}>
+            Please sign in to view notifications
+          </Text>
+          <TouchableOpacity
+            style={[styles.signInButton, { backgroundColor: colors.primary }]}
+            onPress={() => router.push('/(auth)/signin')}
+          >
+            <Text style={styles.signInButtonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Header Actions */}
       {(unreadCount > 0 || notifications.length > 0) && (
@@ -775,5 +818,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  notAuthedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  notAuthedText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  signInButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  signInButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

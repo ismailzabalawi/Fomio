@@ -37,6 +37,9 @@ export default {
       bffUrl: process.env.EXPO_PUBLIC_BFF_URL || 'http://localhost:8080',
       discourseApi: process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
       deepLinkScheme: process.env.EXPO_PUBLIC_DEEP_LINK_SCHEME || 'fomio',
+      DISCOURSE_BASE_URL: process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
+      APPLICATION_NAME: 'Fomio Mobile',
+      SCOPES: 'read,write,session,notifications',
     },
   },
 };

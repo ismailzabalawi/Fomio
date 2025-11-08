@@ -20,7 +20,9 @@ import { HeaderBar } from '../../components/nav/HeaderBar';
 import { useFeed } from '../../hooks/useFeed';
 import { useBffCategories } from '../../hooks/useBffCategories';
 import { useSearch } from '../../hooks';
-import { useAuthContext } from '../../components/shared/auth-provider';
+import { useAuth } from '../../lib/auth';
+import { getSession, getLatest, DiscourseLatestResponse, DiscourseSession } from '../../lib/discourse';
+import { useState, useEffect } from 'react';
 
 // Helper function to format relative time
 function formatRelativeTime(dateString: string): string {
@@ -70,7 +72,23 @@ export default function HomeScreen(): JSX.Element {
     isEmpty,
   } = useFeed();
   const { data: categoriesData } = useBffCategories();
-  const { isAuthenticated } = useAuthContext();
+  const { authed, user } = useAuth();
+  const [session, setSession] = useState<DiscourseSession | null>(null);
+  const [latestData, setLatestData] = useState<DiscourseLatestResponse | null>(null);
+
+  // Load session and latest data when authenticated
+  useEffect(() => {
+    if (authed) {
+      Promise.all([getSession(), getLatest()])
+        .then(([sessionData, latest]) => {
+          setSession(sessionData);
+          setLatestData(latest);
+        })
+        .catch((error) => {
+          console.error('Failed to load session/latest:', error);
+        });
+    }
+  }, [authed]);
 
   // Search functionality - manage query state locally
   const [query, setQuery] = useState('');
@@ -273,6 +291,21 @@ export default function HomeScreen(): JSX.Element {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <HeaderBar title="Feed" showBackButton={false} showProfileButton={true} />
+      
+      {/* Auth banner if not authenticated */}
+      {!authed && (
+        <View style={[styles.authBanner, { backgroundColor: colors.primary }]}>
+          <Text style={styles.authBannerText}>
+            Please sign in to view your feed
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/signin')}
+            style={styles.authBannerButton}
+          >
+            <Text style={styles.authBannerButtonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Conditional Search Input - Completely removed from layout when hidden */}
       {isSearchVisible && (
@@ -627,5 +660,30 @@ const styles = StyleSheet.create({
   },
   searchResultsSubtitle: {
     fontSize: 14,
+  },
+  authBanner: {
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  authBannerText: {
+    color: '#ffffff',
+    fontSize: 14,
+    flex: 1,
+  },
+  authBannerButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 8,
+  },
+  authBannerButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

@@ -11,8 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../../components/shared/theme-provider';
-import { useBffAuth } from '../../components/shared/bff-auth-provider';
 import { Button } from '../../components/ui/button';
+import * as WebBrowser from 'expo-web-browser';
+import Constants from 'expo-constants';
 import {
   UserPlus,
   Globe,
@@ -29,9 +30,12 @@ import {
   SHADOWS,
 } from '../../shared/theme-constants';
 
+const DISCOURSE_BASE_URL =
+  Constants.expoConfig?.extra?.DISCOURSE_BASE_URL ||
+  'https://meta.techrebels.info';
+
 export default function SignUpScreen() {
   const { isDark, isAmoled } = useTheme();
-  const { startLogin } = useBffAuth();
   const { width } = Dimensions.get('window');
 
   // Animation values
@@ -109,11 +113,12 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     try {
-      await startLogin();
-      router.replace('/(tabs)');
+      const signupUrl = `${DISCOURSE_BASE_URL}/signup`;
+      await WebBrowser.openBrowserAsync(signupUrl);
+      // After signup, user returns and presses Sign In to authorize
     } catch (error) {
       console.error('Sign up failed:', error);
-      Alert.alert('Sign Up Error', 'Failed to sign up. Please try again.', [
+      Alert.alert('Sign Up Error', 'Failed to open signup page. Please try again.', [
         { text: 'OK' },
       ]);
     }

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import { useBffAuth } from './bff-auth-provider';
+import { useAuth } from '../../lib/auth';
 import { useTheme } from './theme-provider';
 
 interface AuthGuardProps {
@@ -10,20 +10,20 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useBffAuth();
+  const { authed, ready } = useAuth();
   const { isDark } = useTheme();
 
   useEffect(() => {
-    if (!isLoading && requireAuth && !isAuthenticated) {
+    if (ready && requireAuth && !authed) {
       // Redirect to signin if authentication is required but user is not authenticated
       router.replace('/(auth)/signin');
-    } else if (!isLoading && !requireAuth && isAuthenticated) {
+    } else if (ready && !requireAuth && authed) {
       // Redirect to main app if user is authenticated but trying to access auth pages
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, isLoading, requireAuth]);
+  }, [authed, ready, requireAuth]);
 
-  if (isLoading) {
+  if (!ready) {
     return (
       <View
         style={{
@@ -42,7 +42,7 @@ export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
   }
 
   // If authentication is not required or user is authenticated, render children
-  if (!requireAuth || isAuthenticated) {
+  if (!requireAuth || authed) {
     return <>{children}</>;
   }
 

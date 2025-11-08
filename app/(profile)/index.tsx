@@ -34,9 +34,10 @@ import {
 } from 'phosphor-react-native';
 import { useTheme } from '../../components/shared/theme-provider';
 import { HeaderBar } from '../../components/nav/HeaderBar';
-import { User } from '../../api';
 import { router } from 'expo-router';
-import { useApolloProfile } from '../../hooks';
+import { useAuth } from '../../lib/auth';
+import { getSession, DiscourseSession } from '../../lib/discourse';
+import { useEffect, useState } from 'react';
 
 interface ProfileStats {
   posts: number;
@@ -166,14 +167,47 @@ function ActionButton({
 
 export default function ProfileScreen(): JSX.Element {
   const { isDark, isAmoled } = useTheme();
-  const {
-    user,
-    stats: apolloStats,
-    loading,
-    error,
-    refresh,
-  } = useApolloProfile();
+  const { authed } = useAuth();
+  const [session, setSession] = useState<DiscourseSession | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const loadProfile = async () => {
+    if (!authed) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getSession();
+      setSession(data);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to load profile'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authed) {
+      loadProfile();
+    }
+  }, [authed]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await loadProfile();
+    setRefreshing(false);
+  };
+
+  const user = session?.current_user;
+  const apolloStats = {
+    posts_count: 0,
+    topics_count: 0,
+    likes_received: 0,
+    followers_count: 0,
+    following_count: 0,
+  };
 
   const colors = {
     background: isAmoled ? '#000000' : isDark ? '#18181b' : '#ffffff',
@@ -259,22 +293,36 @@ export default function ProfileScreen(): JSX.Element {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <HeaderBar
-          title="Profile"
-          showBackButton={true}
-          showProfileButton={false}
-          onBack={handleBack}
-        />
+      <HeaderBar
+        title="Profile"
+        showBackButton={true}
+        showProfileButton={false}
+        onBack={handleBack}
+      />
+      {!authed ? (
+        <View style={styles.notAuthedContainer}>
+          <Text style={[styles.notAuthedText, { color: colors.text }]}>
+            Please sign in to view your profile
+          </Text>
+          <TouchableOpacity
+            style={[styles.signInButton, { backgroundColor: colors.primary }]}
+            onPress={() => router.push('/(auth)/signin')}
+          >
+            <Text style={styles.signInButtonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: colors.text }]}>
             Loading profile...
           </Text>
         </View>
+      )}
       </SafeAreaView>
     );
   }
 
-  if (error || !user) {
+  if ((error || !user) && authed) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
@@ -293,6 +341,32 @@ export default function ProfileScreen(): JSX.Element {
             <Text style={[styles.retryText, { color: colors.primary }]}>
               Retry
             </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!authed || !user) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <HeaderBar
+          title="Profile"
+          showBackButton={true}
+          showProfileButton={false}
+          onBack={handleBack}
+        />
+        <View style={styles.notAuthedContainer}>
+          <Text style={[styles.notAuthedText, { color: colors.text }]}>
+            Please sign in to view your profile
+          </Text>
+          <TouchableOpacity
+            style={[styles.signInButton, { backgroundColor: colors.primary }]}
+            onPress={() => router.push('/(auth)/signin')}
+          >
+            <Text style={styles.signInButtonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -468,7 +542,7 @@ export default function ProfileScreen(): JSX.Element {
                 Email
               </Text>
               <Text style={[styles.infoValue, { color: colors.text }]}>
-                {user.email}
+                {user.email || 'Not available'}
               </Text>
             </View>
 
@@ -706,6 +780,27 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 14,
+    fontWeight: '600',
+  },
+  notAuthedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  notAuthedText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  signInButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  signInButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
