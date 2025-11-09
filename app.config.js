@@ -36,7 +36,8 @@ export default {
       // Legacy BFF config (kept for backward compatibility)
       apiMode: process.env.EXPO_PUBLIC_API_MODE || 'rest',
       bffUrl: process.env.EXPO_PUBLIC_BFF_URL || 'http://localhost:8080',
-      discourseApi: process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
+      discourseApi:
+        process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
       deepLinkScheme: process.env.EXPO_PUBLIC_DEEP_LINK_SCHEME || 'fomio',
       // Discourse User API Key config
       DISCOURSE_BASE_URL:
