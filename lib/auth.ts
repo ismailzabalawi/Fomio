@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { loadUserApiKey, clearAll } from './store';
-import { authorizeWithDiscourse, revokeKey, getSession, DiscourseSession } from './discourse';
+import {
+  authorizeWithDiscourse,
+  revokeKey,
+  getSession,
+  DiscourseSession,
+} from './discourse';
 import { router } from 'expo-router';
 
 export interface AuthState {
