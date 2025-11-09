@@ -33,13 +33,21 @@ export default {
       typedRoutes: true,
     },
     extra: {
+      // Legacy BFF config (kept for backward compatibility)
       apiMode: process.env.EXPO_PUBLIC_API_MODE || 'rest',
       bffUrl: process.env.EXPO_PUBLIC_BFF_URL || 'http://localhost:8080',
       discourseApi: process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
       deepLinkScheme: process.env.EXPO_PUBLIC_DEEP_LINK_SCHEME || 'fomio',
-      DISCOURSE_BASE_URL: process.env.EXPO_PUBLIC_DISCOURSE_API || 'https://meta.techrebels.info',
-      APPLICATION_NAME: 'Fomio Mobile',
-      SCOPES: 'read,write,session,notifications',
+      // Discourse User API Key config
+      DISCOURSE_BASE_URL:
+        process.env.EXPO_PUBLIC_DISCOURSE_BASE_URL ||
+        process.env.EXPO_PUBLIC_DISCOURSE_API ||
+        'https://meta.techrebels.info',
+      APPLICATION_NAME:
+        process.env.EXPO_PUBLIC_APPLICATION_NAME || 'Fomio Mobile',
+      SCOPES:
+        process.env.EXPO_PUBLIC_DISCOURSE_SCOPES ||
+        'read,write,session,notifications',
     },
   },
 };
